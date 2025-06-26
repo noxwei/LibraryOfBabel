@@ -1,0 +1,66 @@
+{
+  "coordination_protocol": {
+    "communication_method": "shared_state_files",
+    "update_frequency": "on_task_completion",
+    "handoff_protocol": "dependency_based"
+  },
+  "agents": {
+    "librarian": {
+      "primary_responsibilities": [
+        "EPUB format analysis",
+        "Text extraction algorithms",
+        "Chunking strategies",
+        "Metadata extraction",
+        "Batch processing workflows"
+      ],
+      "deliverables": [
+        "src/epub_processor.py",
+        "src/text_chunker.py",
+        "docs/EPUB_FORMATS.md",
+        "config/processing_config.json"
+      ],
+      "dependencies": [],
+      "dependents": ["dba", "qa"]
+    },
+    "dba": {
+      "primary_responsibilities": [
+        "Database schema design",
+        "PostgreSQL optimization",
+        "Search indexing",
+        "Performance tuning",
+        "Backup procedures"
+      ],
+      "deliverables": [
+        "database/schema.sql",
+        "database/indexes.sql",
+        "database/setup.sh",
+        "docs/DATABASE_SCHEMA.md"
+      ],
+      "dependencies": ["librarian"],
+      "dependents": ["qa"]
+    },
+    "qa": {
+      "primary_responsibilities": [
+        "Test plan creation",
+        "Validation procedures",
+        "Performance benchmarking",
+        "Quality metrics",
+        "Integration testing"
+      ],
+      "deliverables": [
+        "tests/test_epub_processing.py",
+        "tests/test_database.py",
+        "tests/performance_benchmarks.py",
+        "docs/TESTING.md"
+      ],
+      "dependencies": ["librarian", "dba"],
+      "dependents": []
+    }
+  },
+  "success_criteria": {
+    "text_extraction_accuracy": ">95%",
+    "processing_speed": "10-20 books/hour",
+    "search_response_time": "<100ms simple, <500ms complex",
+    "test_coverage": ">90%"
+  }
+}

@@ -1,0 +1,109 @@
+# LibraryOfBabel - Personal Knowledge Base Project
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+postgresql_data/
+pgdata/
+*.dump
+
+# Logs
+*.log
+logs/
+.agents/agent_logs/
+
+# Output Data
+output/
+processed_books/
+temp/
+tmp/
+
+# Test Books (large files)
+ebooktestsamples/
+audiobook_samples/
+book_collection/
+
+# Configuration (may contain sensitive paths)
+config/local_config.json
+.env
+.env.local
+
+# Processing Results
+extraction_results/
+chunk_data/
+search_indexes/
+
+# Performance Monitoring
+performance_reports/
+benchmark_results/
+
+# Backup Files
+*.bak
+*.backup
+backup/
+
+# Large Models (if any)
+models/
+*.model
+*.bin
+
+# Documentation builds
+docs/_build/
+docs/build/
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
+
+# macOS
+*.app
+
+# Cache
+.cache/
+cache/
