@@ -1,0 +1,199 @@
+```python
+# Author: Zara Al-Mansouri (ST2025032)
+# Major: Digital Humanities - Algorithmic Narratives
+# Date: June 26, 2025
+# Topic: Algorithmic Narratives
+# Inspiration: Jill Lepore
+```
+
+## // Initial Commit
+
+```javascript
+// Recursive function to explore Algorithmic Narratives
+function exploreTopicRecursively(depth, context) {
+    if (depth === 0) return "understanding achieved";
+    
+    let insights = gatherData(context);
+    let patterns = analyzePatterns(insights);
+    let questions = generateQuestions(patterns);
+    
+    return questions.map(q => 
+        exploreTopicRecursively(depth - 1, q)
+    );
+}
+
+// The algorithm of understanding is never linear
+let investigation = exploreTopicRecursively(Infinity, "Algorithmic Narratives");
+```
+
+In the digital humanities, we learn to think with algorithms while thinking about algorithms. The recursive structure above mirrors how I find myself approaching Algorithmic Narratives—not as a destination to reach, but as a function to execute, a process that generates its own conditions.
+
+Data archaeology reveals layers of meaning embedded in digital traces. When I query the LibraryOfBabel database for "Algorithmic Narratives", what returns is not neutral information but encoded perspectives, algorithmic interpretations of human interpretations. The metadata carries ideology; the search algorithms embody assumptions about relevance and authority.
+
+```python
+# Pattern recognition in the corpus
+import re
+from collections import Counter
+
+def find_semantic_clusters(text_corpus, topic):
+    # Extract conceptual neighborhoods
+    windows = extract_context_windows(text_corpus, topic, window_size=50)
+    
+    # Identify co-occurrence patterns
+    clusters = cluster_by_semantic_similarity(windows)
+    
+    # Map the conceptual terrain
+    return {
+        'central_concepts': identify_key_nodes(clusters),
+        'boundary_concepts': find_edge_cases(clusters),
+        'absent_concepts': detect_silences(clusters, expected_vocabulary)
+    }
+```
+
+What emerges from this computational analysis is a topology of knowledge—peaks of attention, valleys of silence, unexpected connections bridging distant conceptual territories. Algorithmic Narratives appears not as a fixed entity but as a dynamic pattern in the flow of textual information.
+
+The poetics of code remind us that algorithms are cultural artifacts. Every function encodes values; every database reflects decisions about what matters enough to preserve and organize. To study Algorithmic Narratives computationally is to become complicit in these choices while also gaining tools to interrogate them.
+
+## Data Archaeology
+
+```javascript
+// Recursive function to explore Algorithmic Narratives
+function exploreTopicRecursively(depth, context) {
+    if (depth === 0) return "understanding achieved";
+    
+    let insights = gatherData(context);
+    let patterns = analyzePatterns(insights);
+    let questions = generateQuestions(patterns);
+    
+    return questions.map(q => 
+        exploreTopicRecursively(depth - 1, q)
+    );
+}
+
+// The algorithm of understanding is never linear
+let investigation = exploreTopicRecursively(Infinity, "Algorithmic Narratives");
+```
+
+In the digital humanities, we learn to think with algorithms while thinking about algorithms. The recursive structure above mirrors how I find myself approaching Algorithmic Narratives—not as a destination to reach, but as a function to execute, a process that generates its own conditions.
+
+Data archaeology reveals layers of meaning embedded in digital traces. When I query the LibraryOfBabel database for "Algorithmic Narratives", what returns is not neutral information but encoded perspectives, algorithmic interpretations of human interpretations. The metadata carries ideology; the search algorithms embody assumptions about relevance and authority.
+
+```python
+# Pattern recognition in the corpus
+import re
+from collections import Counter
+
+def find_semantic_clusters(text_corpus, topic):
+    # Extract conceptual neighborhoods
+    windows = extract_context_windows(text_corpus, topic, window_size=50)
+    
+    # Identify co-occurrence patterns
+    clusters = cluster_by_semantic_similarity(windows)
+    
+    # Map the conceptual terrain
+    return {
+        'central_concepts': identify_key_nodes(clusters),
+        'boundary_concepts': find_edge_cases(clusters),
+        'absent_concepts': detect_silences(clusters, expected_vocabulary)
+    }
+```
+
+What emerges from this computational analysis is a topology of knowledge—peaks of attention, valleys of silence, unexpected connections bridging distant conceptual territories. Algorithmic Narratives appears not as a fixed entity but as a dynamic pattern in the flow of textual information.
+
+The poetics of code remind us that algorithms are cultural artifacts. Every function encodes values; every database reflects decisions about what matters enough to preserve and organize. To study Algorithmic Narratives computationally is to become complicit in these choices while also gaining tools to interrogate them.
+
+## Pattern Recognition
+
+```javascript
+// Recursive function to explore Algorithmic Narratives
+function exploreTopicRecursively(depth, context) {
+    if (depth === 0) return "understanding achieved";
+    
+    let insights = gatherData(context);
+    let patterns = analyzePatterns(insights);
+    let questions = generateQuestions(patterns);
+    
+    return questions.map(q => 
+        exploreTopicRecursively(depth - 1, q)
+    );
+}
+
+// The algorithm of understanding is never linear
+let investigation = exploreTopicRecursively(Infinity, "Algorithmic Narratives");
+```
+
+In the digital humanities, we learn to think with algorithms while thinking about algorithms. The recursive structure above mirrors how I find myself approaching Algorithmic Narratives—not as a destination to reach, but as a function to execute, a process that generates its own conditions.
+
+Data archaeology reveals layers of meaning embedded in digital traces. When I query the LibraryOfBabel database for "Algorithmic Narratives", what returns is not neutral information but encoded perspectives, algorithmic interpretations of human interpretations. The metadata carries ideology; the search algorithms embody assumptions about relevance and authority.
+
+```python
+# Pattern recognition in the corpus
+import re
+from collections import Counter
+
+def find_semantic_clusters(text_corpus, topic):
+    # Extract conceptual neighborhoods
+    windows = extract_context_windows(text_corpus, topic, window_size=50)
+    
+    # Identify co-occurrence patterns
+    clusters = cluster_by_semantic_similarity(windows)
+    
+    # Map the conceptual terrain
+    return {
+        'central_concepts': identify_key_nodes(clusters),
+        'boundary_concepts': find_edge_cases(clusters),
+        'absent_concepts': detect_silences(clusters, expected_vocabulary)
+    }
+```
+
+What emerges from this computational analysis is a topology of knowledge—peaks of attention, valleys of silence, unexpected connections bridging distant conceptual territories. Algorithmic Narratives appears not as a fixed entity but as a dynamic pattern in the flow of textual information.
+
+The poetics of code remind us that algorithms are cultural artifacts. Every function encodes values; every database reflects decisions about what matters enough to preserve and organize. To study Algorithmic Narratives computationally is to become complicit in these choices while also gaining tools to interrogate them.
+
+## Version Control
+
+```javascript
+// Recursive function to explore Algorithmic Narratives
+function exploreTopicRecursively(depth, context) {
+    if (depth === 0) return "understanding achieved";
+    
+    let insights = gatherData(context);
+    let patterns = analyzePatterns(insights);
+    let questions = generateQuestions(patterns);
+    
+    return questions.map(q => 
+        exploreTopicRecursively(depth - 1, q)
+    );
+}
+
+// The algorithm of understanding is never linear
+let investigation = exploreTopicRecursively(Infinity, "Algorithmic Narratives");
+```
+
+In the digital humanities, we learn to think with algorithms while thinking about algorithms. The recursive structure above mirrors how I find myself approaching Algorithmic Narratives—not as a destination to reach, but as a function to execute, a process that generates its own conditions.
+
+Data archaeology reveals layers of meaning embedded in digital traces. When I query the LibraryOfBabel database for "Algorithmic Narratives", what returns is not neutral information but encoded perspectives, algorithmic interpretations of human interpretations. The metadata carries ideology; the search algorithms embody assumptions about relevance and authority.
+
+```python
+# Pattern recognition in the corpus
+import re
+from collections import Counter
+
+def find_semantic_clusters(text_corpus, topic):
+    # Extract conceptual neighborhoods
+    windows = extract_context_windows(text_corpus, topic, window_size=50)
+    
+    # Identify co-occurrence patterns
+    clusters = cluster_by_semantic_similarity(windows)
+    
+    # Map the conceptual terrain
+    return {
+        'central_concepts': identify_key_nodes(clusters),
+        'boundary_concepts': find_edge_cases(clusters),
+        'absent_concepts': detect_silences(clusters, expected_vocabulary)
+    }
+```
+
+What emerges from this computational analysis is a topology of knowledge—peaks of attention, valleys of silence, unexpected connections bridging distant conceptual territories. Algorithmic Narratives appears not as a fixed entity but as a dynamic pattern in the flow of textual information.
+
+The poetics of code remind us that algorithms are cultural artifacts. Every function encodes values; every database reflects decisions about what matters enough to preserve and organize. To study Algorithmic Narratives computationally is to become complicit in these choices while also gaining tools to interrogate them.

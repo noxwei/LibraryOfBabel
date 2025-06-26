@@ -1,0 +1,20 @@
+{
+  "ingestion_summary": {
+    "books_processed": 542,
+    "chunks_inserted": 18038,
+    "authors_created": 514,
+    "failed_books": 0,
+    "success_rate": 100.0
+  },
+  "performance_metrics": {
+    "total_processing_time_minutes": 2.32,
+    "books_per_hour": 14029.0,
+    "chunks_per_second": 129.7
+  },
+  "database_ready": {
+    "ready_for_queries": true,
+    "search_index_built": true,
+    "api_ready": true
+  },
+  "failed_files": []
+}
