@@ -70,6 +70,16 @@ ebooktestsamples/
 audiobook_samples/
 book_collection/
 
+# Audio Files (exclude files larger than 20MB)
+*.m4b
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.wma
+*.m4a
+
 # Configuration (may contain sensitive paths)
 config/local_config.json
 .env
