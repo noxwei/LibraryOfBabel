@@ -2,7 +2,14 @@
   "coordination_protocol": {
     "communication_method": "shared_state_files",
     "update_frequency": "on_task_completion",
-    "handoff_protocol": "dependency_based"
+    "handoff_protocol": "dependency_based",
+    "git_workflow": {
+      "production_branch": "main",
+      "development_branch": "dev",
+      "feature_branch_prefix": "feature/",
+      "qa_approval_required": true,
+      "merge_strategy": "pull_request_only"
+    }
   },
   "agents": {
     "librarian": {
@@ -42,19 +49,27 @@
     "qa": {
       "primary_responsibilities": [
         "Test plan creation",
-        "Validation procedures",
+        "Validation procedures", 
         "Performance benchmarking",
         "Quality metrics",
-        "Integration testing"
+        "Integration testing",
+        "Pull request reviews",
+        "Production deployment approval",
+        "Release management"
       ],
       "deliverables": [
         "tests/test_epub_processing.py",
-        "tests/test_database.py",
+        "tests/test_database.py", 
         "tests/performance_benchmarks.py",
         "docs/TESTING.md"
       ],
       "dependencies": ["librarian", "dba"],
-      "dependents": []
+      "dependents": [],
+      "git_permissions": {
+        "can_merge_to_main": true,
+        "can_approve_production_releases": true,
+        "required_for_dev_to_main_merge": true
+      }
     }
   },
   "success_criteria": {
