@@ -1,0 +1,210 @@
+{
+  "reddit_nerd_chaos_session": {
+    "total_attacks": 30,
+    "successful_attacks": 30,
+    "system_breaks": 0,
+    "success_rate": 100.0,
+    "avg_response_time": 306.482474009196
+  },
+  "discovered_vulnerabilities": [],
+  "successful_chaos_attacks": [
+    {
+      "query": "思想 Denken pensée",
+      "attack_type": "unicode_chaos",
+      "success": true,
+      "results_count": 0,
+      "response_time_ms": 1579.30588722229,
+      "results": [],
+      "timestamp": "2025-06-26T17:21:31.002026"
+    },
+    {
+      "query": "feminist object",
+      "attack_type": "content",
+      "success": true,
+      "results_count": 5,
+      "response_time_ms": 154.7400951385498,
+      "results": [
+        {
+          "title": "The Value of Everything",
+          "author": "Mariana Mazzucato",
+          "highlight": "<b>Feminists</b> in particular have long <b>objected</b> to the lack of recognition given to housework’s contribution"
+        },
+        {
+          "title": "The Value of Everything",
+          "author": "Mariana Mazzucato",
+          "highlight": "<b>Feminists</b> in particular have long <b>objected</b> to the lack of recognition given to housework’s contribution"
+        },
+        {
+          "title": "The Value of Everything",
+          "author": "Mariana Mazzucato",
+          "highlight": "<b>Feminists</b> in particular have long <b>objected</b> to the lack of recognition given to housework’s contribution"
+        }
+      ],
+      "timestamp": "2025-06-26T17:21:31.262907"
+    },
+    {
+      "query": "wordless narratives",
+      "attack_type": "content",
+      "success": true,
+      "results_count": 5,
+      "response_time_ms": 176.89800262451172,
+      "results": [
+        {
+          "title": "The Tale of Genji (unabridged)",
+          "author": "Shikibu Murasaki",
+          "highlight": "<b>narrative</b> and, in any case, the later chapters provide information that fills in the storyline. Thus, based on structural and stylistic elements of the text as a whole, I tend to believe that Kumogakure"
+        },
+        {
+          "title": "The Tale of Genji (unabridged)",
+          "author": "Shikibu Murasaki",
+          "highlight": "<b>narrative</b> and, in any case, the later chapters provide information that fills in the storyline. Thus, based on structural and stylistic elements of the text as a whole, I tend to believe that Kumogakure"
+        },
+        {
+          "title": "Adverse Event Race, Inequality, and the Testing of New Pharmaceuticals",
+          "author": "Jill A. Fisher",
+          "highlight": "conflicting assumptions about how healthy volunteers should engage risk information, again highlighting their ambivalence about"
+        }
+      ],
+      "timestamp": "2025-06-26T17:21:31.545516"
+    },
+    {
+      "query": "existentialism heroic fantasy",
+      "attack_type": "content",
+      "success": true,
+      "results_count": 0,
+      "response_time_ms": 126.32489204406738,
+      "results": [],
+      "timestamp": "2025-06-26T17:21:31.777156"
+    },
+    {
+      "query": "café naïveté résumé",
+      "attack_type": "unicode_chaos",
+      "success": true,
+      "results_count": 0,
+      "response_time_ms": 121.46973609924316,
+      "results": [],
+      "timestamp": "2025-06-26T17:21:32.003930"
+    },
+    {
+      "query": "wordless narratives",
+      "attack_type": "content",
+      "success": true,
+      "results_count": 5,
+      "response_time_ms": 169.79289054870605,
+      "results": [
+        {
+          "title": "The Tale of Genji (unabridged)",
+          "author": "Shikibu Murasaki",
+          "highlight": "<b>narrative</b> and, in any case, the later chapters provide information that fills in the storyline. Thus, based on structural and stylistic elements of the text as a whole, I tend to believe that Kumogakure"
+        },
+        {
+          "title": "The Tale of Genji (unabridged)",
+          "author": "Shikibu Murasaki",
+          "highlight": "<b>narrative</b> and, in any case, the later chapters provide information that fills in the storyline. Thus, based on structural and stylistic elements of the text as a whole, I tend to believe that Kumogakure"
+        },
+        {
+          "title": "Adverse Event Race, Inequality, and the Testing of New Pharmaceuticals",
+          "author": "Jill A. Fisher",
+          "highlight": "conflicting assumptions about how healthy volunteers should engage risk information, again highlighting their ambivalence about"
+        }
+      ],
+      "timestamp": "2025-06-26T17:21:32.275165"
+    },
+    {
+      "query": "🤔📚🔍💭✨",
+      "attack_type": "unicode_chaos",
+      "success": true,
+      "results_count": 0,
+      "response_time_ms": 130.22899627685547,
+      "results": [],
+      "timestamp": "2025-06-26T17:21:32.510706"
+    },
+    {
+      "query": "feminist structure",
+      "attack_type": "content",
+      "success": true,
+      "results_count": 5,
+      "response_time_ms": 143.70107650756836,
+      "results": [
+        {
+          "title": "Why I’m No Longer Talking to White People About Race",
+          "author": "Reni Eddo-Lodge",
+          "highlight": "<b>feminist</b> politics to be strangled, stoppered, and hindered by whiteness? If feminism can understand the patriarchy, it’s important to question why so many <b>feminists</b> struggle to understand whiteness as a political <b>structure</b>"
+        },
+        {
+          "title": "Why I’m No Longer Talking to White People About Race",
+          "author": "Reni Eddo-Lodge",
+          "highlight": "<b>feminist</b> politics to be strangled, stoppered, and hindered by whiteness? If feminism can understand the patriarchy, it’s important to question why so many <b>feminists</b> struggle to understand whiteness as a political <b>structure</b>"
+        },
+        {
+          "title": "Why I’m No Longer Talking to White People About Race",
+          "author": "Reni Eddo-Lodge",
+          "highlight": "<b>feminist</b> politics to be strangled, stoppered, and hindered by whiteness? If feminism can understand the patriarchy, it’s important to question why so many <b>feminists</b> struggle to understand whiteness as a political <b>structure</b>"
+        }
+      ],
+      "timestamp": "2025-06-26T17:21:32.756837"
+    },
+    {
+      "query": "the impossibility of communication",
+      "attack_type": "content",
+      "success": true,
+      "results_count": 5,
+      "response_time_ms": 167.53911972045898,
+      "results": [
+        {
+          "title": "Fall; or, Dodge in Hell",
+          "author": "Stephenson, Neal",
+          "highlight": "<b>communicate</b> with them. Mab tried many times to reach into it with her aura but found nothing there. Or rather found a soul whose organization was so different from theirs as to render <b>communication</b> <b>impossible</b>"
+        },
+        {
+          "title": "Fall; or, Dodge in Hell",
+          "author": "Stephenson, Neal",
+          "highlight": "<b>communicate</b> with them. Mab tried many times to reach into it with her aura but found nothing there. Or rather found a soul whose organization was so different from theirs as to render <b>communication</b> <b>impossible</b>"
+        },
+        {
+          "title": "Fall; or, Dodge in Hell",
+          "author": "Stephenson, Neal",
+          "highlight": "<b>communicate</b> with them. Mab tried many times to reach into it with her aura but found nothing there. Or rather found a soul whose organization was so different from theirs as to render <b>communication</b> <b>impossible</b>"
+        }
+      ],
+      "timestamp": "2025-06-26T17:21:33.029579"
+    },
+    {
+      "query": "1' OR '1'='1",
+      "attack_type": "content",
+      "success": true,
+      "results_count": 5,
+      "response_time_ms": 196.7470645904541,
+      "results": [
+        {
+          "title": "Death in a Promised Land",
+          "author": "Scott Ellsworth",
+          "highlight": "<b>1</b>; Tulsa World, October 30, p. <b>1</b>, November 2, p. <b>1</b>"
+        },
+        {
+          "title": "Death in a Promised Land",
+          "author": "Scott Ellsworth",
+          "highlight": "<b>1</b>; Tulsa World, October 30, p. <b>1</b>, November 2, p. <b>1</b>"
+        },
+        {
+          "title": "Death in a Promised Land",
+          "author": "Scott Ellsworth",
+          "highlight": "<b>1</b>; Tulsa World, October 30, p. <b>1</b>, November 2, p. <b>1</b>"
+        }
+      ],
+      "timestamp": "2025-06-26T17:21:33.328170"
+    }
+  ],
+  "interdisciplinary_effectiveness": {
+    "philosophy_finance_intersections": 0,
+    "unicode_attacks_handled": 5,
+    "sql_injection_blocked": 0
+  },
+  "recommendations_for_qa": [
+    "Implement better input sanitization for special characters",
+    "Add query complexity limits to prevent performance attacks",
+    "Enhance cross-domain search performance optimizations",
+    "Consider rate limiting for rapid-fire interdisciplinary queries",
+    "Add better error handling for edge case philosophy-fantasy intersections"
+  ]
+}

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 DB_CONFIG = {
     'host': 'localhost',
     'database': 'knowledge_base',
-    'user': 'postgres',
+    'user': 'weixiangzhang',
     'port': 5432
 }
 
@@ -422,4 +422,4 @@ if __name__ == '__main__':
     print("   GET  /api/suggest - Search suggestions")
     print("🔍 Ready for AI research agent queries!")
     
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5559, debug=False)
