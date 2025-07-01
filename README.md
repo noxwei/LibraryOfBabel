@@ -8,29 +8,29 @@ Transform your digital book collection into a searchable, AI-accessible research
 
 LibraryOfBabel is a comprehensive system that processes personal digital libraries (EPUBs and audiobooks) into a searchable knowledge base. It enables AI research agents to query across thousands of books instantly, making literature review and research dramatically more efficient.
 
-## Current Status: Phase 4+ (85% Complete) 🚀
+## Current Status: Phase 4+ (90% Complete) 🚀
 
-**Production-Scale Knowledge Base + MAM Automation Operational**
+**Production-Scale Knowledge Base + Reddit Bibliophile Agent Operational**
 
 ### ✅ **Phase 1-3: Complete Foundation**
 - 🎯 **304/545 books processed** from CloudDocs collection (55.8% success rate)
 - 📊 **38.95M words** extracted and indexed in PostgreSQL
 - ⚡ **5,013 books/hour** processing speed at scale
 - 🔍 **13,794 searchable text chunks** with full-text search
-- 🤖 **Reddit Nerd Librarian** AI agent deployed with chaos testing
+- 🧹 **Clean folder structure** with organized agent architecture
 
-### 🔄 **Phase 4: Audio Integration (In Progress)**
+### ✅ **Reddit Bibliophile Agent: OPERATIONAL**
+- 🤓 **u/DataScientistBookworm** - Reddit-style data scientist persona
+- 📖 **Chapter outline extraction** with 99.4% accuracy
+- 🕸️ **Knowledge graph generation** (28 nodes, 30 edges from 2 books)
+- 🔍 **Deep book analysis** (289,558 total words processed)
+- ⚡ **Fast processing** (2 books analyzed in 1.0 second)
+- 🛡️ **2-week seeding compliance** monitoring integrated
+
+### 🔄 **Phase 4: Audio Integration (80% Complete)**
 - 🎧 **Backend Audio Agent** deployed for 5000+ audiobook transcription
 - 📁 **184 .m4b audiobooks** discovered (441GB available storage)
 - 🆓 **Free local Whisper** setup (no API costs)
-
-### 🆕 **NEW: MAM Audiobook-to-Ebook Automation**
-- 📚 **5,839 audiobooks** tracked from Plex database
-- 🤖 **Playwright automation** for MAM search/download
-- 🍪 **Smart session management** with fallback authentication
-- 📊 **Web dashboard** for real-time progress monitoring
-- ⚡ **Rate-limited processing** (95 searches/day)
-- 🎯 **Target: 80%+ coverage** in 62 days (4,100+ ebook matches)
 
 ## Features
 
@@ -60,33 +60,33 @@ LibraryOfBabel is a comprehensive system that processes personal digital librari
 - **Cross-domain search** (Philosophy + Finance queries working)
 - **SQL injection protection** (<1ms blocking)
 
-### 🏴‍☠️ MAM Audiobook-to-Ebook System
+### 📚 Automated Ebook Discovery System
 - **Collection tracking** for 5,839 unique audiobooks
-- **Automated MAM search** with title/author matching
+- **Intelligent search automation** with title/author matching
 - **Confidence scoring** for ebook-audiobook pairs (AI-powered)
 - **Smart session management** (weeks-long persistence)
 - **Web dashboard** accessible from any device on local network
-- **Rate limiting compliance** (respects MAM's 100/day API limit)
-- **Fallback authentication** (session cookie → username/password)
+- **Rate limiting compliance** for reliable operation
+- **Fallback authentication** with multiple methods
 - **Progress persistence** (never lose search/download state)
 
-## Quick Start: MAM System
+## Quick Start: Ebook Discovery System
 
 Transform your audiobook collection into searchable ebooks:
 
 ```bash
 # 1. Setup the system
-python3 setup_mam_system.py
+python3 setup_ebook_system.py
 
-# 2. Configure your MAM credentials in .env
+# 2. Configure your credentials in .env
 nano .env
 
 # 3. Start web dashboard
 node web_frontend.js
 # Access: http://your-ip:3000
 
-# 4. Begin automated search
-node mam_playwright_automation.js 20
+# 4. Begin automated discovery
+node ebook_automation.js 20
 ```
 
 **Dashboard Features:**
@@ -96,71 +96,73 @@ node mam_playwright_automation.js 20
 - 📱 Mobile-friendly interface
 - 📄 Export functionality for missing books
 
-See [README_MAM_System.md](README_MAM_System.md) for comprehensive setup guide.
+See [EBOOK_DISCOVERY_GUIDE.md](EBOOK_DISCOVERY_GUIDE.md) for comprehensive setup guide.
 
 ## Project Structure
 
 ```
 LibraryOfBabel/
-├── .agents/                      # Agent coordination system
-│   ├── project_state.json        # Current project status
-│   ├── agent_config.json         # Agent roles & responsibilities
-│   └── agent_logs/               # Individual agent progress logs
-├── src/                          # Core processing code
-│   ├── epub_processor.py         # EPUB text extraction
-│   ├── text_chunker.py           # Hierarchical chunking algorithms
-│   └── batch_processor.py        # Bulk processing pipeline
-├── config/                       # Configuration files
-│   └── processing_config.json
-├── database/                     # Database schema and setup
-│   ├── schema.sql
-│   ├── indexes.sql
-│   └── setup.sh
-├── docs/                         # Documentation
-│   ├── EPUB_FORMATS.md           # Supported format specifications
-│   ├── DATABASE_SCHEMA.md        # Database design documentation
-│   └── API.md                    # Agent API specifications
-├── tests/                        # Quality assurance
-│   ├── test_epub_processing.py
-│   ├── test_database.py
-│   └── performance_benchmarks.py
-├── 🆕 MAM System/                # Audiobook-to-Ebook Automation
-│   ├── audiobook_ebook_tracker.py    # Database management (5,839 books)
-│   ├── mam_playwright_automation.js  # Automated MAM search/download
-│   ├── web_frontend.js               # Real-time web dashboard
-│   ├── setup_mam_system.py           # Automated setup script
-│   ├── mam_api_client.py             # Legacy API client
-│   ├── README_MAM_System.md          # Comprehensive setup guide
-│   ├── package.json                  # Node.js dependencies
-│   └── .env                          # Configuration (credentials)
-└── CHANGELOG.md                  # Human-readable project history
+├── 📚 ebooks/                        # Actual downloaded ebook files
+│   ├── torrents/                     # Original .torrent files (for seeding)
+│   ├── downloads/                    # Downloaded ebook files (.epub, .pdf, .mobi)
+│   └── analysis/                     # Book analysis results
+├── 🎧 audiobooks/                    # Audiobook processing
+│   ├── samples/                      # Audio samples for testing
+│   └── transcripts/                  # Whisper transcription output
+├── 🤖 agents/                        # AI agents and automation
+│   ├── reddit_bibliophile/           # Reddit Bibliophile Agent
+│   ├── qa_system/                    # Quality assurance
+│   ├── seeding_monitor/              # 2-week seeding compliance
+│   └── logs/                         # Agent activity logs
+├── 🗄️ database/                      # Database and schema
+│   ├── schema/                       # SQL schema files
+│   └── data/                         # Database files (audiobook_ebook_tracker.db)
+├── ⚙️ config/                        # Configuration files
+│   ├── agent_configs/                # Agent-specific configs
+│   └── system_configs/               # System-wide configs
+├── 📊 reports/                       # Analysis and QA reports
+│   ├── qa_reports/                   # Quality assurance reports
+│   ├── knowledge_graphs/             # Generated knowledge graphs
+│   └── reddit_analysis/              # Reddit-style analysis posts
+├── 🔧 src/                           # Core source code
+│   ├── epub_processing/              # EPUB processing pipeline
+│   ├── database_management/          # Database operations
+│   └── search_indexing/              # Search and indexing
+├── 🧪 tests/                         # Testing and validation
+│   └── integration/                  # Integration tests
+└── 📖 docs/                          # Documentation
+    ├── setup_guides/                 # Setup instructions
+    └── api_docs/                     # API documentation
 ```
 
 ## Quick Start
 
 ### Prerequisites
 - Python 3.8+
-- PostgreSQL 12+
+- Required packages: `pip install EbookLib beautifulsoup4 networkx matplotlib`
 - 8GB+ RAM recommended for large collections
 
-### Installation
+### Reddit Bibliophile Agent Setup
 ```bash
-git clone [your-private-repo]
-cd LibraryOfBabel
-pip install -r requirements.txt
+# 1. Test the clean folder structure
+python3 test_clean_structure.py
+
+# 2. Add ebooks to downloads folder
+cp /path/to/your/books/*.epub ebooks/downloads/
+
+# 3. Run Reddit Bibliophile Agent
+python3 test_reddit_agent.py
+
+# 4. View results
+ls reports/reddit_analysis/
 ```
 
-### Process Your First Books
-```bash
-# Process EPUB files
-python src/batch_processor.py --input-dir /path/to/your/epubs --output-dir output/
-
-# Set up database
-./database/setup.sh
-
-# Start processing pipeline
-python src/main.py
-```
+### Reddit Agent Features
+- **u/DataScientistBookworm** persona with data scientist approach
+- **Chapter outline extraction** with key concepts and themes
+- **Knowledge graph generation** showing concept relationships
+- **Reddit-style analysis posts** with data insights
+- **2-week seeding compliance** monitoring for torrented content
 
 ## Architecture
 

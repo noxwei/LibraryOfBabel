@@ -1,0 +1,166 @@
+{
+  "timestamp": "2025-07-01T18:37:51.553256",
+  "total_duration_seconds": 0.048941850662231445,
+  "tests_passed": 10,
+  "tests_failed": 2,
+  "tests_warning": 1,
+  "total_tests": 13,
+  "success_rate": 76.92307692307693,
+  "detailed_results": [
+    {
+      "test_name": "Database Connectivity",
+      "status": "passed",
+      "duration": 0.006100177764892578,
+      "details": {
+        "audiobook_count": 5839
+      },
+      "error": null
+    },
+    {
+      "test_name": "Required Tables Exist",
+      "status": "passed",
+      "duration": 0.00012493133544921875,
+      "details": {
+        "tables": [
+          "audiobooks",
+          "ebooks",
+          "sqlite_sequence",
+          "search_attempts",
+          "download_queue",
+          "collection_stats"
+        ]
+      },
+      "error": null
+    },
+    {
+      "test_name": "Data Consistency",
+      "status": "passed",
+      "duration": 0.019317150115966797,
+      "details": {
+        "orphaned_ebooks": 0,
+        "duplicate_audiobooks": 0
+      },
+      "error": null
+    },
+    {
+      "test_name": "MAM Downloads Directory",
+      "status": "passed",
+      "duration": 0.00032210350036621094,
+      "details": {
+        "path": "mam_downloads"
+      },
+      "error": null
+    },
+    {
+      "test_name": "Torrent Files Validation",
+      "status": "passed",
+      "duration": 8.296966552734375e-05,
+      "details": {
+        "total_torrents": 0,
+        "valid_torrents": 0,
+        "invalid_torrents": []
+      },
+      "error": null
+    },
+    {
+      "test_name": "Transmission CLI Available",
+      "status": "failed",
+      "duration": 0.0027618408203125,
+      "details": {},
+      "error": "transmission-remote not found"
+    },
+    {
+      "test_name": "Transmission Daemon Connection",
+      "status": "failed",
+      "duration": 0.0012230873107910156,
+      "details": {},
+      "error": "[Errno 2] No such file or directory: 'transmission-remote'"
+    },
+    {
+      "test_name": "Torrent Addition Test",
+      "status": "warning",
+      "duration": 6.914138793945312e-05,
+      "details": {},
+      "error": "No torrent files available for testing"
+    },
+    {
+      "test_name": "Web Frontend Accessibility",
+      "status": "passed",
+      "duration": 0.006335020065307617,
+      "details": {
+        "status_code": 200,
+        "port": 3000
+      },
+      "error": null
+    },
+    {
+      "test_name": "API Endpoints",
+      "status": "passed",
+      "duration": 0.010848045349121094,
+      "details": {
+        "/api/stats": {
+          "status_code": 200,
+          "response_time": 0.001117
+        },
+        "/api/audiobooks/missing": {
+          "status_code": 200,
+          "response_time": 0.003603
+        },
+        "/api/audiobooks/matched": {
+          "status_code": 200,
+          "response_time": 0.00093
+        },
+        "/api/searches/recent": {
+          "status_code": 200,
+          "response_time": 0.001624
+        },
+        "/api/downloads/queue": {
+          "status_code": 200,
+          "response_time": 0.001207
+        }
+      },
+      "error": null
+    },
+    {
+      "test_name": "Completed Downloads Analysis",
+      "status": "passed",
+      "duration": 0.00031304359436035156,
+      "details": {
+        "epub": 0,
+        "pdf": 0,
+        "mobi": 0,
+        "total": 0
+      },
+      "error": null
+    },
+    {
+      "test_name": "Database Query Performance",
+      "status": "passed",
+      "duration": 0.0005850791931152344,
+      "details": {
+        "query_times": {
+          "Count audiobooks": 0.00014901161193847656,
+          "Count ebooks": 1.0967254638671875e-05,
+          "Missing ebooks query": 0.0003020763397216797,
+          "Complex join query": 3.409385681152344e-05
+        },
+        "max_time": 0.0003020763397216797,
+        "avg_time": 0.0001240372657775879
+      },
+      "error": null
+    },
+    {
+      "test_name": "Torrent Files vs Database Consistency",
+      "status": "passed",
+      "duration": 0.00013184547424316406,
+      "details": {
+        "torrent_files_count": 0,
+        "torrent_ids_from_files": 0,
+        "torrent_ids_from_db": 0,
+        "files_not_in_db": 0,
+        "db_not_in_files": 0
+      },
+      "error": null
+    }
+  ]
+}
