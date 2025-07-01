@@ -8,9 +8,9 @@ Transform your digital book collection into a searchable, AI-accessible research
 
 LibraryOfBabel is a comprehensive system that processes personal digital libraries (EPUBs and audiobooks) into a searchable knowledge base. It enables AI research agents to query across thousands of books instantly, making literature review and research dramatically more efficient.
 
-## Current Status: Phase 4 (80% Complete) 🚀
+## Current Status: Phase 4+ (85% Complete) 🚀
 
-**Production-Scale Knowledge Base Operational** - Major achievements:
+**Production-Scale Knowledge Base + MAM Automation Operational**
 
 ### ✅ **Phase 1-3: Complete Foundation**
 - 🎯 **304/545 books processed** from CloudDocs collection (55.8% success rate)
@@ -23,8 +23,14 @@ LibraryOfBabel is a comprehensive system that processes personal digital librari
 - 🎧 **Backend Audio Agent** deployed for 5000+ audiobook transcription
 - 📁 **184 .m4b audiobooks** discovered (441GB available storage)
 - 🆓 **Free local Whisper** setup (no API costs)
-- 🧠 **Smart chunking** strategy (10-minute segments)
-- ⚡ **Dependencies installing** - ready for first transcription test
+
+### 🆕 **NEW: MAM Audiobook-to-Ebook Automation**
+- 📚 **5,839 audiobooks** tracked from Plex database
+- 🤖 **Playwright automation** for MAM search/download
+- 🍪 **Smart session management** with fallback authentication
+- 📊 **Web dashboard** for real-time progress monitoring
+- ⚡ **Rate-limited processing** (95 searches/day)
+- 🎯 **Target: 80%+ coverage** in 62 days (4,100+ ebook matches)
 
 ## Features
 
@@ -54,33 +60,80 @@ LibraryOfBabel is a comprehensive system that processes personal digital librari
 - **Cross-domain search** (Philosophy + Finance queries working)
 - **SQL injection protection** (<1ms blocking)
 
+### 🏴‍☠️ MAM Audiobook-to-Ebook System
+- **Collection tracking** for 5,839 unique audiobooks
+- **Automated MAM search** with title/author matching
+- **Confidence scoring** for ebook-audiobook pairs (AI-powered)
+- **Smart session management** (weeks-long persistence)
+- **Web dashboard** accessible from any device on local network
+- **Rate limiting compliance** (respects MAM's 100/day API limit)
+- **Fallback authentication** (session cookie → username/password)
+- **Progress persistence** (never lose search/download state)
+
+## Quick Start: MAM System
+
+Transform your audiobook collection into searchable ebooks:
+
+```bash
+# 1. Setup the system
+python3 setup_mam_system.py
+
+# 2. Configure your MAM credentials in .env
+nano .env
+
+# 3. Start web dashboard
+node web_frontend.js
+# Access: http://your-ip:3000
+
+# 4. Begin automated search
+node mam_playwright_automation.js 20
+```
+
+**Dashboard Features:**
+- 📊 Real-time collection statistics 
+- 📚 Missing vs matched book visualization
+- 🔄 Download progress tracking
+- 📱 Mobile-friendly interface
+- 📄 Export functionality for missing books
+
+See [README_MAM_System.md](README_MAM_System.md) for comprehensive setup guide.
+
 ## Project Structure
 
 ```
 LibraryOfBabel/
-├── .agents/                 # Agent coordination system
-│   ├── project_state.json   # Current project status
-│   ├── agent_config.json    # Agent roles & responsibilities
-│   └── agent_logs/          # Individual agent progress logs
-├── src/                     # Core processing code
-│   ├── epub_processor.py    # EPUB text extraction
-│   ├── text_chunker.py      # Hierarchical chunking algorithms
-│   └── batch_processor.py   # Bulk processing pipeline
-├── config/                  # Configuration files
+├── .agents/                      # Agent coordination system
+│   ├── project_state.json        # Current project status
+│   ├── agent_config.json         # Agent roles & responsibilities
+│   └── agent_logs/               # Individual agent progress logs
+├── src/                          # Core processing code
+│   ├── epub_processor.py         # EPUB text extraction
+│   ├── text_chunker.py           # Hierarchical chunking algorithms
+│   └── batch_processor.py        # Bulk processing pipeline
+├── config/                       # Configuration files
 │   └── processing_config.json
-├── database/                # Database schema and setup
+├── database/                     # Database schema and setup
 │   ├── schema.sql
 │   ├── indexes.sql
 │   └── setup.sh
-├── docs/                    # Documentation
-│   ├── EPUB_FORMATS.md      # Supported format specifications
-│   ├── DATABASE_SCHEMA.md   # Database design documentation
-│   └── API.md               # Agent API specifications
-├── tests/                   # Quality assurance
+├── docs/                         # Documentation
+│   ├── EPUB_FORMATS.md           # Supported format specifications
+│   ├── DATABASE_SCHEMA.md        # Database design documentation
+│   └── API.md                    # Agent API specifications
+├── tests/                        # Quality assurance
 │   ├── test_epub_processing.py
 │   ├── test_database.py
 │   └── performance_benchmarks.py
-└── CHANGELOG.md             # Human-readable project history
+├── 🆕 MAM System/                # Audiobook-to-Ebook Automation
+│   ├── audiobook_ebook_tracker.py    # Database management (5,839 books)
+│   ├── mam_playwright_automation.js  # Automated MAM search/download
+│   ├── web_frontend.js               # Real-time web dashboard
+│   ├── setup_mam_system.py           # Automated setup script
+│   ├── mam_api_client.py             # Legacy API client
+│   ├── README_MAM_System.md          # Comprehensive setup guide
+│   ├── package.json                  # Node.js dependencies
+│   └── .env                          # Configuration (credentials)
+└── CHANGELOG.md                  # Human-readable project history
 ```
 
 ## Quick Start

@@ -84,6 +84,36 @@ book_collection/
 config/local_config.json
 .env
 .env.local
+.env.production
+
+# MAM System Files
+mam_downloads/
+*.torrent
+mam_session.json
+mam_request_log.json
+mam_setup.log
+mam_client.log
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Database Files
+audiobook_ebook_tracker.db*
+missing_ebooks.json
+missing_ebooks.csv
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Transmission Downloads
+completed_ebooks/
+mam_session.json
 
 # Processing Results
 extraction_results/

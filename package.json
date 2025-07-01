@@ -1,0 +1,32 @@
+{
+  "name": "libraryofbabel",
+  "version": "1.0.0",
+  "description": "**Personal Knowledge Base Indexing System**",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noxwei/LibraryOfBabel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noxwei/LibraryOfBabel/issues"
+  },
+  "homepage": "https://github.com/noxwei/LibraryOfBabel#readme",
+  "dependencies": {
+    "@playwright/test": "^1.53.2",
+    "dotenv": "^17.0.1",
+    "express": "^5.1.0",
+    "playwright": "^1.53.2",
+    "sqlite3": "^5.1.7"
+  }
+}

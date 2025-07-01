@@ -608,18 +608,31 @@ The LibraryOfBabel project has **dramatically exceeded** initial expectations:
 
 ### 🔄 **PHASE 4: AUDIO INTEGRATION (80% Complete)**
 
-#### **Current Focus:**
+#### **Original Audio Plan:**
 - 🎧 **Backend Audio Agent deployed** with free local Whisper pipeline
 - 📁 **184 .m4b audiobooks discovered** (441GB storage available)
 - 🧠 **Smart chunking strategy** designed (10-minute segments)
-- ⚡ **Dependencies installing** - ready for first transcription test
+- ⚡ **Challenge**: 243 days of transcription time for 5,839 audiobooks
 
-#### **Immediate Next Actions:**
-1. Complete Whisper dependency installation
-2. Test first audiobook transcription (65MB sample)
-3. Validate transcription quality and processing speed
-4. Scale to larger audiobook batches
-5. Integrate audio transcripts with existing PostgreSQL database
+### 🆕 **PHASE 4.5: MAM AUDIOBOOK-TO-EBOOK AUTOMATION (NEW)**
+
+#### **Breakthrough Solution:**
+Instead of 8 months of transcription, leverage existing ebook versions:
+
+**System Deployed:**
+- 📚 **5,839 audiobooks tracked** from Plex database (not 1,607!)
+- 🤖 **Playwright automation** for MAM search/download
+- 🍪 **Smart session management** (auto-login → weeks-long persistence)
+- 📊 **Web dashboard** accessible from phone (http://10.0.0.13:3000)
+- ⚡ **Rate-limited processing** (95 searches/day, respects MAM limits)
+- 🎯 **Target**: 80%+ coverage in 62 days vs 243 days transcription
+
+**Key Files:**
+- `audiobook_ebook_tracker.py` - Database management (5,839 books)
+- `mam_playwright_automation.js` - Automated search/download
+- `web_frontend.js` - Real-time progress dashboard
+- `setup_mam_system.py` - One-command setup
+- `.env` - Auto-login configuration (no manual cookies needed)
 
 ### 📋 **PHASE 5: FULL PRODUCTION (Next)**
 
