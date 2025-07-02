@@ -1,12 +1,18 @@
 # LibraryOfBabel 📚
 
-**Personal Knowledge Base Indexing System**
+**Personal Knowledge Liberation System**
 
-Transform your digital book collection into a searchable, AI-accessible research library.
+Transform your digital ebook collection into a searchable, AI-accessible research library for unprecedented knowledge production.
 
 ## Overview
 
-LibraryOfBabel is a comprehensive system that processes personal digital libraries (EPUBs and audiobooks) into a searchable knowledge base. It enables AI research agents to query across thousands of books instantly, making literature review and research dramatically more efficient.
+LibraryOfBabel is a streamlined system focused on three core components:
+
+1. **📚 Ebook Processing**: Extract and index content from personal EPUB collections
+2. **🗄️ Database Management**: PostgreSQL-powered searchable knowledge base  
+3. **🔍 MAM Integration**: Automated ebook discovery and acquisition system
+
+The system enables instant AI-powered research across thousands of books, revolutionizing personal knowledge production.
 
 ## Current Status: Phase 4+ (90% Complete) 🚀
 
@@ -27,10 +33,10 @@ LibraryOfBabel is a comprehensive system that processes personal digital librari
 - ⚡ **Fast processing** (2 books analyzed in 1.0 second)
 - 🛡️ **2-week seeding compliance** monitoring integrated
 
-### 🔄 **Phase 4: Audio Integration (80% Complete)**
-- 🎧 **Backend Audio Agent** deployed for 5000+ audiobook transcription
-- 📁 **184 .m4b audiobooks** discovered (441GB available storage)
-- 🆓 **Free local Whisper** setup (no API costs)
+### 🔄 **Phase 4: Production Scale (In Progress)**
+- 📚 **Enhanced Processing Pipeline** for 5,600+ book collections
+- 🤖 **Advanced AI Agents** with Reddit Bibliophile improvements
+- 🔍 **Enhanced Search Features** and knowledge graph expansion
 
 ## Features
 
@@ -60,123 +66,91 @@ LibraryOfBabel is a comprehensive system that processes personal digital librari
 - **Cross-domain search** (Philosophy + Finance queries working)
 - **SQL injection protection** (<1ms blocking)
 
-### 📚 Automated Ebook Discovery System
-- **Collection tracking** for 5,839 unique audiobooks
-- **Intelligent search automation** with title/author matching
-- **Confidence scoring** for ebook-audiobook pairs (AI-powered)
+### 🔍 MAM Automated Ebook Discovery
+- **Intelligent search automation** with title/author matching  
 - **Smart session management** (weeks-long persistence)
 - **Web dashboard** accessible from any device on local network
 - **Rate limiting compliance** for reliable operation
-- **Fallback authentication** with multiple methods
 - **Progress persistence** (never lose search/download state)
 
-## Quick Start: Ebook Discovery System
+## Quick Start
 
-Transform your audiobook collection into searchable ebooks:
-
+### Core System Setup
 ```bash
-# 1. Setup the system
-python3 setup_ebook_system.py
+# 1. Install dependencies
+pip install -r requirements.txt
 
-# 2. Configure your credentials in .env
+# 2. Setup PostgreSQL database
+cd database/schema && ./setup.sh
+
+# 3. Process your ebook collection
+python3 src/epub_processor.py --input /path/to/ebooks/
+
+# 4. Start search API
+python3 src/api/search_api.py
+```
+
+### MAM Ebook Discovery
+```bash
+# 1. Configure credentials
 nano .env
 
-# 3. Start web dashboard
+# 2. Start web dashboard  
 node web_frontend.js
-# Access: http://your-ip:3000
 
-# 4. Begin automated discovery
+# 3. Begin automated discovery
 node ebook_automation.js 20
 ```
 
-**Dashboard Features:**
-- 📊 Real-time collection statistics 
-- 📚 Missing vs matched book visualization
-- 🔄 Download progress tracking
-- 📱 Mobile-friendly interface
-- 📄 Export functionality for missing books
-
-See [EBOOK_DISCOVERY_GUIDE.md](EBOOK_DISCOVERY_GUIDE.md) for comprehensive setup guide.
-
-## Project Structure
+## Core Architecture
 
 ```
 LibraryOfBabel/
-├── 📚 ebooks/                        # Actual downloaded ebook files
-│   ├── torrents/                     # Original .torrent files (for seeding)
-│   ├── downloads/                    # Downloaded ebook files (.epub, .pdf, .mobi)
-│   └── analysis/                     # Book analysis results
-├── 🎧 audiobooks/                    # Audiobook processing
-│   ├── samples/                      # Audio samples for testing
-│   └── transcripts/                  # Whisper transcription output
-├── 🤖 agents/                        # AI agents and automation
-│   ├── reddit_bibliophile/           # Reddit Bibliophile Agent
-│   ├── qa_system/                    # Quality assurance
-│   ├── seeding_monitor/              # 2-week seeding compliance
-│   └── logs/                         # Agent activity logs
-├── 🗄️ database/                      # Database and schema
-│   ├── schema/                       # SQL schema files
-│   └── data/                         # Database files (audiobook_ebook_tracker.db)
-├── ⚙️ config/                        # Configuration files
-│   ├── agent_configs/                # Agent-specific configs
-│   └── system_configs/               # System-wide configs
-├── 📊 reports/                       # Analysis and QA reports
-│   ├── qa_reports/                   # Quality assurance reports
-│   ├── knowledge_graphs/             # Generated knowledge graphs
-│   └── reddit_analysis/              # Reddit-style analysis posts
-├── 🔧 src/                           # Core source code
-│   ├── epub_processing/              # EPUB processing pipeline
+├── 📚 ebooks/                        # Downloaded ebook files (.epub, .pdf, .mobi)
+│   ├── downloads/                    # Processed ebook collection
+│   └── torrents/                     # For seeding compliance
+├── 🗄️ database/                      # PostgreSQL knowledge base
+│   ├── schema/                       # Database schema and setup
+│   └── data/                         # Database files and backups
+├── 🔧 src/                           # Core processing pipeline
+│   ├── epub_processing/              # EPUB text extraction
 │   ├── database_management/          # Database operations
-│   └── search_indexing/              # Search and indexing
-├── 🧪 tests/                         # Testing and validation
-│   └── integration/                  # Integration tests
-└── 📖 docs/                          # Documentation
-    ├── setup_guides/                 # Setup instructions
-    └── api_docs/                     # API documentation
+│   ├── api/                          # Search API endpoints
+│   └── search_indexing/              # Full-text search optimization
+├── 🤖 agents/                        # Essential AI agents
+│   ├── reddit_bibliophile/           # Book analysis agent
+│   ├── qa_system/                    # Quality assurance
+│   └── seeding_monitor/              # MAM compliance monitoring
+├── ⚙️ config/                        # System configuration
+├── 📊 reports/                       # Analysis outputs
+└── 📖 docs/                          # Technical documentation
 ```
 
 ## Quick Start
 
 ### Prerequisites
-- Python 3.8+
-- Required packages: `pip install EbookLib beautifulsoup4 networkx matplotlib`
+- Python 3.8+, PostgreSQL 12+
 - 8GB+ RAM recommended for large collections
+- Node.js (for MAM web dashboard)
 
-### Reddit Bibliophile Agent Setup
-```bash
-# 1. Test the clean folder structure
-python3 test_clean_structure.py
+### Core System Features
+- **EPUB Processing**: Extract and chunk text from ebook collections
+- **PostgreSQL Database**: 38.95M words indexed across 13,794 searchable chunks
+- **Search API**: Sub-100ms query response with full-text search
+- **MAM Integration**: Automated ebook discovery and download
+- **Reddit Bibliophile Agent**: Advanced book analysis and knowledge graphs
 
-# 2. Add ebooks to downloads folder
-cp /path/to/your/books/*.epub ebooks/downloads/
+## System Architecture
 
-# 3. Run Reddit Bibliophile Agent
-python3 test_reddit_agent.py
+### Three-Pillar Design
+1. **📚 Ebook Processing Pipeline**: EPUB extraction, text chunking, metadata handling
+2. **🗄️ PostgreSQL Knowledge Base**: Optimized for full-text search across millions of words  
+3. **🔍 MAM Integration System**: Automated ebook discovery and acquisition
 
-# 4. View results
-ls reports/reddit_analysis/
-```
-
-### Reddit Agent Features
-- **u/DataScientistBookworm** persona with data scientist approach
-- **Chapter outline extraction** with key concepts and themes
-- **Knowledge graph generation** showing concept relationships
-- **Reddit-style analysis posts** with data insights
-- **2-week seeding compliance** monitoring for torrented content
-
-## Architecture
-
-### Agent-Based Development
-The project uses specialized AI agents for different components:
-
-- **🔬 Librarian Agent**: EPUB processing and CloudDocs import (304 books processed)
-- **🗄️ DBA Agent**: PostgreSQL schema and search optimization (13,794 chunks indexed)
-- **🤓 Reddit Nerd Librarian**: Interdisciplinary research with chaos testing (9 attack patterns)
-- **✅ QA Agent**: Security fixes and vulnerability testing (75% fix success rate)
-- **🎧 Backend Audio Agent**: Whisper transcription pipeline (184 audiobooks ready)
-
-### LLM-Agnostic Design
-All agents communicate through structured JSON files, making the system compatible with any LLM (Claude, GPT, etc.).
+### Essential AI Agents
+- **Reddit Bibliophile**: Advanced book analysis with knowledge graph generation
+- **QA System**: Automated testing and vulnerability detection
+- **Seeding Monitor**: MAM compliance and torrent management
 
 ## Performance Metrics
 
@@ -220,17 +194,17 @@ All agents communicate through structured JSON files, making the system compatib
 - Cross-domain search functionality (Philosophy + Finance)
 - SQL injection protection (<1ms blocking)
 
-### 🔄 Phase 4: Audio Integration (80% Complete)
-- Backend Audio Agent deployed for 5000+ audiobooks
-- Free local Whisper transcription pipeline
-- 184 .m4b audiobooks discovered (441GB storage ready)
-- Smart chunking strategy (10-minute segments)
+### 🔄 Phase 4: Production Scale (In Progress)
+- Enhanced processing pipeline for 5,600+ book collections
+- Advanced AI agent improvements and coordination
+- Enhanced search capabilities and analytics
+- System optimization and monitoring tools
 
 ### 📋 Phase 5: Full Production (Next)
 - Complete 5,600+ book collection processing
 - Advanced semantic search features
 - System monitoring and maintenance automation
-- Multi-modal search across text and audio
+- Production deployment with enhanced reliability
 
 ## Contributing
 
@@ -253,7 +227,7 @@ Private research project. All rights reserved.
 
 ---
 
-*Building the future of personal knowledge management, one book at a time.*
+*Liberating knowledge through intelligent automation and searchable personal libraries.*
 
-**Status**: Phase 4 (80% Complete) | Production-Scale Knowledge Base Operational | Next: Audio Integration
-**Last Updated**: June 26, 2025
+**Status**: Phase 4 (90% Complete) | Streamlined Ebook-Focus Branch | Core Mission: Knowledge Liberation
+**Last Updated**: July 2, 2025

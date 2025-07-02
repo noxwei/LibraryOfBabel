@@ -1,10 +1,10 @@
 # Personal Knowledge Base Indexing Project
 
-## Building a Searchable AI-Accessible Library from Digital Collections
+## Building a Searchable AI-Accessible Library from Digital Ebook Collections
 
 ### Project Overview
 
-Create a comprehensive, searchable knowledge base from personal digital library collections (EPUBs and audiobooks) that can be efficiently queried by AI research agents. This system will provide instantaneous access to hundreds of millions of words across thousands of books, enabling unprecedented research capabilities for independent scholarship.
+Create a comprehensive, searchable knowledge base from personal digital ebook collections (EPUBs) that can be efficiently queried by AI research agents. This system will provide instantaneous access to hundreds of millions of words across thousands of books, enabling unprecedented research capabilities for independent scholarship.
 
 ### Core Objectives
 
@@ -183,89 +183,7 @@ CREATE INDEX idx_chunks_book ON chunks(book_id);
 
 -----
 
-## PHASE 3: Audiobook Integration (Week 5-6)
-
-### Speech-to-Text Pipeline
-
-#### Audio Processing Objectives
-
-- **Target**: Process 50-100 audiobook files
-- **Goal**: Integrate transcribed audio with text database
-- **Challenge**: Handle large audio files efficiently
-
-#### Technical Implementation
-
-##### A. Audio Transcription Pipeline
-
-**Transcription Workflow:**
-
-1. **Audio preprocessing**: Normalize volume, remove silence
-2. **Chunking strategy**: Split audio into manageable segments
-3. **Speech-to-text**: Use Whisper or similar for transcription
-4. **Quality assessment**: Confidence scoring for transcriptions
-5. **Post-processing**: Clean up transcription artifacts
-
-**Whisper Integration:**
-
-```python
-# Pseudo-code for audio processing
-import whisper
-model = whisper.load_model("large")
-
-def process_audiobook(audio_file_path):
-    # Load and preprocess audio
-    # Chunk into segments (30-60 second chunks)
-    # Transcribe each chunk
-    # Combine transcripts with timestamps
-    # Clean and format text output
-```
-
-##### B. Audio-Text Alignment
-
-**Synchronization Strategy:**
-
-- **Chapter alignment**: Match audio chapters to transcript sections
-- **Timestamp tracking**: Maintain audio position references
-- **Quality indicators**: Confidence scores for each section
-- **Cross-validation**: Compare with existing text versions when available
-
-##### C. Unified Database Schema
-
-**Extended schema for audio content:**
-
-```sql
--- Audio files table
-CREATE TABLE audiobooks (
-    audiobook_id SERIAL PRIMARY KEY,
-    book_id INTEGER REFERENCES books(book_id),
-    audio_file_path VARCHAR(1000),
-    duration_seconds INTEGER,
-    transcription_confidence FLOAT,
-    processed_date TIMESTAMP DEFAULT NOW()
-);
-
--- Audio chunks table
-CREATE TABLE audio_chunks (
-    audio_chunk_id SERIAL PRIMARY KEY,
-    audiobook_id INTEGER REFERENCES audiobooks(audiobook_id),
-    chunk_id INTEGER REFERENCES chunks(chunk_id),
-    start_time_seconds INTEGER,
-    end_time_seconds INTEGER,
-    transcription_confidence FLOAT
-);
-```
-
-#### Phase 3 Deliverables
-
-- [ ] Audio transcription pipeline using Whisper
-- [ ] Audio-text synchronization system
-- [ ] Unified search across text and audio sources
-- [ ] Quality assessment metrics for transcriptions
-- [ ] Batch processing for audiobook collections
-
------
-
-## PHASE 4: AI Agent Integration (Week 7-8)
+## PHASE 3: AI Agent Integration (Week 5-6)
 
 ### Research Agent Interface
 
@@ -346,7 +264,7 @@ def extract_quotes(topic, context_length=200):
 
 -----
 
-## PHASE 5: Full Scale Implementation (Week 9-12)
+## PHASE 4: Full Scale Implementation (Week 7-10)
 
 ### Complete Library Processing
 
@@ -419,14 +337,13 @@ def extract_quotes(topic, context_length=200):
 
 - **Database**: PostgreSQL with full-text search extensions
 - **Programming**: Python for processing scripts
-- **Audio Processing**: OpenAI Whisper for transcription
 - **Text Processing**: NLTK or spaCy for natural language processing
 - **Web Interface**: Flask or FastAPI for agent API
 
 ### Performance Targets
 
 - **Search Response**: <100ms for simple queries, <500ms for complex
-- **Processing Speed**: 10-20 books per hour for EPUBs, 2-5 per hour for audiobooks
+- **Processing Speed**: 10-20 books per hour for EPUBs
 - **Database Size**: ~10GB for complete collection
 - **Concurrent Users**: Support 5-10 simultaneous AI agents
 
@@ -457,15 +374,7 @@ def extract_quotes(topic, context_length=200):
 - Process 100-500 books
 - Performance benchmarking
 
-### Week 5-6: Audio Integration (Phase 3)
-
-- Implement Whisper transcription pipeline
-- Audio-text synchronization
-- Unified search across all content types
-- Process 50-100 audiobooks
-- Quality assessment procedures
-
-### Week 7-8: AI Integration (Phase 4)
+### Week 5-6: AI Integration (Phase 3)
 
 - Develop API for AI agent access
 - Natural language query processing
@@ -473,7 +382,7 @@ def extract_quotes(topic, context_length=200):
 - Integration testing with existing AI workflows
 - Multi-agent support
 
-### Week 9-12: Production System (Phase 5)
+### Week 7-10: Production System (Phase 4)
 
 - Process complete 5,600+ book collection
 - System optimization and tuning
@@ -603,11 +512,10 @@ The LibraryOfBabel project has **dramatically exceeded** initial expectations:
 - ✅ **Clean folder structure** with organized agent architecture
 - ✅ **Fast processing** (2 books analyzed in 1.0 second)
 
-#### **AI Agent Ecosystem Operational:**
+#### **Essential AI Agent System:**
 - ✅ **Reddit Bibliophile Agent** - Chapter outlines & knowledge graphs working
 - ✅ **QA Agent** - Security testing and vulnerability fixes (75% success rate)
-- ✅ **DBA Agent** - Database optimization and performance tuning  
-- ✅ **Backend Audio Agent** - Ready for 5000+ audiobook transcription
+- ✅ **Seeding Monitor** - MAM compliance and torrent management
 
 #### **Advanced Features Working:**
 - ✅ **Cross-domain search** (Philosophy + Finance queries functional)
@@ -619,17 +527,17 @@ The LibraryOfBabel project has **dramatically exceeded** initial expectations:
 ### 🔄 **PHASE 5: FULL PRODUCTION (In Progress)**
 
 #### **Current Focus:**
-- 🎧 **Backend Audio Agent** ready for 5000+ audiobook transcription
-- 📁 **184 .m4b audiobooks** discovered (441GB storage available)
-- 🧠 **Smart chunking strategy** designed (10-minute segments)
-- 🔧 **System optimization** for complete 5,600+ book collection
+- 📚 **Ebook Processing Pipeline** optimized for 5,600+ books
+- 🔧 **System optimization** for complete book collection
+- 🤖 **AI Agent Enhancement** with Reddit Bibliophile improvements
+- 📊 **Advanced Analytics** and knowledge graph generation
 
 #### **Immediate Next Actions:**
-1. Process complete ebook collection with Reddit agent
-2. Deploy audio transcription pipeline at scale
-3. Advanced semantic search features
+1. Scale ebook processing to complete 5,600+ book collection
+2. Enhance MAM integration for automated ebook discovery
+3. Advanced semantic search and knowledge graph features
 4. System monitoring and maintenance automation
-5. Multi-modal search across text and audio content
+5. Production deployment optimization
 
 ### 📋 **PROJECT SUCCESS METRICS ACHIEVED**
 
@@ -647,6 +555,6 @@ The LibraryOfBabel project has **dramatically exceeded** initial expectations:
 
 -----
 
-*Project Status: **Phase 5 (90% Complete)** | Reddit Bibliophile Agent Operational*
-*Current Focus: Scale to full collection processing*
-*Next Milestone: Complete production deployment*
+*Project Status: **Phase 4 (90% Complete)** | Streamlined Ebook-Focus Branch*
+*Current Focus: Knowledge Liberation through Three-Pillar Architecture*
+*Next Milestone: Production-scale ebook processing and MAM integration*
