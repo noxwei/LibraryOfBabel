@@ -38,7 +38,7 @@ def get_db():
             return None
     return g.db
 
-def close_db(e=None):
+def close_db_connection(e=None):
     """Close database connection"""
     db = g.pop('db', None)
     if db is not None:
@@ -46,7 +46,7 @@ def close_db(e=None):
 
 @app.teardown_appcontext
 def close_db(error):
-    close_db()
+    close_db_connection()
 
 def format_search_results(results: List[Dict], query_time: float, total_count: int = None) -> Dict:
     """Format search results for AI agent consumption"""
