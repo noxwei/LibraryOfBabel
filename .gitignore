@@ -147,3 +147,4 @@ docs/build/
 # Cache
 .cache/
 cache/
+*.epub
