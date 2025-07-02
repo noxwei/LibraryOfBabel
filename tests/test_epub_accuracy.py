@@ -23,7 +23,7 @@ import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 
 # Add src directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.insert(0, Path(os.path.dirname(__file__), '..', 'src'))
 
 from epub_processor import EPUBProcessor
 from text_chunker import TextChunker

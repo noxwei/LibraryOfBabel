@@ -144,7 +144,7 @@ class EPUBProcessor:
     def _process_epub_directory(self, epub_dir: str) -> Tuple[BookMetadata, List[ChapterInfo]]:
         """Process extracted EPUB directory."""
         # Find and parse the OPF file
-        container_path = os.path.join(epub_dir, 'META-INF', 'container.xml')
+        container_path = Path(epub_dir, 'META-INF', 'container.xml')
         if not os.path.exists(container_path):
             raise ValueError("Invalid EPUB: Missing container.xml")
         
@@ -155,7 +155,7 @@ class EPUBProcessor:
         if not opf_path:
             raise ValueError("Invalid EPUB: Could not find OPF path")
         
-        opf_full_path = os.path.join(epub_dir, opf_path)
+        opf_full_path = Path(epub_dir, opf_path)
         if not os.path.exists(opf_full_path):
             raise ValueError("Invalid EPUB: OPF file not found")
         
@@ -372,7 +372,7 @@ class EPUBProcessor:
             if opf_dir:
                 file_path = f"{opf_dir}/{file_path}"
             
-            full_file_path = os.path.join(epub_dir, file_path)
+            full_file_path = Path(epub_dir, file_path)
             
             # Skip if file should be excluded
             filename = os.path.basename(file_path).lower()

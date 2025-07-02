@@ -17,9 +17,9 @@ import subprocess
 # Test configuration
 API_BASE = "http://localhost:5000/api"
 DB_CONFIG = {
-    'host': 'localhost',
-    'database': 'knowledge_base',
-    'user': 'postgres',
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'database': os.getenv('DB_NAME', 'knowledge_base'),
+    'user': os.getenv('DB_USER', 'postgres'),
     'port': 5432
 }
 
