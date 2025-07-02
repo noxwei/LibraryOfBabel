@@ -1,0 +1,142 @@
+{
+  "timestamp": "2025-07-01T23:24:37.557288",
+  "project_root": "/Users/weixiangzhang/Local Dev/LibraryOfBabel",
+  "technical_debt_summary": {
+    "total_issues": 262,
+    "issues_by_severity": {
+      "low": 169,
+      "medium": 93
+    },
+    "issues_by_type": {
+      "missing_type_hints": 122,
+      "import_order": 25,
+      "long_function": 62,
+      "hardcoded_config": 31,
+      "path_handling": 17,
+      "todo_comment": 5
+    },
+    "estimated_total_effort_minutes": 3805
+  },
+  "top_priority_fixes": [
+    {
+      "file_path": "/Users/weixiangzhang/Local Dev/LibraryOfBabel/analyze_completed_downloads.py",
+      "issue_type": "long_function",
+      "line_number": 84,
+      "description": "Function 'analyze_all_downloads' is 75 lines long",
+      "severity": "medium",
+      "fix_suggestion": "Consider breaking into smaller functions",
+      "estimated_effort": 30
+    },
+    {
+      "file_path": "/Users/weixiangzhang/Local Dev/LibraryOfBabel/analyze_completed_downloads.py",
+      "issue_type": "long_function",
+      "line_number": 330,
+      "description": "Function 'find_audiobook_matches' is 55 lines long",
+      "severity": "medium",
+      "fix_suggestion": "Consider breaking into smaller functions",
+      "estimated_effort": 30
+    },
+    {
+      "file_path": "/Users/weixiangzhang/Local Dev/LibraryOfBabel/audiobook_ebook_tracker.py",
+      "issue_type": "long_function",
+      "line_number": 64,
+      "description": "Function 'init_database' is 85 lines long",
+      "severity": "medium",
+      "fix_suggestion": "Consider breaking into smaller functions",
+      "estimated_effort": 30
+    },
+    {
+      "file_path": "/Users/weixiangzhang/Local Dev/LibraryOfBabel/audiobook_ebook_tracker.py",
+      "issue_type": "long_function",
+      "line_number": 150,
+      "description": "Function 'import_audiobooks_from_plex' is 86 lines long",
+      "severity": "medium",
+      "fix_suggestion": "Consider breaking into smaller functions",
+      "estimated_effort": 30
+    },
+    {
+      "file_path": "/Users/weixiangzhang/Local Dev/LibraryOfBabel/audiobook_ebook_tracker.py",
+      "issue_type": "long_function",
+      "line_number": 358,
+      "description": "Function 'calculate_collection_stats' is 58 lines long",
+      "severity": "medium",
+      "fix_suggestion": "Consider breaking into smaller functions",
+      "estimated_effort": 30
+    },
+    {
+      "file_path": "/Users/weixiangzhang/Local Dev/LibraryOfBabel/mam_api_client.py",
+      "issue_type": "long_function",
+      "line_number": 357,
+      "description": "Function 'main' is 72 lines long",
+      "severity": "medium",
+      "fix_suggestion": "Consider breaking into smaller functions",
+      "estimated_effort": 30
+    },
+    {
+      "file_path": "/Users/weixiangzhang/Local Dev/LibraryOfBabel/mam_api_client.py",
+      "issue_type": "long_function",
+      "line_number": 137,
+      "description": "Function 'search_ebooks' is 58 lines long",
+      "severity": "medium",
+      "fix_suggestion": "Consider breaking into smaller functions",
+      "estimated_effort": 30
+    },
+    {
+      "file_path": "/Users/weixiangzhang/Local Dev/LibraryOfBabel/chaos_attack.py",
+      "issue_type": "long_function",
+      "line_number": 98,
+      "description": "Function 'attack_search' is 93 lines long",
+      "severity": "medium",
+      "fix_suggestion": "Consider breaking into smaller functions",
+      "estimated_effort": 30
+    },
+    {
+      "file_path": "/Users/weixiangzhang/Local Dev/LibraryOfBabel/database/schema/ingest_data.py",
+      "issue_type": "long_function",
+      "line_number": 107,
+      "description": "Function 'insert_book' is 58 lines long",
+      "severity": "medium",
+      "fix_suggestion": "Consider breaking into smaller functions",
+      "estimated_effort": 30
+    },
+    {
+      "file_path": "/Users/weixiangzhang/Local Dev/LibraryOfBabel/database/schema/ingest_data.py",
+      "issue_type": "long_function",
+      "line_number": 291,
+      "description": "Function 'run_ingestion' is 56 lines long",
+      "severity": "medium",
+      "fix_suggestion": "Consider breaking into smaller functions",
+      "estimated_effort": 30
+    }
+  ],
+  "files_with_most_issues": [
+    [
+      "/Users/weixiangzhang/Local Dev/LibraryOfBabel/tests/test_performance.py",
+      20
+    ],
+    [
+      "/Users/weixiangzhang/Local Dev/LibraryOfBabel/tests/test_integration.py",
+      20
+    ],
+    [
+      "/Users/weixiangzhang/Local Dev/LibraryOfBabel/tests/test_database_integration.py",
+      16
+    ],
+    [
+      "/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+      16
+    ],
+    [
+      "/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/api/search_api.py",
+      16
+    ]
+  ],
+  "recommendations": [
+    "Implement environment-based configuration management",
+    "Set up automatic import sorting with isort or black",
+    "Refactor large functions into smaller, focused functions",
+    "Add type hints for better code maintainability",
+    "Set up pre-commit hooks for code quality checks",
+    "Consider adding automated code formatting with black"
+  ]
+}

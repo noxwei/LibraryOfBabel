@@ -22,7 +22,7 @@ from typing import Dict, List, Tuple, Optional
 import tempfile
 
 # Add src directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.insert(0, Path(os.path.dirname(__file__), '..', 'src'))
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)

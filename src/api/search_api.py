@@ -10,6 +10,7 @@ import psycopg2.extras
 import logging
 import time
 import re
+import os
 from typing import Dict, List, Any, Optional
 import json
 from datetime import datetime
@@ -20,9 +21,9 @@ logger = logging.getLogger(__name__)
 
 # Database configuration
 DB_CONFIG = {
-    'host': 'localhost',
-    'database': 'knowledge_base',
-    'user': 'weixiangzhang',
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'database': os.getenv('DB_NAME', 'knowledge_base'),
+    'user': os.getenv('DB_USER', 'weixiangzhang'),
     'port': 5432
 }
 
@@ -37,7 +38,7 @@ def get_db():
             return None
     return g.db
 
-def close_db(e=None):
+def close_db_connection(e=None):
     """Close database connection"""
     db = g.pop('db', None)
     if db is not None:
@@ -45,7 +46,7 @@ def close_db(e=None):
 
 @app.teardown_appcontext
 def close_db(error):
-    close_db()
+    close_db_connection()
 
 def format_search_results(results: List[Dict], query_time: float, total_count: int = None) -> Dict:
     """Format search results for AI agent consumption"""
