@@ -441,10 +441,10 @@ class DownloadPipeline:
 async def test_download_pipeline():
     """Test the download pipeline with sample book"""
     db_config = {
-        'host': 'localhost',
+        'host': os.getenv('DB_HOST', 'localhost'),
         'port': 5432,
         'database': 'libraryofbabel',
-        'user': 'libraryofbabel_user',
+        'user': os.getenv('DB_USER', 'libraryofbabel_user'),
         'password': 'your_password'
     }
     

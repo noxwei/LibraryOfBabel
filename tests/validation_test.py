@@ -12,9 +12,9 @@ import json
 class ValidationTest:
     def __init__(self):
         self.db_config = {
-            'host': 'localhost',
-            'database': 'knowledge_base', 
-            'user': 'weixiangzhang',
+            'host': os.getenv('DB_HOST', 'localhost'),
+            'database': os.getenv('DB_NAME', 'knowledge_base'), 
+            'user': os.getenv('DB_USER', 'weixiangzhang'),
             'port': 5432
         }
     

@@ -94,7 +94,7 @@ class BatchProcessor:
         
         # Look for EPUB directories (extracted EPUBs)
         for item in os.listdir(directory):
-            item_path = os.path.join(directory, item)
+            item_path = Path(directory, item)
             
             # Check if it's a directory ending with .epub
             if os.path.isdir(item_path) and item.lower().endswith('.epub'):
@@ -111,13 +111,13 @@ class BatchProcessor:
     def _is_valid_epub_directory(self, directory: str) -> bool:
         """Check if directory contains valid EPUB structure."""
         # Check for required EPUB files
-        meta_inf = os.path.join(directory, 'META-INF')
-        container_xml = os.path.join(meta_inf, 'container.xml')
-        mimetype = os.path.join(directory, 'mimetype')
+        meta_inf = Path(directory, 'META-INF')
+        container_xml = Path(meta_inf, 'container.xml')
+        mimetype = Path(directory, 'mimetype')
         
         return (os.path.exists(meta_inf) and 
                 os.path.exists(container_xml) and
-                (os.path.exists(mimetype) or os.path.exists(os.path.join(directory, 'OEBPS'))))
+                (os.path.exists(mimetype) or os.path.exists(Path(directory, 'OEBPS'))))
     
     def process_directory(self, directory: str, output_dir: str) -> Dict:
         """Process all EPUB files in a directory."""
@@ -220,7 +220,7 @@ class BatchProcessor:
         clean_name = "".join(c for c in base_name if c.isalnum() or c in (' ', '-', '_')).strip()
         clean_name = clean_name.replace(' ', '_')
         
-        return os.path.join(output_dir, f"{clean_name}_processed.json")
+        return Path(output_dir, f"{clean_name}_processed.json")
     
     def _save_results(self, data: Dict, output_file: str):
         """Save processing results to file."""

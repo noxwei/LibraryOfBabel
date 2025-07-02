@@ -25,8 +25,8 @@ import psycopg2.extras
 
 # Configuration
 DATABASE_CONFIG = {
-    'host': 'localhost',
-    'database': 'knowledge_base',
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'database': os.getenv('DB_NAME', 'knowledge_base'),
     'user': os.getenv('POSTGRES_USER', os.getenv('USER')),  # Use system user as default
     'password': os.getenv('POSTGRES_PASSWORD', ''),  # No password for local development
     'port': 5432

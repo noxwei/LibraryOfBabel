@@ -211,7 +211,7 @@ class LibraryOfBabelQAAgent:
             'temp_download_dir': '/Users/weixiangzhang/Media Holding Station/Temporary Download',
             'completed_downloads_dir': '/Users/weixiangzhang/Media Holding Station/Ebooks',
             'transmission': {
-                'host': 'localhost',
+                'host': os.getenv('DB_HOST', 'localhost'),
                 'port': 9091,
                 'username': None,
                 'password': None

@@ -533,7 +533,7 @@ def main():
     
     # Default configuration
     config = {
-        'host': 'localhost',
+        'host': os.getenv('DB_HOST', 'localhost'),
         'port': 9091,
         'username': None,
         'password': None,
