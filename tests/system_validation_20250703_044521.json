@@ -1,0 +1,30 @@
+{
+  "tests": [
+    [
+      "Database",
+      "pass",
+      "1286 chunks"
+    ],
+    [
+      "Ollama",
+      "pass",
+      "8 models"
+    ],
+    [
+      "Essay API",
+      "fail",
+      "Not running"
+    ],
+    [
+      "Reference Essay",
+      "pass",
+      "2051 words"
+    ],
+    [
+      "QA System",
+      "pass",
+      "Import OK"
+    ]
+  ],
+  "overall_status": "degraded"
+}
