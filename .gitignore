@@ -148,3 +148,6 @@ docs/build/
 .cache/
 cache/
 *.epub
+*.pdf
+*.db-shm
+*.db-wal
