@@ -25,6 +25,13 @@ from text_chunker import TextChunker
 
 logger = logging.getLogger(__name__)
 
+class PathJSONEncoder(json.JSONEncoder):
+    """JSON encoder that handles Path objects by converting them to strings."""
+    def default(self, obj):
+        if isinstance(obj, Path):
+            return str(obj)
+        return super().default(obj)
+
 class BatchProcessor:
     """Batch processes EPUB files with memory efficiency and error handling."""
     
@@ -185,12 +192,12 @@ class BatchProcessor:
             
             # Prepare output data with enum conversion
             output_data = {
-                'metadata': asdict(metadata),
-                'chapters': [asdict(chapter) for chapter in chapters],
+                'metadata': self._convert_paths_to_strings(asdict(metadata)),
+                'chapters': [self._convert_paths_to_strings(asdict(chapter)) for chapter in chapters],
                 'chunks': [self._chunk_to_dict(chunk) for chunk in chunks],
                 'processing_info': {
                     'processed_at': time.time(),
-                    'epub_path': epub_path,
+                    'epub_path': str(epub_path),
                     'chapter_count': len(chapters),
                     'word_count': metadata.total_words,
                     'chunk_count': len(chunks)
@@ -211,7 +218,20 @@ class BatchProcessor:
         chunk_dict = asdict(chunk)
         # Convert enum to string
         chunk_dict['chunk_type'] = chunk.chunk_type.value
+        # Convert any Path objects to strings
+        chunk_dict = self._convert_paths_to_strings(chunk_dict)
         return chunk_dict
+    
+    def _convert_paths_to_strings(self, obj):
+        """Recursively convert Path objects to strings in nested dictionaries/lists."""
+        if isinstance(obj, Path):
+            return str(obj)
+        elif isinstance(obj, dict):
+            return {key: self._convert_paths_to_strings(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self._convert_paths_to_strings(item) for item in obj]
+        else:
+            return obj
     
     def _get_output_filename(self, epub_path: str, output_dir: str) -> str:
         """Generate output filename for processed EPUB."""
@@ -225,8 +245,10 @@ class BatchProcessor:
     def _save_results(self, data: Dict, output_file: str):
         """Save processing results to file."""
         try:
+            # Apply path conversion to entire data structure before saving
+            clean_data = self._convert_paths_to_strings(data)
             with open(output_file, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+                json.dump(clean_data, f, indent=2, ensure_ascii=False)
             logger.debug(f"Saved results to: {output_file}")
         except Exception as e:
             logger.error(f"Failed to save results to {output_file}: {e}")
