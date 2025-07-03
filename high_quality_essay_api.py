@@ -18,6 +18,7 @@ import os
 from threading import Thread
 import queue
 import numpy as np
+import pickle
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -39,15 +40,16 @@ class HighQualityEssayGenerator:
         
         # Model hierarchy - from highest to lowest quality
         self.model_hierarchy = [
-            'qwen2.5:32b',      # 32B parameter model - highest quality
-            'llama3.1:70b',     # 70B if available (quantized)
-            'qwen2.5:14b',      # 14B parameter model - high quality
-            'llama3.1:8b',      # 8B parameter model - good quality
-            'qwen2.5:7b'        # 7B parameter model - fallback
+            'deepseek-r1:8b',   # 8B parameter model - better for creative writing
+            'gemma2:9b',        # 9B parameter model - good for essays
+            'qwen2.5-coder:14b', # 14B parameter model - analytical writing
+            'llama3.1:8b',      # 8B parameter model - fallback
+            'llama3.2:latest'   # 3B parameter model - final fallback
         ]
         
         self.selected_model = self.select_best_available_model()
-        self.generation_queue = {}
+        self.essays_file = "/Users/weixiangzhang/Local Dev/LibraryOfBabel/essays_archive.pkl"
+        self.generation_queue = self.load_essays()
         
         # Enhanced processing settings for quality
         self.max_context_length = 32768  # Use full context for larger models
@@ -56,8 +58,8 @@ class HighQualityEssayGenerator:
             'top_p': 0.85,          # More selective token sampling
             'top_k': 30,            # Reduced for higher quality
             'repeat_penalty': 1.1,  # Prevent repetition
-            'num_predict': 6000,    # Allow very long responses
-            'num_ctx': 32768,       # Full context window
+            'num_predict': 2000,    # Shorter responses to avoid memory issues
+            'num_ctx': 8192,        # Reduced context window
             'mirostat': 2,          # Advanced sampling for coherence
             'mirostat_eta': 0.1,    # Fine-tuned for essay quality
             'mirostat_tau': 5.0     # Target perplexity for coherence
@@ -88,6 +90,26 @@ class HighQualityEssayGenerator:
         
         # Ultimate fallback
         return 'llama3.1:8b'
+    
+    def load_essays(self) -> Dict:
+        """Load saved essays from file"""
+        try:
+            if os.path.exists(self.essays_file):
+                with open(self.essays_file, 'rb') as f:
+                    return pickle.load(f)
+            return {}
+        except Exception as e:
+            logger.error(f"Error loading essays: {e}")
+            return {}
+    
+    def save_essays(self):
+        """Save essays to file"""
+        try:
+            os.makedirs(os.path.dirname(self.essays_file), exist_ok=True)
+            with open(self.essays_file, 'wb') as f:
+                pickle.dump(self.generation_queue, f)
+        except Exception as e:
+            logger.error(f"Error saving essays: {e}")
     
     def get_sophisticated_sources(self, query: str, limit: int = 12) -> List[Dict]:
         """Get high-quality sources with simplified approach"""
@@ -189,7 +211,9 @@ class HighQualityEssayGenerator:
         config = style_configurations.get(style, style_configurations["journalistic"])
         
         # Create sophisticated prompt
-        prompt = f"""You are an exceptional intellectual writer with deep expertise across philosophy, social theory, technology studies, and cultural criticism. You have been commissioned to write a substantial essay on: {topic}
+        prompt = f"""You are an academic writer creating an original analytical essay. Using the provided source materials as references and inspiration, write a comprehensive essay on: {topic}
+
+IMPORTANT: This is NOT plagiarism - you are synthesizing information from multiple sources to create original analysis. All sources are properly cited and attributed.
 
 WRITING SPECIFICATIONS:
 • Style: {config['tone']}
@@ -198,7 +222,7 @@ WRITING SPECIFICATIONS:
 • Argumentation: {config['argumentation']}
 
 ESSAY REQUIREMENTS:
-• Length: 3,500-4,500 words (substantial intellectual treatment)
+• Length: 1,500-2,500 words (substantial but manageable for the model)
 • Intellectual Depth: Move beyond surface analysis to generate novel theoretical insights
 • Cross-Domain Synthesis: Connect insights across the {len(genres_covered)} different genres represented in sources
 • Original Framework: Develop a unique theoretical lens or analytical framework
@@ -323,6 +347,9 @@ Write the complete essay now:"""
                 'authors_count': len(unique_authors)
             })
             
+            # Save essays after successful generation
+            self.save_essays()
+            
         except Exception as e:
             logger.error(f"Essay generation error: {e}")
             self.generation_queue[essay_id].update({
@@ -335,6 +362,161 @@ Write the complete essay now:"""
 generator = HighQualityEssayGenerator()
 
 # Enhanced web interface for quality generation
+ESSAY_MANAGEMENT_PAGE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LibraryOfBabel - Essay Archive</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 20px; background: #0d1117; color: #c9d1d9; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #58a6ff; border-bottom: 2px solid #21262d; padding-bottom: 15px; font-weight: 600; }
+        .nav { margin-bottom: 30px; }
+        .nav a { color: #58a6ff; text-decoration: none; margin-right: 20px; padding: 10px 15px; border: 1px solid #30363d; border-radius: 6px; display: inline-block; }
+        .nav a:hover { background: #21262d; }
+        .essay-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .essay-card { background: #21262d; border-radius: 8px; padding: 20px; border-left: 4px solid #58a6ff; }
+        .essay-title { font-size: 18px; font-weight: 600; color: #ffa657; margin-bottom: 10px; }
+        .essay-meta { font-size: 14px; color: #8b949e; margin-bottom: 15px; }
+        .essay-preview { font-size: 13px; line-height: 1.5; color: #c9d1d9; margin-bottom: 15px; }
+        .essay-actions { display: flex; gap: 10px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; text-decoration: none; display: inline-block; }
+        .btn-primary { background: #238636; color: white; }
+        .btn-danger { background: #da3633; color: white; }
+        .btn:hover { opacity: 0.9; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #8b949e; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+        .modal-content { background: #21262d; margin: 5% auto; padding: 30px; width: 90%; max-width: 900px; border-radius: 8px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { color: #58a6ff; font-size: 20px; font-weight: 600; }
+        .close { background: none; border: none; font-size: 24px; color: #8b949e; cursor: pointer; }
+        .essay-content { background: #0d1117; padding: 25px; border-radius: 6px; white-space: pre-wrap; line-height: 1.8; font-family: 'SF Mono', Consolas, monospace; font-size: 14px; }
+        .loading { text-align: center; padding: 40px; color: #8b949e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 LibraryOfBabel Essay Archive</h1>
+        
+        <div class="nav">
+            <a href="/">🏠 Generate New Essay</a>
+            <a href="/essays">📖 Essay Archive</a>
+            <a href="/api/health">🔍 System Health</a>
+            <a href="/api/essays">🔗 API Essays</a>
+        </div>
+        
+        <div id="essayContainer">
+            <div class="loading">Loading essays...</div>
+        </div>
+    </div>
+
+    <!-- Essay Viewer Modal -->
+    <div id="essayModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Essay Title</div>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalContent" class="essay-content">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        let essays = [];
+        
+        async function loadEssays() {
+            try {
+                const response = await fetch('/api/essays');
+                const data = await response.json();
+                essays = data.essays || [];
+                renderEssays();
+            } catch (error) {
+                document.getElementById('essayContainer').innerHTML = 
+                    '<div class="empty-state">❌ Error loading essays: ' + error.message + '</div>';
+            }
+        }
+        
+        function renderEssays() {
+            const container = document.getElementById('essayContainer');
+            
+            if (essays.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        📝 No essays generated yet<br>
+                        <a href="/" style="color: #58a6ff;">Generate your first essay</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            const grid = essays.map(essay => `
+                <div class="essay-card">
+                    <div class="essay-title">${essay.topic}</div>
+                    <div class="essay-meta">
+                        📅 ${new Date(essay.created_at).toLocaleString()}<br>
+                        🎨 ${essay.style} • 📊 ${essay.word_count} words • 🤖 ${essay.model_used}
+                    </div>
+                    <div class="essay-preview">${essay.preview}</div>
+                    <div class="essay-actions">
+                        <button class="btn btn-primary" onclick="openEssay('${essay.id}')">📖 Read</button>
+                        <button class="btn btn-danger" onclick="deleteEssay('${essay.id}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = '<div class="essay-grid">' + grid + '</div>';
+        }
+        
+        async function openEssay(essayId) {
+            try {
+                const response = await fetch('/api/essays/' + essayId);
+                const data = await response.json();
+                
+                document.getElementById('modalTitle').textContent = data.topic;
+                document.getElementById('modalContent').textContent = data.essay;
+                document.getElementById('essayModal').style.display = 'block';
+                
+            } catch (error) {
+                alert('Error loading essay: ' + error.message);
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('essayModal').style.display = 'none';
+        }
+        
+        async function deleteEssay(essayId) {
+            if (!confirm('Are you sure you want to delete this essay?')) return;
+            
+            try {
+                const response = await fetch('/api/essays/' + essayId, { method: 'DELETE' });
+                if (response.ok) {
+                    essays = essays.filter(e => e.id !== essayId);
+                    renderEssays();
+                } else {
+                    alert('Error deleting essay');
+                }
+            } catch (error) {
+                alert('Error deleting essay: ' + error.message);
+            }
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('essayModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+        
+        // Load essays on page load
+        loadEssays();
+    </script>
+</body>
+</html>
+"""
+
 QUALITY_WEB_INTERFACE = """
 <!DOCTYPE html>
 <html>
@@ -369,6 +551,13 @@ QUALITY_WEB_INTERFACE = """
     <div class="container">
         <h1>📚 LibraryOfBabel Quality Essay Generator</h1>
         <div class="subtitle">High-quality intellectual essays generated using your personal knowledge corpus and advanced language models</div>
+        
+        <div class="nav" style="margin-bottom: 30px;">
+            <a href="/" style="color: #58a6ff; text-decoration: none; margin-right: 20px; padding: 10px 15px; border: 1px solid #30363d; border-radius: 6px; display: inline-block;">🏠 Generate Essay</a>
+            <a href="/essays" style="color: #58a6ff; text-decoration: none; margin-right: 20px; padding: 10px 15px; border: 1px solid #30363d; border-radius: 6px; display: inline-block;">📖 Essay Archive</a>
+            <a href="/api/health" style="color: #58a6ff; text-decoration: none; margin-right: 20px; padding: 10px 15px; border: 1px solid #30363d; border-radius: 6px; display: inline-block;">🔍 System Health</a>
+            <a href="/api/essays" style="color: #58a6ff; text-decoration: none; margin-right: 20px; padding: 10px 15px; border: 1px solid #30363d; border-radius: 6px; display: inline-block;">🔗 API Essays</a>
+        </div>
         
         <div class="model-info">
             <strong>🤖 Current Model:</strong> <span id="currentModel">{{ current_model }}</span>
@@ -573,6 +762,107 @@ def get_status(essay_id):
         return jsonify({'error': 'Essay ID not found'}), 404
     
     return jsonify(generator.generation_queue[essay_id])
+
+@app.route('/api/essays')
+def list_essays():
+    """List all generated essays"""
+    try:
+        essays = []
+        for essay_id, data in generator.generation_queue.items():
+            if data.get('status') == 'completed' and data.get('essay'):
+                essays.append({
+                    'id': essay_id,
+                    'topic': data.get('topic', 'Unknown'),
+                    'style': data.get('style', 'Unknown'),
+                    'word_count': data.get('word_count', 0),
+                    'created_at': data.get('completed_at', data.get('created_at')),
+                    'model_used': data.get('model_used', 'Unknown'),
+                    'preview': data.get('essay', '')[:200] + '...' if data.get('essay') else ''
+                })
+        
+        # Sort by creation date, newest first
+        essays.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        return jsonify({'essays': essays})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/essays/<essay_id>')
+def get_essay(essay_id):
+    """Get full essay content"""
+    if essay_id not in generator.generation_queue:
+        return jsonify({'error': 'Essay not found'}), 404
+    
+    data = generator.generation_queue[essay_id]
+    if data.get('status') != 'completed':
+        return jsonify({'error': 'Essay not completed'}), 400
+    
+    return jsonify(data)
+
+@app.route('/api/essays/<essay_id>', methods=['DELETE'])
+def delete_essay(essay_id):
+    """Delete an essay"""
+    if essay_id not in generator.generation_queue:
+        return jsonify({'error': 'Essay not found'}), 404
+    
+    del generator.generation_queue[essay_id]
+    generator.save_essays()  # Save after deletion
+    return jsonify({'message': 'Essay deleted successfully'})
+
+@app.route('/essays')
+def essays_page():
+    """Essay management page"""
+    return render_template_string(ESSAY_MANAGEMENT_PAGE)
+
+@app.route('/api')
+def api_docs():
+    """API documentation"""
+    docs = {
+        "LibraryOfBabel Essay Generation API": {
+            "version": "1.0",
+            "endpoints": {
+                "POST /api/generate": {
+                    "description": "Generate a new essay",
+                    "parameters": {
+                        "topic": "Essay topic/title (required)",
+                        "style": "Writing style: journalistic, academic, analytical, experimental",
+                        "search_query": "Optional search terms for source material"
+                    },
+                    "returns": "Essay generation ID for status polling"
+                },
+                "GET /api/status/<essay_id>": {
+                    "description": "Check essay generation status",
+                    "returns": "Status: queued, analyzing_corpus, crafting_essay, completed, error"
+                },
+                "GET /api/essays": {
+                    "description": "List all completed essays",
+                    "returns": "Array of essay metadata with previews"
+                },
+                "GET /api/essays/<essay_id>": {
+                    "description": "Get full essay content",
+                    "returns": "Complete essay data including content and metadata"
+                },
+                "DELETE /api/essays/<essay_id>": {
+                    "description": "Delete an essay",
+                    "returns": "Success confirmation"
+                },
+                "GET /api/health": {
+                    "description": "System health check",
+                    "returns": "Database status, Ollama status, model info, and metrics"
+                }
+            },
+            "example_usage": {
+                "curl_generate": "curl -X POST http://localhost:5571/api/generate -H 'Content-Type: application/json' -d '{\"topic\":\"Knowledge systems\",\"style\":\"journalistic\"}'",
+                "curl_status": "curl http://localhost:5571/api/status/abc123",
+                "curl_list": "curl http://localhost:5571/api/essays",
+                "curl_read": "curl http://localhost:5571/api/essays/abc123",
+                "curl_delete": "curl -X DELETE http://localhost:5571/api/essays/abc123"
+            },
+            "current_model": generator.selected_model,
+            "total_essays": len([e for e in generator.generation_queue.values() if e.get('status') == 'completed'])
+        }
+    }
+    return jsonify(docs)
 
 @app.route('/api/health')
 def health_check():
