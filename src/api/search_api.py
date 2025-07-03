@@ -154,6 +154,8 @@ def search():
             if len(concepts) < 2:
                 return jsonify({"error": "Cross-reference search requires at least 2 concepts"}), 400
             results = search_cross_reference(cursor, concepts, limit)
+        elif search_type == 'semantic':
+            results = search_semantic(query, limit)
         else:
             return jsonify({"error": f"Unsupported search type: {search_type}"}), 400
         
@@ -281,6 +283,38 @@ def search_cross_reference(cursor, concepts: List[str], limit: int) -> List[Dict
     
     return [dict(row) for row in cursor.fetchall()]
 
+def search_semantic(query: str, limit: int) -> List[Dict]:
+    """Semantic search using vector embeddings"""
+    try:
+        # Import here to avoid circular dependencies
+        import sys
+        import os
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        sys.path.insert(0, os.path.join(project_root, 'src'))
+        from vector_embeddings import VectorEmbeddingGenerator
+        
+        generator = VectorEmbeddingGenerator()
+        results = generator.semantic_search(query, limit)
+        
+        # Format results for API consistency
+        formatted_results = []
+        for result in results:
+            formatted_results.append({
+                'title': result['title'],
+                'author': result['author'],
+                'chunk_type': result['chunk_type'],
+                'similarity_score': result['similarity_score'],
+                'content_preview': result['content_preview'],
+                'chapter_number': result.get('chapter_number'),
+                'publication_year': result.get('publication_year')
+            })
+        
+        return formatted_results
+        
+    except Exception as e:
+        logger.error(f"Semantic search failed: {e}")
+        return []
+
 @app.route('/api/stats', methods=['GET'])
 def get_stats():
     """Get knowledge base statistics"""
@@ -378,6 +412,7 @@ def suggest_queries():
             "Search by content: 'artificial intelligence'",
             "Search by author: 'type=author&q=AuthorName'",
             "Cross-reference: 'type=cross_reference&q=democracy,technology'",
+            "Semantic search: 'type=semantic&q=consciousness and meaning'",
             "Find titles: 'type=title&q=history'"
         ]
         
@@ -406,6 +441,7 @@ if __name__ == '__main__':
     print("   POST /api/search - Advanced search with JSON payload")
     print("   GET  /api/stats - Knowledge base statistics")
     print("   GET  /api/suggest - Search suggestions")
+    print("   🧠 Semantic search: type=semantic&q=your_query")
     print("🔍 Ready for AI research agent queries!")
     
     app.run(host='0.0.0.0', port=5559, debug=False)
