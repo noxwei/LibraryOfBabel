@@ -1,0 +1,59 @@
+{
+  "name": "library-of-babel",
+  "version": "1.0.0",
+  "description": "Digital implementation of Borges' Library of Babel with procedural generation and mystical interface",
+  "main": "babel-backend/src/server.js",
+  "scripts": {
+    "install-all": "npm install && cd babel-backend && npm install && cd ../frontend && npm install",
+    "start-backend": "cd babel-backend && npm start",
+    "start-frontend": "cd frontend && npm start",
+    "start-dev": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report tests/playwright-report",
+    "test:install": "playwright install",
+    "test:babel-only": "playwright test babel-test-agent",
+    "build-backend": "cd babel-backend && npm run build",
+    "build-frontend": "cd frontend && npm run build",
+    "build-all": "npm run build-backend && npm run build-frontend",
+    "lint": "cd babel-backend && npm run lint",
+    "docs": "echo 'Documentation available in docs/ directory'",
+    "explore": "npm run test:babel-only -- --headed",
+    "health-check": "curl http://localhost:5570/api/health && curl http://localhost:3000"
+  },
+  "keywords": [
+    "borges",
+    "library-of-babel", 
+    "procedural-generation",
+    "infinite-library",
+    "educational",
+    "digital-humanities",
+    "literature",
+    "philosophy",
+    "algorithms"
+  ],
+  "author": "Library of Babel Project",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@types/node": "^20.8.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/noxwei/LibraryOfBabel.git"
+  },
+  "homepage": "https://github.com/noxwei/LibraryOfBabel#readme",
+  "bugs": {
+    "url": "https://github.com/noxwei/LibraryOfBabel/issues"
+  }
+}
