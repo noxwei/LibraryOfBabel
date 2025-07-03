@@ -61,7 +61,7 @@ def launch_agent_demo():
         try:
             # Generate question
             result = subprocess.run([
-                'python3', 'src/seed_question_generator.py',
+                'python3', '../seed_question_generator.py',
                 '--seed', str(seed),
                 '--ask-agent'
             ], capture_output=True, text=True, timeout=360)  # Increased timeout to 6 minutes
