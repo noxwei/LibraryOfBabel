@@ -101,6 +101,24 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 
+# Backend Development
+babel-backend/node_modules/
+babel-backend/.env
+babel-backend/logs/
+babel-backend/temp/
+babel-backend/build/
+babel-backend/dist/
+
+# Frontend Development  
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
 # Database Files
 audiobook_ebook_tracker.db*
 missing_ebooks.json
