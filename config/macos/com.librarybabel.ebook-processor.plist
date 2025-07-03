@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.librarybabel.ebook-processor</string>
+    
+    <key>Program</key>
+    <string>/opt/homebrew/bin/python3</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/python3</string>
+        <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/automated_ebook_processor.py</string>
+        <string>--mode</string>
+        <string>realtime</string>
+    </array>
+    
+    <key>WorkingDirectory</key>
+    <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel</string>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <true/>
+    
+    <key>StandardOutPath</key>
+    <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/ebook-processor.out.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/ebook-processor.err.log</string>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>PYTHONPATH</key>
+        <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/src</string>
+    </dict>
+    
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+    
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+    
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>
