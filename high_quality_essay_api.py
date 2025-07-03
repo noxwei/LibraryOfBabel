@@ -154,6 +154,10 @@ class HighQualityEssayGenerator:
                 high_quality_sources += f", {passage['genre_confidence']:.1%} genre confidence"
             high_quality_sources += f"\n\nCONTENT:\n{passage['content']}\n"
         
+        # Convert set operations to list operations for safety
+        authors_covered = list(set(authors_covered))
+        genres_covered = list(set(genres_covered))
+        
         # Advanced style configurations
         style_configurations = {
             "academic": {
@@ -196,13 +200,13 @@ WRITING SPECIFICATIONS:
 ESSAY REQUIREMENTS:
 • Length: 3,500-4,500 words (substantial intellectual treatment)
 • Intellectual Depth: Move beyond surface analysis to generate novel theoretical insights
-• Cross-Domain Synthesis: Connect insights across the {len(set(genres_covered))} different genres represented in sources
+• Cross-Domain Synthesis: Connect insights across the {len(genres_covered)} different genres represented in sources
 • Original Framework: Develop a unique theoretical lens or analytical framework
 • Contemporary Relevance: Connect historical/theoretical insights to current issues
 • Sophisticated Argumentation: Build complex, multi-layered arguments with substantial evidence
 
 SOURCE MATERIAL INTEGRATION:
-You have access to {len(passages)} carefully selected sources spanning works by {len(set(authors_covered))} different authors including {', '.join(set(authors_covered)[:3])}{'...' if len(set(authors_covered)) > 3 else ''}. These sources cover {', '.join(set(genres_covered))} and provide rich material for synthesis.
+You have access to {len(passages)} carefully selected sources spanning works by {len(authors_covered)} different authors including {', '.join(authors_covered[:3])}{'...' if len(authors_covered) > 3 else ''}. These sources cover {', '.join(genres_covered)} and provide rich material for synthesis.
 
 INTELLECTUAL APPROACH:
 1. Identify unexpected connections and tensions between sources
@@ -300,7 +304,8 @@ Write the complete essay now:"""
             
             # Log prompt statistics for debugging
             logger.info(f"Prompt length: {len(prompt)} characters")
-            logger.info(f"Using {len(passages)} sources from {len(set(p['author'] for p in passages))} authors")
+            unique_authors = list(set(p.get('author', 'Unknown') for p in passages))
+            logger.info(f"Using {len(passages)} sources from {len(unique_authors)} authors")
             
             # Generate with optimized settings
             essay_content = self.generate_with_ollama_optimized(prompt)
@@ -315,7 +320,7 @@ Write the complete essay now:"""
                 'model_used': self.selected_model,
                 'prompt_length': len(prompt),
                 'sources_count': len(passages),
-                'authors_count': len(set(p['author'] for p in passages))
+                'authors_count': len(unique_authors)
             })
             
         except Exception as e:
