@@ -33,7 +33,7 @@ DATABASE_CONFIG = {
 }
 
 # Paths
-PROJECT_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 OUTPUT_DIR = PROJECT_ROOT / 'output'
 LOG_FILE = PROJECT_ROOT / 'database' / 'ingestion.log'
 
@@ -118,38 +118,30 @@ class DatabaseIngester:
                 except (ValueError, TypeError):
                     self.log(f"Could not parse publication date: {metadata.get('publication_date')}")
             
-            # Prepare book data
+            # Prepare book data - match actual database schema
             book_data = {
                 'title': metadata['title'][:500],  # Truncate if too long
-                'author': metadata.get('author', '')[:200] if metadata.get('author') else None,
-                'publisher': metadata.get('publisher', '')[:200] if metadata.get('publisher') else None,
-                'publication_date': pub_date,
-                'language': metadata.get('language', 'en')[:10],
-                'isbn': metadata.get('isbn', '')[:20] if metadata.get('isbn') else None,
+                'author': metadata.get('author', '')[:255] if metadata.get('author') else None,
+                'publisher': metadata.get('publisher', '')[:255] if metadata.get('publisher') else None,
+                'publication_date': metadata.get('publication_date', '')[:100] if metadata.get('publication_date') else None,
+                'language': metadata.get('language', 'english')[:50],
+                'isbn': metadata.get('isbn', '')[:50] if metadata.get('isbn') else None,
                 'description': metadata.get('description'),
-                'subject': metadata.get('subject', '')[:100] if metadata.get('subject') else None,
-                'file_path': metadata['file_path'],
-                'original_filename': os.path.basename(metadata['file_path']),
-                'total_chapters': metadata.get('total_chapters', 0),
-                'total_words': metadata.get('total_words', 0),
-                'processing_status': 'completed',
-                'processed_date': datetime.now(),
-                'processing_version': '1.0'
+                'genre': metadata.get('subject', '')[:100] if metadata.get('subject') else None,  # Map subject to genre
+                'word_count': metadata.get('total_words', 0),
+                'file_path': metadata['file_path'][:1000],
+                'processed_date': datetime.now()
             }
             
             # Insert book
             insert_query = """
                 INSERT INTO books (
                     title, author, publisher, publication_date, language, isbn,
-                    description, subject, file_path, original_filename,
-                    total_chapters, total_words, processing_status, 
-                    processed_date, processing_version
+                    description, genre, word_count, file_path, processed_date
                 ) VALUES (
                     %(title)s, %(author)s, %(publisher)s, %(publication_date)s, 
-                    %(language)s, %(isbn)s, %(description)s, %(subject)s,
-                    %(file_path)s, %(original_filename)s, %(total_chapters)s,
-                    %(total_words)s, %(processing_status)s, %(processed_date)s,
-                    %(processing_version)s
+                    %(language)s, %(isbn)s, %(description)s, %(genre)s,
+                    %(word_count)s, %(file_path)s, %(processed_date)s
                 ) RETURNING book_id
             """
             
@@ -168,32 +160,35 @@ class DatabaseIngester:
         chunks_inserted = 0
         
         try:
-            for chapter in chapters:
-                # Prepare chunk data
+            for i, chapter in enumerate(chapters):
+                # Generate unique chunk_id 
+                chunk_id = f"{book_id}_{i+1:04d}"
+                
+                # Prepare chunk data - match actual database schema
                 chunk_data = {
+                    'chunk_id': chunk_id,
                     'book_id': book_id,
                     'chunk_type': 'chapter',  # Default type
                     'title': chapter.get('title', '')[:500] if chapter.get('title') else None,
                     'chapter_number': chapter.get('chapter_number'),
                     'section_number': chapter.get('section_number'),
-                    'spine_order': chapter.get('spine_order'),
                     'content': chapter['content'],
-                    'file_path': chapter.get('file_path')
+                    'word_count': chapter.get('word_count', 0),
+                    'character_count': len(chapter['content']) if 'content' in chapter else 0
                 }
                 
                 # Insert chunk
                 insert_query = """
                     INSERT INTO chunks (
-                        book_id, chunk_type, title, chapter_number, section_number,
-                        spine_order, content, file_path
+                        chunk_id, book_id, chunk_type, title, chapter_number, section_number,
+                        content, word_count, character_count
                     ) VALUES (
-                        %(book_id)s, %(chunk_type)s, %(title)s, %(chapter_number)s,
-                        %(section_number)s, %(spine_order)s, %(content)s, %(file_path)s
+                        %(chunk_id)s, %(book_id)s, %(chunk_type)s, %(title)s, %(chapter_number)s,
+                        %(section_number)s, %(content)s, %(word_count)s, %(character_count)s
                     ) RETURNING chunk_id
                 """
                 
                 self.cursor.execute(insert_query, chunk_data)
-                chunk_id = self.cursor.fetchone()['chunk_id']
                 chunks_inserted += 1
                 
                 if chunks_inserted % 50 == 0:  # Progress update every 50 chunks
