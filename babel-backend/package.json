@@ -5,9 +5,15 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "start:local": "node src/local-server.js",
+    "start:production": "node src/production-server.js",
     "dev": "nodemon src/server.js",
+    "dev:local": "nodemon src/local-server.js",
+    "dev:production": "nodemon src/production-server.js",
     "test": "jest",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "network:scan": "curl -s http://localhost:5571/api/network/scan | jq .",
+    "health:all": "curl -s http://localhost:5571/api/health && curl -s http://localhost:5572/api/health"
   },
   "keywords": ["borges", "library", "babel", "procedural", "literature", "educational"],
   "author": "Library of Babel Project",
