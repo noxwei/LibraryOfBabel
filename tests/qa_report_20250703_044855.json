@@ -1,0 +1,93 @@
+{
+  "timestamp": "2025-07-03T04:48:14.976298",
+  "tests": [
+    {
+      "test_name": "API Health Check",
+      "status": "pass",
+      "details": "All systems operational. Model: llama3.1:8b",
+      "metrics": {
+        "available_models": [
+          "qwen2.5:32b",
+          "llama3.1:70b",
+          "qwen2.5:14b",
+          "llama3.1:8b",
+          "qwen2.5:7b"
+        ],
+        "chunk_count": 1286,
+        "database": "connected",
+        "model": "llama3.1:8b",
+        "model_info": {
+          "details": {
+            "families": [
+              "llama"
+            ],
+            "family": "llama",
+            "format": "gguf",
+            "parameter_size": "8.0B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+          "model": "llama3.1:8b",
+          "modified_at": "2025-07-03T02:51:17.870828658-04:00",
+          "name": "llama3.1:8b",
+          "size": 4920753328
+        },
+        "ollama": "connected",
+        "quality_settings": {
+          "mirostat": 2,
+          "mirostat_eta": 0.1,
+          "mirostat_tau": 5.0,
+          "num_ctx": 32768,
+          "num_predict": 6000,
+          "repeat_penalty": 1.1,
+          "temperature": 0.7,
+          "top_k": 30,
+          "top_p": 0.85
+        },
+        "queue_size": 1,
+        "status": "healthy"
+      }
+    },
+    {
+      "test_name": "Database Integrity",
+      "status": "pass",
+      "details": "Chunks: 1286, Books: 35, Authors: 34",
+      "metrics": {
+        "chunk_count": 1286,
+        "book_count": 35,
+        "author_count": 34,
+        "search_results": 310
+      }
+    },
+    {
+      "test_name": "Essay Generation: Cognitive_Capture_Replication",
+      "status": "fail",
+      "details": "Generation failed: 'set' object is not subscriptable"
+    },
+    {
+      "test_name": "Essay Generation: Philosophy Synthesis",
+      "status": "fail",
+      "details": "Generation failed: 'set' object is not subscriptable"
+    },
+    {
+      "test_name": "Essay Generation: Cross-Domain Analysis",
+      "status": "fail",
+      "details": "Generation failed: 'set' object is not subscriptable"
+    },
+    {
+      "test_name": "Essay Generation: Contemporary Critique",
+      "status": "fail",
+      "details": "Generation failed: 'set' object is not subscriptable"
+    }
+  ],
+  "essays_generated": [],
+  "summary": {
+    "total_tests": 6,
+    "passed": 2,
+    "warnings": 0,
+    "failed": 4,
+    "success_rate": 0.3333333333333333,
+    "essays_generated": 0
+  }
+}
