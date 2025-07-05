@@ -101,6 +101,53 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 
+# Backend Development
+babel-backend/node_modules/
+babel-backend/.env
+babel-backend/.env.local
+babel-backend/.env.production
+babel-backend/logs/
+babel-backend/temp/
+babel-backend/build/
+babel-backend/dist/
+
+# Production Secrets & Security
+babel-backend/src/production-server.js.secrets
+cloudflare-setup.md
+cloudflare-credentials/
+*.pem
+*.key
+*.crt
+*.p12
+ssl/
+certificates/
+deployment-notes.md
+production-domains.txt
+
+# Cloudflare Tunnel Credentials
+.cloudflared/
+cloudflared.log
+cloudflared.error.log
+tunnel-credentials.json
+
+# Domain Configuration (contains sensitive info)
+domain-config.json
+production-config.json
+
+# Analytics & Monitoring Keys
+analytics-keys.json
+monitoring-secrets.env
+
+# Frontend Development  
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
 # Database Files
 audiobook_ebook_tracker.db*
 missing_ebooks.json
