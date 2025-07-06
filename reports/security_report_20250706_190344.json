@@ -1,0 +1,320 @@
+{
+  "scan_timestamp": "2025-07-06T19:03:44.375581",
+  "project_root": "/Users/weixiangzhang/Local Dev/LibraryOfBabel",
+  "summary": {
+    "total_sensitive_data_findings": 8,
+    "total_permission_issues": 2,
+    "total_vulnerabilities": 24,
+    "critical_issues": 2,
+    "high_priority_fixes": 1,
+    "automated_fixes_available": 0
+  },
+  "detailed_findings": {
+    "sensitive_data": [
+      {
+        "file": "agents/security_qa/security_qa_agent.py",
+        "category": "database_urls",
+        "pattern": "postgresql://[^:\\s]+:[^@\\s]+@[^/\\s]+/[^\\s]+",
+        "match": "postgresql://[^:\\s]+:[^@\\s]+@[^/\\s]+/[^\\s]+',",
+        "line_number": 56,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/security_qa/security_qa_agent.py",
+        "category": "database_urls",
+        "pattern": "mysql://[^:\\s]+:[^@\\s]+@[^/\\s]+/[^\\s]+",
+        "match": "mysql://[^:\\s]+:[^@\\s]+@[^/\\s]+/[^\\s]+',",
+        "line_number": 57,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/security_qa/security_qa_agent.py",
+        "category": "database_urls",
+        "pattern": "mongodb://[^:\\s]+:[^@\\s]+@[^/\\s]+/[^\\s]+",
+        "match": "mongodb://[^:\\s]+:[^@\\s]+@[^/\\s]+/[^\\s]+',",
+        "line_number": 58,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "wiki/Security-Guide.md",
+        "category": "secrets",
+        "pattern": "secret\\s*=\\s*[\"\\']([^\"\\']+)[\"\\']",
+        "match": "SECRET=\"your-super-secure-jwt-secret-key\"",
+        "line_number": 679,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "wiki/Security-Guide.md",
+        "category": "secrets",
+        "pattern": "SECRET\\s*=\\s*[\"\\']([^\"\\']+)[\"\\']",
+        "match": "SECRET=\"your-super-secure-jwt-secret-key\"",
+        "line_number": 679,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "wiki/API-Reference.md",
+        "category": "api_keys",
+        "pattern": "api_key\\s*=\\s*[\"\\']([^\"\\']+)[\"\\']",
+        "match": "api_key='your-api-key'",
+        "line_number": 853,
+        "severity": "HIGH"
+      },
+      {
+        "file": "wiki/API-Reference.md",
+        "category": "api_keys",
+        "pattern": "API_KEY\\s*=\\s*[\"\\']([^\"\\']+)[\"\\']",
+        "match": "api_key='your-api-key'",
+        "line_number": 853,
+        "severity": "HIGH"
+      },
+      {
+        "file": "docs/security/SECURITY_ANALYSIS_REPORT.md",
+        "category": "database_urls",
+        "pattern": "postgresql://[^:\\s]+:[^@\\s]+@[^/\\s]+/[^\\s]+",
+        "match": "postgresql://user:pass@localhost/db",
+        "line_number": 124,
+        "severity": "MEDIUM"
+      }
+    ],
+    "permission_issues": [
+      {
+        "file": "process_new_books.py",
+        "current_permissions": "755",
+        "issue": "Overly permissive file permissions",
+        "severity": "MEDIUM",
+        "recommendation": "Change to 644 for regular files, 755 for executables"
+      },
+      {
+        "file": "database/schema/ingest_data.py",
+        "current_permissions": "755",
+        "issue": "Overly permissive file permissions",
+        "severity": "MEDIUM",
+        "recommendation": "Change to 644 for regular files, 755 for executables"
+      }
+    ],
+    "vulnerabilities": [
+      {
+        "file": "reconstruct_book.py",
+        "vulnerability": "sql_injection",
+        "pattern": "execute\\s*\\(\\s*[\"\\'].*%.*[\"\\']",
+        "line_number": 23,
+        "code_snippet": "execute(\"SELECT book_id, title, author FROM books WHERE title ILIKE %s\", (f\"%{book_title}%\"",
+        "severity": "HIGH"
+      },
+      {
+        "file": "safe_folder_cleanup.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "DES\\s*\\(",
+        "line_number": 206,
+        "code_snippet": "des\n            (",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "tests/test_database_integration.py",
+        "vulnerability": "sql_injection",
+        "pattern": "execute\\s*\\(\\s*[\"\\'].*%.*[\"\\']",
+        "line_number": 431,
+        "code_snippet": "execute(\"SELECT * FROM books WHERE author LIKE ?\", (f\"%{test_author}%\"",
+        "severity": "HIGH"
+      },
+      {
+        "file": "tests/validation_test.py",
+        "vulnerability": "sql_injection",
+        "pattern": "execute\\s*\\(\\s*[\"\\'].*%.*[\"\\']",
+        "line_number": 39,
+        "code_snippet": "execute(\"SELECT * FROM safe_search(%s)\"",
+        "severity": "HIGH"
+      },
+      {
+        "file": "tests/validation_test.py",
+        "vulnerability": "sql_injection",
+        "pattern": "execute\\s*\\(\\s*[\"\\'].*%.*[\"\\']",
+        "line_number": 70,
+        "code_snippet": "execute(\"SELECT * FROM intersection_bomb_search(%s, %s)\"",
+        "severity": "HIGH"
+      },
+      {
+        "file": "tests/validation_test.py",
+        "vulnerability": "sql_injection",
+        "pattern": "execute\\s*\\(\\s*[\"\\'].*%.*[\"\\']",
+        "line_number": 101,
+        "code_snippet": "execute(\"SELECT * FROM fast_search(%s)\"",
+        "severity": "HIGH"
+      },
+      {
+        "file": "agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "md5\\s*\\(",
+        "line_number": 646,
+        "code_snippet": "md5(",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "md5\\s*\\(",
+        "line_number": 824,
+        "code_snippet": "md5(",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "DES\\s*\\(",
+        "line_number": 197,
+        "code_snippet": "des (",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "DES\\s*\\(",
+        "line_number": 217,
+        "code_snippet": "des (",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "DES\\s*\\(",
+        "line_number": 218,
+        "code_snippet": "des (",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "DES\\s*\\(",
+        "line_number": 235,
+        "code_snippet": "des (",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "DES\\s*\\(",
+        "line_number": 957,
+        "code_snippet": "des(",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "DES\\s*\\(",
+        "line_number": 959,
+        "code_snippet": "des (",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "DES\\s*\\(",
+        "line_number": 996,
+        "code_snippet": "des(",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/reddit_bibliophile/reddit_bibliophile_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "DES\\s*\\(",
+        "line_number": 1084,
+        "code_snippet": "des(",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "agents/code_quality/code_quality_agent.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "md5\\s*\\(",
+        "line_number": 429,
+        "code_snippet": "md5(",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "scripts/utils/essay_generation_api.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "md5\\s*\\(",
+        "line_number": 389,
+        "code_snippet": "md5(",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "scripts/utils/high_quality_essay_api.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "md5\\s*\\(",
+        "line_number": 727,
+        "code_snippet": "md5(",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "src/vector_embeddings_optimized.py",
+        "vulnerability": "weak_crypto",
+        "pattern": "md5\\s*\\(",
+        "line_number": 61,
+        "code_snippet": "md5(",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "src/database_ingestion.py",
+        "vulnerability": "sql_injection",
+        "pattern": "execute\\s*\\(\\s*[\"\\'].*%.*[\"\\']",
+        "line_number": 99,
+        "code_snippet": "execute(\"SELECT author_id FROM authors WHERE name = %s\"",
+        "severity": "HIGH"
+      },
+      {
+        "file": "src/database_ingestion.py",
+        "vulnerability": "sql_injection",
+        "pattern": "execute\\s*\\(\\s*[\"\\'].*%.*[\"\\']",
+        "line_number": 107,
+        "code_snippet": "execute(\n                \"INSERT INTO authors (name) VALUES (%s) RETURNING author_id\"",
+        "severity": "HIGH"
+      },
+      {
+        "file": "src/database_ingestion.py",
+        "vulnerability": "sql_injection",
+        "pattern": "execute\\s*\\(\\s*[\"\\'].*%.*[\"\\']",
+        "line_number": 118,
+        "code_snippet": "execute(\"SELECT author_id FROM authors WHERE name = %s\"",
+        "severity": "HIGH"
+      },
+      {
+        "file": "src/serendipity_engine.py",
+        "vulnerability": "sql_injection",
+        "pattern": "execute\\s*\\(\\s*[\"\\'].*%.*[\"\\']",
+        "line_number": 54,
+        "code_snippet": "execute(\"SELECT COUNT(*) FROM chunks WHERE word_count >= %s AND word_count <= %s\"",
+        "severity": "HIGH"
+      }
+    ]
+  },
+  "remediation_plan": {
+    "timestamp": "2025-07-06T19:03:44.375573",
+    "critical_actions": [
+      {
+        "action": "Remove API key file from repository",
+        "file": "api_key.txt",
+        "command": "git rm api_key.txt && git commit -m \"Remove sensitive API key file\"",
+        "automated": true
+      }
+    ],
+    "high_priority_actions": [
+      {
+        "action": "Add log files to .gitignore",
+        "files": "*.log",
+        "command": "echo \"*.log\" >> .gitignore && git add .gitignore",
+        "automated": true
+      }
+    ],
+    "medium_priority_actions": [
+      {
+        "action": "Review SSL configuration files for sensitive data",
+        "directory": "ssl/",
+        "automated": false,
+        "manual_review": true
+      }
+    ],
+    "automated_fixes": [],
+    "manual_review_required": []
+  },
+  "analysis_document": "\n    # LibraryOfBabel Security Analysis\n    \n    ## Critical Security Issues Found:\n    \n    1. **API Key Exposure**: /api_key.txt contains sensitive API credentials\n    2. **Log File Exposure**: Multiple .log files contain potentially sensitive information\n    3. **SSL Configuration**: SSL configs may contain sensitive certificate data\n    4. **Scattered Sensitive Files**: Configuration files with potential credentials\n    \n    ## Immediate Actions Required:\n    - Remove api_key.txt from repository\n    - Add *.log to .gitignore\n    - Move sensitive configs to environment variables\n    - Review SSL certificate files for sensitive data\n    "
+}

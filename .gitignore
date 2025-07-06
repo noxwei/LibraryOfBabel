@@ -224,3 +224,6 @@ cache/
 *.pdf
 *.db-shm
 *.db-wal
+*.log
+.env
+api_key.txt

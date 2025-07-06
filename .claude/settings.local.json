@@ -19,7 +19,11 @@
       "Bash(pkill:*)",
       "Bash(git commit:*)",
       "Bash(git filter-branch:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(brew install git-filter-repo)",
+      "Bash(chmod:*)",
+      "Bash(mv:*)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   }

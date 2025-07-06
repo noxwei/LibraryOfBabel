@@ -28,29 +28,24 @@ class SecurityManager:
         logger.info(f"🔑 API Key (last 8 chars): ...{self.api_key[-8:]}")
     
     def _load_api_key(self):
-        """Load API key from environment or file"""
-        # Try environment variable first
-        api_key = os.getenv('LIBRARY_API_KEY')
+        """Load API key from environment variables (secure method)"""
+        # Try environment variable first (SECURE METHOD)
+        api_key = os.getenv('API_KEY') or os.getenv('LIBRARY_API_KEY')
         if api_key:
             return api_key
         
-        # Try to load from api_key.txt file
+        # DEPRECATED: Try to load from api_key.txt file for backwards compatibility
+        # This is being phased out for security reasons
         api_key_file = os.path.join(os.path.dirname(__file__), '..', 'api_key.txt')
         if os.path.exists(api_key_file):
+            logger.warning("🚨 SECURITY WARNING: Using deprecated api_key.txt file. Please set API_KEY environment variable instead.")
             with open(api_key_file, 'r') as f:
                 return f.read().strip()
         
         # Generate new key if none exists
         new_key = secrets.token_urlsafe(32)
-        logger.warning(f"🔑 Generated new API key - save this: {new_key}")
-        
-        # Save to file
-        try:
-            with open(api_key_file, 'w') as f:
-                f.write(new_key)
-            logger.info("🔑 API key saved to api_key.txt")
-        except Exception as e:
-            logger.error(f"Failed to save API key: {e}")
+        logger.warning(f"🔑 Generated new API key - save this to your .env file: API_KEY={new_key}")
+        logger.warning("🔐 IMPORTANT: Set this as an environment variable instead of using api_key.txt")
         
         return new_key
     
