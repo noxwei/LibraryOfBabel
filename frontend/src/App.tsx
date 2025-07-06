@@ -1,180 +1,163 @@
 import React, { useState } from 'react';
-import InfiniteSearchChamber from './components/InfiniteSearchChamber';
-import TwinMirrorsOfKnowledge from './components/TwinMirrorsOfKnowledge';
-import ReadingChamber from './components/ReadingChamber';
-import { babelLibraryAPI, enhancedBabelAPI } from './services/BabelLibraryAPI';
-import { SearchMode, MysticalRevelation, ReadingChamber as ReadingChamberType } from './types/borgesian';
+import './simple.css';
 
-type AppState = 'search' | 'results' | 'reading';
+type SearchMode = 'divine' | 'mystical' | 'precise';
+
+interface Book {
+  title: string;
+  author: string;
+  excerpt: string;
+  coordinates: string;
+  id: string;
+}
+
+interface SearchResults {
+  books: Book[];
+  query: string;
+  totalResults: number;
+}
 
 function App() {
-  const [appState, setAppState] = useState<AppState>('search');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<MysticalRevelation | null>(null);
-  const [currentChamber, setCurrentChamber] = useState<ReadingChamberType | null>(null);
+  const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [libraryMode, setLibraryMode] = useState<'educational' | 'enhanced'>('educational');
+  const [searchMode, setSearchMode] = useState<SearchMode>('divine');
 
-  const getAPIClient = () => libraryMode === 'enhanced' ? enhancedBabelAPI : babelLibraryAPI;
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
 
-  const handleSearch = async (query: string, mode: SearchMode) => {
     setLoading(true);
     setError(null);
     
     try {
-      const api = getAPIClient();
-      const revelation = await api.divineKnowledge(query, mode);
-      setSearchResults(revelation);
-      setAppState('results');
+      // Detect domain and use appropriate port
+      const currentHost = window.location.hostname;
+      const port = window.location.port || (window.location.hostname === 'localhost' ? '5571' : '5571');
+      const apiUrl = `http://${currentHost}:${port}/api/search`;
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: searchQuery,
+          mode: searchMode,
+          maxResults: 5
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Transform API response to our interface
+      const results: SearchResults = {
+        books: data.books?.map((book: any) => ({
+          title: book.title || 'Untitled Manuscript',
+          author: book.author || 'Anonymous Scribe',
+          excerpt: book.content?.substring(0, 300) + '...' || 'No excerpt available',
+          coordinates: book.coordinates || 'Unknown coordinates',
+          id: book.id || Math.random().toString()
+        })) || [],
+        query: searchQuery,
+        totalResults: data.totalResults || 0
+      };
+      
+      setSearchResults(results);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'The mirrors show conflicting reflections');
+      setError(err instanceof Error ? err.message : 'Search failed');
+      console.error('Search error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEnterChamber = async (chunkId: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const api = getAPIClient();
-      const chamber = await api.seekChamberWisdom(chunkId);
-      setCurrentChamber(chamber);
-      setAppState('reading');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'The passage to this chamber is obscured');
-    } finally {
-      setLoading(false);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
-  };
-
-  const handleFollowThread = async (chunkId: string) => {
-    await handleEnterChamber(chunkId);
-  };
-
-  const handleReturnToHalls = () => {
-    setAppState('search');
-    setCurrentChamber(null);
-    setSearchResults(null);
-    setSearchQuery('');
-  };
-
-  const handleReturnToResults = () => {
-    if (searchResults) {
-      setAppState('results');
-      setCurrentChamber(null);
-    } else {
-      handleReturnToHalls();
-    }
-  };
-
-  const handleNavigateToChunk = async (chunkId: string) => {
-    await handleEnterChamber(chunkId);
   };
 
   return (
-    <div className="min-h-screen bg-infinite-depths-900 text-parchment-50 font-manuscript">
-      {/* Library Mode Switcher */}
-      <div className="fixed top-4 left-4 z-50">
-        <div className="bg-infinite-depths-800 bg-opacity-90 border border-ancient-gold-800 p-3 rounded">
-          <p className="text-ancient-gold-600 text-xs font-manuscript mb-2">Library Mode:</p>
-          <div className="flex space-x-2">
-            <button
-              onClick={() => setLibraryMode('educational')}
-              className={`px-3 py-1 text-xs font-manuscript transition-all ${
-                libraryMode === 'educational'
-                  ? 'bg-ancient-gold-800 text-infinite-depths-900'
-                  : 'border border-ancient-gold-800 text-ancient-gold-600 hover:text-ancient-gold-400'
-              }`}
-            >
-              📚 Educational
-            </button>
-            <button
-              onClick={() => setLibraryMode('enhanced')}
-              className={`px-3 py-1 text-xs font-manuscript transition-all ${
-                libraryMode === 'enhanced'
-                  ? 'bg-ancient-gold-800 text-infinite-depths-900'
-                  : 'border border-ancient-gold-800 text-ancient-gold-600 hover:text-ancient-gold-400'
-              }`}
-            >
-              🔧 Enhanced
-            </button>
-          </div>
-          <p className="text-mystic-silver-500 text-xs mt-1 italic">
-            {libraryMode === 'educational' 
-              ? 'Infinite procedural generation' 
-              : 'Hybrid with real content'}
-          </p>
-        </div>
-      </div>
-
-      {/* Error display */}
-      {error && (
-        <div className="fixed top-4 right-4 z-50 bg-red-900 bg-opacity-80 border border-red-700 text-red-200 px-4 py-2 rounded">
-          <p className="font-manuscript text-sm">{error}</p>
+    <div className="container">
+      <h1 className="title">📚 Library of Babel</h1>
+      
+      <div className="search-container">
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search the infinite library..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
+        
+        <div className="mode-switcher">
           <button 
-            onClick={() => setError(null)}
-            className="ml-2 text-red-400 hover:text-red-200"
+            className={`mode-button ${searchMode === 'divine' ? 'active' : ''}`}
+            onClick={() => setSearchMode('divine')}
           >
-            ✕
+            Divine
+          </button>
+          <button 
+            className={`mode-button ${searchMode === 'mystical' ? 'active' : ''}`}
+            onClick={() => setSearchMode('mystical')}
+          >
+            Mystical
+          </button>
+          <button 
+            className={`mode-button ${searchMode === 'precise' ? 'active' : ''}`}
+            onClick={() => setSearchMode('precise')}
+          >
+            Precise
           </button>
         </div>
-      )}
+        
+        <button className="search-button" onClick={handleSearch} disabled={loading}>
+          {loading ? '🔍 Searching the Infinite...' : '🔍 Search the Library'}
+        </button>
+      </div>
 
-      {/* Main application states */}
-      {appState === 'search' && (
-        <InfiniteSearchChamber
-          onSearch={handleSearch}
-          loading={loading}
-          query={searchQuery}
-          onQueryChange={setSearchQuery}
-        />
-      )}
-
-      {appState === 'results' && searchResults && (
-        <div>
-          {/* Return to search button */}
-          <div className="p-4 border-b border-ancient-gold-800">
-            <button
-              onClick={handleReturnToHalls}
-              className="mystical-button"
-            >
-              ← Return to Search
-            </button>
-            <span className="ml-4 text-mystic-silver-500 font-manuscript">
-              Sought: "{searchQuery}"
-            </span>
-          </div>
-          
-          <TwinMirrorsOfKnowledge
-            revelation={searchResults}
-            onEnterChamber={handleEnterChamber}
-            onFollowThread={handleFollowThread}
-          />
+      {error && (
+        <div className="error">
+          ⚠️ {error}
         </div>
       )}
 
-      {appState === 'reading' && currentChamber && (
-        <ReadingChamber
-          chamber={currentChamber}
-          onReturnToHalls={handleReturnToResults}
-          onNavigateToChunk={handleNavigateToChunk}
-        />
+      {loading && (
+        <div className="loading">
+          ✨ Navigating the hexagonal galleries...
+        </div>
       )}
 
-      {/* Loading overlay */}
-      {loading && (
-        <div className="fixed inset-0 bg-infinite-depths-900 bg-opacity-80 flex items-center justify-center z-50">
-          <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-ancient-gold-800 animate-hexagonal-pulse clip-hexagon"></div>
-            <div className="w-6 h-6 bg-ancient-gold-700 animate-hexagonal-pulse clip-hexagon" style={{animationDelay: '0.2s'}}></div>
-            <div className="w-4 h-4 bg-ancient-gold-600 animate-hexagonal-pulse clip-hexagon" style={{animationDelay: '0.4s'}}></div>
-            <span className="text-mystic-silver-400 font-manuscript ml-4">
-              Consulting the infinite catalog...
-            </span>
-          </div>
+      {searchResults && !loading && (
+        <div className="results-container">
+          <h2 className="title" style={{fontSize: '2rem', marginBottom: '1rem'}}>
+            📖 Found {searchResults.totalResults} Books for "{searchResults.query}"
+          </h2>
+          
+          {searchResults.books.map((book, index) => (
+            <div key={book.id} className="book-result">
+              <h3 className="book-title">{book.title}</h3>
+              <p className="book-author">📝 By {book.author}</p>
+              <p className="book-excerpt">{book.excerpt}</p>
+              <p style={{color: '#888', fontSize: '0.9rem'}}>
+                📍 Location: {book.coordinates}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!searchResults && !loading && (
+        <div style={{margin: '2rem 0', textAlign: 'center', color: '#888'}}>
+          <p>🏛️ Welcome to the infinite Library of Babel</p>
+          <p>Every book that ever was or could be exists here</p>
+          <p>Search above to begin your exploration...</p>
         </div>
       )}
     </div>
