@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 LibraryOfBabel QA Agent
-Comprehensive testing system for MAM automation process
+Comprehensive testing system for download automation process
 """
 
 import sqlite3
@@ -187,14 +187,14 @@ class TransmissionClient:
         return torrents
 
 class LibraryOfBabelQAAgent:
-    """Comprehensive QA testing for LibraryOfBabel MAM automation"""
+    """Comprehensive QA testing for LibraryOfBabel download automation"""
     
     def __init__(self, config_file: str = None):
         self.config = self._load_config(config_file)
         self.setup_logging()
         
         self.db_path = self.config.get('db_path', './audiobook_ebook_tracker.db')
-        self.mam_downloads_dir = Path(self.config.get('mam_downloads_dir', './mam_downloads'))
+        self.downloads_dir = Path(self.config.get('downloads_dir', './downloads'))
         self.temp_download_dir = Path(self.config.get('temp_download_dir', '/Users/weixiangzhang/Media Holding Station/Temporary Download'))
         self.completed_downloads_dir = Path(self.config.get('completed_downloads_dir', '/Users/weixiangzhang/Media Holding Station/Ebooks'))
         
@@ -207,7 +207,7 @@ class LibraryOfBabelQAAgent:
         """Load configuration from file or use defaults"""
         default_config = {
             'db_path': './audiobook_ebook_tracker.db',
-            'mam_downloads_dir': './mam_downloads',
+            'downloads_dir': './downloads',
             'temp_download_dir': '/Users/weixiangzhang/Media Holding Station/Temporary Download',
             'completed_downloads_dir': '/Users/weixiangzhang/Media Holding Station/Ebooks',
             'transmission': {
@@ -253,7 +253,7 @@ class LibraryOfBabelQAAgent:
         # Test categories
         test_categories = [
             ('Database Integrity', self._test_database_integrity),
-            ('MAM Downloads Validation', self._test_mam_downloads),
+            ('Downloads Validation', self._test_downloads),
             ('Transmission Integration', self._test_transmission_integration),
             ('Web Frontend', self._test_web_frontend),
             ('Completed Downloads Analysis', self._test_completed_downloads),
@@ -445,39 +445,39 @@ class LibraryOfBabelQAAgent:
         
         return results
     
-    def _test_mam_downloads(self) -> List[QATestResult]:
-        """Test MAM download functionality"""
+    def _test_downloads(self) -> List[QATestResult]:
+        """Test download functionality"""
         results = []
         
         # Test 1: Download directory exists and is accessible
         start_time = time.time()
         try:
-            self.mam_downloads_dir.mkdir(exist_ok=True)
+            self.downloads_dir.mkdir(exist_ok=True)
             
             # Test write permissions
-            test_file = self.mam_downloads_dir / 'qa_test.tmp'
+            test_file = self.downloads_dir / 'qa_test.tmp'
             test_file.write_text('QA test')
             test_file.unlink()
             
             results.append(QATestResult(
-                test_name="MAM Downloads Directory",
+                test_name="Downloads Directory",
                 status="passed",
                 duration_seconds=time.time() - start_time,
-                details={"path": str(self.mam_downloads_dir)}
+                details={"path": str(self.downloads_dir)}
             ))
         except Exception as e:
             results.append(QATestResult(
-                test_name="MAM Downloads Directory",
+                test_name="Downloads Directory",
                 status="failed",
                 duration_seconds=time.time() - start_time,
-                details={"path": str(self.mam_downloads_dir)},
+                details={"path": str(self.downloads_dir)},
                 error_message=str(e)
             ))
         
         # Test 2: Validate existing torrent files
         start_time = time.time()
         try:
-            torrent_files = list(self.mam_downloads_dir.glob('*.torrent'))
+            torrent_files = list(self.downloads_dir.glob('*.torrent'))
             valid_torrents = 0
             invalid_torrents = []
             
@@ -601,7 +601,7 @@ class LibraryOfBabelQAAgent:
         # Test 3: Test torrent addition (if torrent files exist)
         start_time = time.time()
         try:
-            torrent_files = list(self.mam_downloads_dir.glob('*.torrent'))
+            torrent_files = list(self.downloads_dir.glob('*.torrent'))
             
             if torrent_files:
                 # Test with first torrent file
@@ -866,7 +866,7 @@ class LibraryOfBabelQAAgent:
         start_time = time.time()
         try:
             # Get torrent files
-            torrent_files = list(self.mam_downloads_dir.glob('*.torrent'))
+            torrent_files = list(self.downloads_dir.glob('*.torrent'))
             torrent_ids_from_files = set()
             
             for torrent_file in torrent_files:
@@ -879,7 +879,7 @@ class LibraryOfBabelQAAgent:
             # Get torrent IDs from database
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                cursor.execute("SELECT DISTINCT mam_torrent_id FROM ebooks WHERE mam_torrent_id IS NOT NULL")
+                cursor.execute("SELECT DISTINCT torrent_id FROM ebooks WHERE torrent_id IS NOT NULL")
                 torrent_ids_from_db = set(row[0] for row in cursor.fetchall())
             
             # Find mismatches

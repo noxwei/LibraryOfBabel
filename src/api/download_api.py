@@ -113,10 +113,10 @@ class DownloadAPI:
                     'error_message': status.get('error_message')
                 }
                 
-                # Add MAM search results if available
-                if status.get('mam_search_results'):
+                # Add search results if available
+                if status.get('search_results'):
                     try:
-                        response['mam_results'] = json.loads(status['mam_search_results'])
+                        response['search_results'] = json.loads(status['search_results'])
                     except:
                         pass
                         

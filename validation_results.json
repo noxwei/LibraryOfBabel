@@ -1,0 +1,49 @@
+{
+  "validation_timestamp": "2025-07-06T15:03:39.094966",
+  "books_tested": 5,
+  "average_scores": {
+    "accuracy": 0.9967065018274359,
+    "structure": 0.9986666666666666,
+    "overlap": 0.9717202727055394,
+    "overall": 0.9922973054548259
+  },
+  "grade": "A+",
+  "quality_assessment": "\ud83c\udfc6 Excellent - Production ready",
+  "detailed_results": [
+    {
+      "title": "The New Jim Crow",
+      "author": "Alexander, Michelle",
+      "overall_score": 0.9927133300305191,
+      "issues_count": 1,
+      "top_recommendation": "\u2705 Excellent reconstruction quality - no changes needed"
+    },
+    {
+      "title": "10th Anniversary Edition",
+      "author": "Jos\u00e9 Esteban Mu\u00f1oz",
+      "overall_score": 0.9850240333718805,
+      "issues_count": 0,
+      "top_recommendation": "\u2705 Excellent reconstruction quality - no changes needed"
+    },
+    {
+      "title": "Heretics of Dune",
+      "author": "Frank Herbert",
+      "overall_score": 0.9982695563347415,
+      "issues_count": 1,
+      "top_recommendation": "\u2705 Excellent reconstruction quality - no changes needed"
+    },
+    {
+      "title": "Parable of the Sower",
+      "author": "Octavia Butler",
+      "overall_score": 0.9865434971511965,
+      "issues_count": 0,
+      "top_recommendation": "\u2705 Excellent reconstruction quality - no changes needed"
+    },
+    {
+      "title": "Look Alive Out There",
+      "author": "Sloane Crosley",
+      "overall_score": 0.9989361103857914,
+      "issues_count": 0,
+      "top_recommendation": "\u2705 Excellent reconstruction quality - no changes needed"
+    }
+  ]
+}

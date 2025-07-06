@@ -14,7 +14,7 @@ Leverages existing proven infrastructure:
 - EPUBProcessor for text extraction
 - BatchProcessor for scalable processing  
 - DatabaseIngestor for PostgreSQL integration
-- Frictionless harvester for size filtering
+- File size filtering for optimal processing
 """
 
 import os
@@ -32,7 +32,7 @@ sys.path.append('src')
 from epub_processor import EPUBProcessor
 from batch_processor import BatchProcessor
 from database_ingestion import DatabaseIngestor
-from frictionless_ebook_harvester import FrictionlessEbookHarvester
+# from frictionless_ebook_harvester import FrictionlessEbookHarvester  # Removed MAM dependency
 
 class AutomatedEbookProcessor:
     """Automated agent for processing downloaded ebooks into database"""
@@ -326,7 +326,7 @@ class AutomatedEbookProcessor:
     def update_tracking_database(self, processed_count: int):
         """Update the ebook tracking database with processing status"""
         try:
-            # This would update the MAM tracking database to mark books as processed
+            # This would update the tracking database to mark books as processed
             # For now, just log the status
             self.logger.info(f"📊 Processing session complete: {processed_count} books processed")
             

@@ -1,8 +1,8 @@
-# 📊 MAM Audiobook-Ebook Tracker Database Schema
+# 📊 Audiobook-Ebook Tracker Database Schema
 
 ## Overview
 
-The database tracks relationships between audiobooks (from Plex) and their corresponding ebooks (from MAM), including search attempts, download status, and queue management.
+The database tracks relationships between audiobooks (from Plex) and their corresponding ebooks (from various sources), including search attempts, download status, and queue management.
 
 ## 🗄️ Database Tables
 
@@ -25,18 +25,18 @@ CREATE TABLE audiobooks (
 );
 ```
 
-#### `ebooks` - MAM ebook search results and downloads
+#### `ebooks` - Ebook search results and downloads
 ```sql
 CREATE TABLE ebooks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     audiobook_id INTEGER,                  -- Links to audiobooks.album_id
-    mam_torrent_id TEXT UNIQUE,           -- MAM torrent identifier
-    ebook_title TEXT NOT NULL,            -- Ebook title from MAM
-    ebook_author TEXT NOT NULL,           -- Ebook author from MAM
+    torrent_id TEXT UNIQUE,               -- Torrent identifier
+    ebook_title TEXT NOT NULL,            -- Ebook title from search
+    ebook_author TEXT NOT NULL,           -- Ebook author from search
     file_format TEXT,                     -- epub, pdf, mobi, etc.
     file_size_mb REAL,                    -- Ebook file size
-    seeders INTEGER,                      -- Current seeders on MAM
-    leechers INTEGER,                     -- Current leechers on MAM
+    seeders INTEGER,                      -- Current seeders
+    leechers INTEGER,                     -- Current leechers
     match_confidence REAL,                -- AI confidence score (0.0-1.0)
     discovered_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     download_status TEXT DEFAULT 'available', -- Status: available/downloading/completed/failed
@@ -48,7 +48,7 @@ CREATE TABLE ebooks (
 );
 ```
 
-#### `search_attempts` - Log of all MAM searches
+#### `search_attempts` - Log of all searches
 ```sql
 CREATE TABLE search_attempts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,7 +56,7 @@ CREATE TABLE search_attempts (
     search_query TEXT,                    -- Query string used
     results_found INTEGER,               -- Number of results returned
     search_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    search_engine TEXT DEFAULT 'MAM',    -- Search source
+    search_engine TEXT DEFAULT 'ANNAS_ARCHIVE',    -- Search source
     FOREIGN KEY (audiobook_id) REFERENCES audiobooks (album_id)
 );
 ```
@@ -111,11 +111,11 @@ CREATE TABLE collection_stats (
          ▼
 ┌─────────────────┐    ┌─────────────────┐
 │     ebooks      │    │ search_attempts │
-│ (MAM results)   │    │  (search log)   │
+│ (search results) │    │  (search log)   │
 ├─────────────────┤    ├─────────────────┤
 │ id (PK)         │    │ id (PK)         │
 │ audiobook_id(FK)│◄──┤ audiobook_id(FK)│
-│ mam_torrent_id  │    │ search_query    │
+│ torrent_id      │    │ search_query    │
 │ ebook_title     │    │ results_found   │
 │ ebook_author    │    │ search_date     │
 │ match_confidence│    └─────────────────┘
@@ -189,7 +189,7 @@ Plex Database → audiobooks table (5,839 records)
 
 ### 2. Search Process
 ```
-audiobooks → MAM API Search → ebooks table + search_attempts log
+audiobooks → Search API → ebooks table + search_attempts log
 ```
 
 ### 3. Download Process
@@ -260,7 +260,7 @@ GROUP BY dq.status;
 
 ## 🚨 Data Integrity Notes
 
-1. **Unique Constraints**: `mam_torrent_id` must be unique to prevent duplicate downloads
+1. **Unique Constraints**: `torrent_id` must be unique to prevent duplicate downloads
 2. **Foreign Keys**: All relationships use proper foreign key constraints
 3. **Confidence Scores**: Always between 0.0 and 1.0
 4. **Status Values**: 
@@ -291,4 +291,4 @@ SELECT
     (SELECT COUNT(DISTINCT audiobook_id) FROM ebooks) * 100.0 / (SELECT COUNT(*) FROM audiobooks);
 ```
 
-This schema supports the complete MAM audiobook-to-ebook automation workflow with proper relationships, performance optimization, and data integrity.
+This schema supports the complete audiobook-to-ebook automation workflow with proper relationships, performance optimization, and data integrity.
