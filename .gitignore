@@ -126,10 +126,25 @@ cloudflare-credentials/
 *.key
 *.crt
 *.p12
+*.csr
 ssl/
 certificates/
 deployment-notes.md
 production-domains.txt
+
+# Let's Encrypt Certificates & Keys
+ssl/letsencrypt-config/
+ssl/letsencrypt-work/  
+ssl/letsencrypt-logs/
+ssl/verification/
+ssl/fresh-*.pem
+ssl/ios-*.pem
+
+# Production Configuration
+domain-setup.md
+production-config.json
+deployment-secrets.json
+service-config.plist
 
 # Cloudflare Tunnel Credentials
 .cloudflared/
