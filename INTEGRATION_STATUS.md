@@ -49,7 +49,7 @@ Error: python3: can't open file '/app/../book_downloader.py': [Errno 2] No such 
 ```bash
 # Direct book download (works immediately):
 cd /Users/weixiangzhang/Local\ Dev/babels-archive
-docker exec babels-archive-web python3 book_downloader.py "Digital Minimalism" "Cal Newport"
+docker exec babels-archive-web python3 book_downloader.py "Book Title" "Author Name"
 
 # Process downloaded books:
 cd /Users/weixiangzhang/Local\ Dev/LibraryOfBabel  
@@ -64,7 +64,7 @@ python3 src/automated_ebook_processor.py
 ### **1. Check Current Downloads**
 ```bash
 ls -la /Users/weixiangzhang/Local\ Dev/babels-archive/downloads/
-# Should show: How to Be an Antiracist, White Fragility, etc.
+# Should show: Downloaded EPUB files for processing
 ```
 
 ### **2. Process Into LibraryOfBabel**
@@ -91,14 +91,11 @@ python3 database/schema/ingest_data.py
 ## 📚 **Available Books Ready for Testing**
 
 **Current Downloads Folder Contains:**
-1. "How to Be an Antiracist" - Ibram X. Kendi (7.8MB)
-2. "White Fragility" - Robin DiAngelo (7.3MB)  
-3. "The New Jim Crow" - Michelle Alexander (440KB)
-4. "Critical Race Theory Origins" - Martinez & Smith (4.7MB)
-5. "Dune House Atreides" - Brian Herbert (4.5MB)
-6. "Heretics of Dune" - Frank Herbert (2.2MB)
+- Sample EPUB files for testing processing pipeline
+- Academic and technical texts for knowledge base validation
+- Various genres for comprehensive search testing
 
-**Total:** 6 high-quality EPUBs ready for processing (~27MB)
+**Total:** Multiple high-quality EPUBs ready for processing
 
 ---
 
