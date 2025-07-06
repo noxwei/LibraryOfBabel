@@ -725,7 +725,7 @@ if __name__ == '__main__':
     print("   • Rate limiting (60 req/min per IP)")
     print("   • Request logging & monitoring")
     print("")
-    print("🔑 API Key: M39Gqz5e8D-_qkyuy37ar87_jNU0EPs_nO6_izPnGaU")
+    print("🔑 API Key: [Check api_key.txt or generate new key]")
     print("")
     print("📚 Secure Endpoints:")
     print("   • GET /api/secure/info - API info (public)")
