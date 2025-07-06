@@ -1,0 +1,13 @@
+{
+  "stats": {
+    "total_requested": 57,
+    "successful_downloads": 0,
+    "failed_downloads": 0,
+    "books_not_found": 57,
+    "processing_queue": [],
+    "start_time": 1751767405.400289
+  },
+  "processing_queue": [],
+  "generated_at": "2025-07-05T22:03:25.898285",
+  "total_downloads": 0
+}

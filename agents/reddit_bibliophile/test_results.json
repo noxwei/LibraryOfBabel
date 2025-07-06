@@ -1,0 +1,942 @@
+[
+  {
+    "test": {
+      "name": "AI Consciousness (Divine Mode)",
+      "query": "artificial intelligence consciousness philosophy",
+      "mode": "divine"
+    },
+    "hell": {
+      "success": true,
+      "response_time_ms": 4930.289268493652,
+      "data": {
+        "available_modes": [
+          "divine",
+          "mystical",
+          "precise",
+          "enhanced"
+        ],
+        "domain_message": "\ud83d\udd25 Hell Domain: Where knowledge burns brightest in the darkness",
+        "hell_domain_status": {
+          "domain_power": "hell_standard",
+          "infernal_power": "maximum",
+          "knowledge_depth": "divine",
+          "search_intensity": "divine",
+          "seeker_activated": false,
+          "similarity_threshold": 0.1,
+          "total_results": 5
+        },
+        "query_metadata": {
+          "domain": "hell",
+          "mode": "divine",
+          "port": 5571,
+          "query": "artificial intelligence consciousness philosophy",
+          "response_time_ms": 4923.61,
+          "seeker_mode": null,
+          "timestamp": "2025-07-03T16:23:44.459914"
+        },
+        "results": [
+          {
+            "author": "Neal Shusterman",
+            "chunk_id": "thunderhead_arc_of_a_neal_shusterman_ch21",
+            "content_preview": "I rely on the bureaucracy of the Authority Interface to handle the governmental aspects of my relationship with humankind. Nimbus agents, as they are called, provide an easy-to-understand, physical form to my governance. I don\u2019t have to do this. I could handle it all myself if I wanted to. It is ful...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.7069253568805863,
+              "infernal_relevance": 0.723,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "divine",
+            "relevance_rank": 0.6025,
+            "similarity_score": 0.6025,
+            "title": "Thunderhead (Arc of a Scythe Book 2)"
+          },
+          {
+            "author": "Neal Shusterman",
+            "chunk_id": "thunderhead_arc_of_a_neal_shusterman_ch21_p1",
+            "content_preview": "I rely on the bureaucracy of the Authority Interface to handle the governmental aspects of my relationship with humankind. Nimbus agents, as they are called, provide an easy-to-understand, physical form to my governance. I don\u2019t have to do this. I could handle it all myself if I wanted to. It is ful...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.8380972049779185,
+              "infernal_relevance": 0.723,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "divine",
+            "relevance_rank": 0.6025,
+            "similarity_score": 0.6025,
+            "title": "Thunderhead (Arc of a Scythe Book 2)"
+          },
+          {
+            "author": "Paul Stamets",
+            "chunk_id": "mycelium_running_how_paul_stamets_ch12",
+            "content_preview": "The History of Fungal Networks Animals are more closely related to fungi than to any other kingdom. More than 600 million years ago we shared a common ancestry. Fungi evolved a means of externally digesting food by secreting acids and enzymes into their immediate environs and then absorbing nutrient...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.8863067915369273,
+              "infernal_relevance": 0.72216,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "divine",
+            "relevance_rank": 0.6018,
+            "similarity_score": 0.6018,
+            "title": "Mycelium Running: How Mushrooms Can Help Save the World"
+          },
+          {
+            "author": "Paul Stamets",
+            "chunk_id": "mycelium_running_how_paul_stamets_ch12_p1",
+            "content_preview": "The History of Fungal Networks Animals are more closely related to fungi than to any other kingdom. More than 600 million years ago we shared a common ancestry. Fungi evolved a means of externally digesting food by secreting acids and enzymes into their immediate environs and then absorbing nutrient...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.7825892290012515,
+              "infernal_relevance": 0.72216,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "divine",
+            "relevance_rank": 0.6018,
+            "similarity_score": 0.6018,
+            "title": "Mycelium Running: How Mushrooms Can Help Save the World"
+          },
+          {
+            "author": "FREY, CARL BENEDIKT.;",
+            "chunk_id": "the_technology_trap_frey_carl_bened_ch24",
+            "content_preview": "PART V THE FUTURE What of the future? \u2026 The history of computing to date shows no slackening of innovation in the fundamental computational processes or in applications of computation throughout the economy. Perhaps, aside from humans, computers and software are the ultimate general purpose technolo...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.805452468595685,
+              "infernal_relevance": 0.71268,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "divine",
+            "relevance_rank": 0.5939,
+            "similarity_score": 0.5939,
+            "title": "The Technology Trap"
+          }
+        ]
+      }
+    },
+    "quest": {
+      "success": true,
+      "response_time_ms": 4716.03798866272,
+      "data": {
+        "available_modes": [
+          "mystical",
+          "precise",
+          "enhanced",
+          "adventure"
+        ],
+        "domain_message": "\u2694\ufe0f Quest Domain: Your adventure through knowledge begins",
+        "query_metadata": {
+          "domain": "quest",
+          "mode": "divine",
+          "port": 5572,
+          "query": "artificial intelligence consciousness philosophy",
+          "response_time_ms": 4713.49,
+          "seeker_mode": null,
+          "timestamp": "2025-07-03T16:23:49.176277"
+        },
+        "quest_domain_status": {
+          "adventure_power": "mystical",
+          "domain_power": "quest_standard",
+          "knowledge_depth": "quest-driven",
+          "search_mode": "divine",
+          "seeker_activated": false,
+          "similarity_threshold": 0.2,
+          "total_results": 5
+        },
+        "quest_guidance": "Each result is a step in your knowledge journey",
+        "results": [
+          {
+            "author": "Neal Shusterman",
+            "chunk_id": "thunderhead_arc_of_a_neal_shusterman_ch21",
+            "content_preview": "I rely on the bureaucracy of the Authority Interface to handle the governmental aspects of my relationship with humankind. Nimbus agents, as they are called, provide an easy-to-understand, physical form to my governance. I don\u2019t have to do this. I could handle it all myself if I wanted to. It is ful...",
+            "domain": "quest",
+            "power_level": "divine",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.6627500000000001,
+              "knowledge_quest_level": 1,
+              "mystical_factor": 0.7493962343738995,
+              "quest_theme": "discovery"
+            },
+            "quest_position": "Stage 1 of 5",
+            "relevance_rank": 0.6025,
+            "similarity_score": 0.6025,
+            "title": "Thunderhead (Arc of a Scythe Book 2)"
+          },
+          {
+            "author": "Neal Shusterman",
+            "chunk_id": "thunderhead_arc_of_a_neal_shusterman_ch21_p1",
+            "content_preview": "I rely on the bureaucracy of the Authority Interface to handle the governmental aspects of my relationship with humankind. Nimbus agents, as they are called, provide an easy-to-understand, physical form to my governance. I don\u2019t have to do this. I could handle it all myself if I wanted to. It is ful...",
+            "domain": "quest",
+            "power_level": "divine",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.6627500000000001,
+              "knowledge_quest_level": 2,
+              "mystical_factor": 0.9463817424846852,
+              "quest_theme": "journey"
+            },
+            "quest_position": "Stage 2 of 5",
+            "relevance_rank": 0.6025,
+            "similarity_score": 0.6025,
+            "title": "Thunderhead (Arc of a Scythe Book 2)"
+          },
+          {
+            "author": "Paul Stamets",
+            "chunk_id": "mycelium_running_how_paul_stamets_ch12",
+            "content_preview": "The History of Fungal Networks Animals are more closely related to fungi than to any other kingdom. More than 600 million years ago we shared a common ancestry. Fungi evolved a means of externally digesting food by secreting acids and enzymes into their immediate environs and then absorbing nutrient...",
+            "domain": "quest",
+            "power_level": "divine",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.66198,
+              "knowledge_quest_level": 3,
+              "mystical_factor": 0.7362943504387908,
+              "quest_theme": "mystery"
+            },
+            "quest_position": "Stage 3 of 5",
+            "relevance_rank": 0.6018,
+            "similarity_score": 0.6018,
+            "title": "Mycelium Running: How Mushrooms Can Help Save the World"
+          },
+          {
+            "author": "Paul Stamets",
+            "chunk_id": "mycelium_running_how_paul_stamets_ch12_p1",
+            "content_preview": "The History of Fungal Networks Animals are more closely related to fungi than to any other kingdom. More than 600 million years ago we shared a common ancestry. Fungi evolved a means of externally digesting food by secreting acids and enzymes into their immediate environs and then absorbing nutrient...",
+            "domain": "quest",
+            "power_level": "divine",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.66198,
+              "knowledge_quest_level": 4,
+              "mystical_factor": 0.939673731534979,
+              "quest_theme": "discovery"
+            },
+            "quest_position": "Stage 4 of 5",
+            "relevance_rank": 0.6018,
+            "similarity_score": 0.6018,
+            "title": "Mycelium Running: How Mushrooms Can Help Save the World"
+          },
+          {
+            "author": "FREY, CARL BENEDIKT.;",
+            "chunk_id": "the_technology_trap_frey_carl_bened_ch24",
+            "content_preview": "PART V THE FUTURE What of the future? \u2026 The history of computing to date shows no slackening of innovation in the fundamental computational processes or in applications of computation throughout the economy. Perhaps, aside from humans, computers and software are the ultimate general purpose technolo...",
+            "domain": "quest",
+            "power_level": "divine",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.65329,
+              "knowledge_quest_level": 5,
+              "mystical_factor": 0.709793035597197,
+              "quest_theme": "discovery"
+            },
+            "quest_position": "Stage 5 of 5",
+            "relevance_rank": 0.5939,
+            "similarity_score": 0.5939,
+            "title": "The Technology Trap"
+          }
+        ]
+      }
+    },
+    "timestamp": "2025-07-03T12:23:49.177193"
+  },
+  {
+    "test": {
+      "name": "Quantum Metaphysics (Mystical Mode)",
+      "query": "quantum mechanics metaphysics reality",
+      "mode": "mystical"
+    },
+    "hell": {
+      "success": true,
+      "response_time_ms": 4797.657012939453,
+      "data": {
+        "available_modes": [
+          "divine",
+          "mystical",
+          "precise",
+          "enhanced"
+        ],
+        "domain_message": "\ud83d\udd25 Hell Domain: Where knowledge burns brightest in the darkness",
+        "hell_domain_status": {
+          "domain_power": "hell_standard",
+          "infernal_power": "maximum",
+          "knowledge_depth": "divine",
+          "search_intensity": "mystical",
+          "seeker_activated": false,
+          "similarity_threshold": 0.1,
+          "total_results": 5
+        },
+        "query_metadata": {
+          "domain": "hell",
+          "mode": "mystical",
+          "port": 5571,
+          "query": "quantum mechanics metaphysics reality",
+          "response_time_ms": 4795.18,
+          "seeker_mode": null,
+          "timestamp": "2025-07-03T16:23:53.974034"
+        },
+        "results": [
+          {
+            "author": "Andy Thomas",
+            "chunk_id": "the_new_heretics_andy_thomas_ch23",
+            "content_preview": "12. A \u201cQUANTUM\u201d APPROACH The fear of uncertainty \u2013 Quantum physics \u2013 The power of \u201cquantum\u201d thinking \u2013 Crop circle research as a microcosm \u2013 Staying fluid Despite our attempts to impose a rigid order everywhere we can, little in nature or human history has an either/or basis at its core. The lemming...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.7634172535120684,
+              "infernal_relevance": 0.768,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "mystical",
+            "relevance_rank": 0.64,
+            "similarity_score": 0.64,
+            "title": "The New Heretics"
+          },
+          {
+            "author": "Andy Thomas",
+            "chunk_id": "the_new_heretics_andy_thomas_ch23_p1",
+            "content_preview": "12. A \u201cQUANTUM\u201d APPROACH The fear of uncertainty \u2013 Quantum physics \u2013 The power of \u201cquantum\u201d thinking \u2013 Crop circle research as a microcosm \u2013 Staying fluid Despite our attempts to impose a rigid order everywhere we can, little in nature or human history has an either/or basis at its core. The lemming...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.7095486784027285,
+              "infernal_relevance": 0.768,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "mystical",
+            "relevance_rank": 0.64,
+            "similarity_score": 0.64,
+            "title": "The New Heretics"
+          },
+          {
+            "author": "Andy Thomas",
+            "chunk_id": "the_new_heretics_andy_thomas_ch23_s1",
+            "content_preview": "12. A \u201cQUANTUM\u201d APPROACH The fear of uncertainty \u2013 Quantum physics \u2013 The power of \u201cquantum\u201d thinking \u2013 Crop circle research as a microcosm \u2013 Staying fluid Despite our attempts to impose a rigid order everywhere we can, little in nature or human history has an either/or basis at its core. The lemming...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.7485960638128478,
+              "infernal_relevance": 0.768,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "mystical",
+            "relevance_rank": 0.64,
+            "similarity_score": 0.64,
+            "title": "The New Heretics"
+          },
+          {
+            "author": "Mlodinow, Leonard",
+            "chunk_id": "subliminal_how_your_mlodinow_leonar_ch5",
+            "content_preview": "Prologue These subliminal aspects of everything that happens to us may seem to play very little part in our daily lives. But they are the almost invisible roots of our conscious thoughts. \u2014CARL JUNG IN JUNE 1879, the American philosopher and scientist Charles Sanders Peirce was on a steamship journe...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.9169996722159527,
+              "infernal_relevance": 0.7215599999999999,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "mystical",
+            "relevance_rank": 0.6013,
+            "similarity_score": 0.6013,
+            "title": "Subliminal: How Your Unconscious Mind Rules Your Behavior"
+          },
+          {
+            "author": "Mlodinow, Leonard",
+            "chunk_id": "subliminal_how_your_mlodinow_leonar_ch5_p1",
+            "content_preview": "Prologue These subliminal aspects of everything that happens to us may seem to play very little part in our daily lives. But they are the almost invisible roots of our conscious thoughts. \u2014CARL JUNG IN JUNE 1879, the American philosopher and scientist Charles Sanders Peirce was on a steamship journe...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.9643716993174594,
+              "infernal_relevance": 0.7215599999999999,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "mystical",
+            "relevance_rank": 0.6013,
+            "similarity_score": 0.6013,
+            "title": "Subliminal: How Your Unconscious Mind Rules Your Behavior"
+          }
+        ]
+      }
+    },
+    "quest": {
+      "success": true,
+      "response_time_ms": 4777.087211608887,
+      "data": {
+        "available_modes": [
+          "mystical",
+          "precise",
+          "enhanced",
+          "adventure"
+        ],
+        "domain_message": "\u2694\ufe0f Quest Domain: Your adventure through knowledge begins",
+        "query_metadata": {
+          "domain": "quest",
+          "mode": "mystical",
+          "port": 5572,
+          "query": "quantum mechanics metaphysics reality",
+          "response_time_ms": 4774.43,
+          "seeker_mode": null,
+          "timestamp": "2025-07-03T16:23:58.751206"
+        },
+        "quest_domain_status": {
+          "adventure_power": "mystical",
+          "domain_power": "quest_standard",
+          "knowledge_depth": "quest-driven",
+          "search_mode": "mystical",
+          "seeker_activated": false,
+          "similarity_threshold": 0.2,
+          "total_results": 5
+        },
+        "quest_guidance": "Each result is a step in your knowledge journey",
+        "results": [
+          {
+            "author": "Andy Thomas",
+            "chunk_id": "the_new_heretics_andy_thomas_ch23",
+            "content_preview": "12. A \u201cQUANTUM\u201d APPROACH The fear of uncertainty \u2013 Quantum physics \u2013 The power of \u201cquantum\u201d thinking \u2013 Crop circle research as a microcosm \u2013 Staying fluid Despite our attempts to impose a rigid order everywhere we can, little in nature or human history has an either/or basis at its core. The lemming...",
+            "domain": "quest",
+            "power_level": "mystical",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.7040000000000001,
+              "knowledge_quest_level": 1,
+              "mystical_factor": 0.7631288541412272,
+              "quest_theme": "mystery"
+            },
+            "quest_position": "Stage 1 of 5",
+            "relevance_rank": 0.64,
+            "similarity_score": 0.64,
+            "title": "The New Heretics"
+          },
+          {
+            "author": "Andy Thomas",
+            "chunk_id": "the_new_heretics_andy_thomas_ch23_p1",
+            "content_preview": "12. A \u201cQUANTUM\u201d APPROACH The fear of uncertainty \u2013 Quantum physics \u2013 The power of \u201cquantum\u201d thinking \u2013 Crop circle research as a microcosm \u2013 Staying fluid Despite our attempts to impose a rigid order everywhere we can, little in nature or human history has an either/or basis at its core. The lemming...",
+            "domain": "quest",
+            "power_level": "mystical",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.7040000000000001,
+              "knowledge_quest_level": 2,
+              "mystical_factor": 0.6408335556748107,
+              "quest_theme": "enlightenment"
+            },
+            "quest_position": "Stage 2 of 5",
+            "relevance_rank": 0.64,
+            "similarity_score": 0.64,
+            "title": "The New Heretics"
+          },
+          {
+            "author": "Andy Thomas",
+            "chunk_id": "the_new_heretics_andy_thomas_ch23_s1",
+            "content_preview": "12. A \u201cQUANTUM\u201d APPROACH The fear of uncertainty \u2013 Quantum physics \u2013 The power of \u201cquantum\u201d thinking \u2013 Crop circle research as a microcosm \u2013 Staying fluid Despite our attempts to impose a rigid order everywhere we can, little in nature or human history has an either/or basis at its core. The lemming...",
+            "domain": "quest",
+            "power_level": "mystical",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.7040000000000001,
+              "knowledge_quest_level": 3,
+              "mystical_factor": 0.816074232348988,
+              "quest_theme": "discovery"
+            },
+            "quest_position": "Stage 3 of 5",
+            "relevance_rank": 0.64,
+            "similarity_score": 0.64,
+            "title": "The New Heretics"
+          },
+          {
+            "author": "Mlodinow, Leonard",
+            "chunk_id": "subliminal_how_your_mlodinow_leonar_ch5",
+            "content_preview": "Prologue These subliminal aspects of everything that happens to us may seem to play very little part in our daily lives. But they are the almost invisible roots of our conscious thoughts. \u2014CARL JUNG IN JUNE 1879, the American philosopher and scientist Charles Sanders Peirce was on a steamship journe...",
+            "domain": "quest",
+            "power_level": "mystical",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.66143,
+              "knowledge_quest_level": 4,
+              "mystical_factor": 0.812685249984854,
+              "quest_theme": "mystery"
+            },
+            "quest_position": "Stage 4 of 5",
+            "relevance_rank": 0.6013,
+            "similarity_score": 0.6013,
+            "title": "Subliminal: How Your Unconscious Mind Rules Your Behavior"
+          },
+          {
+            "author": "Mlodinow, Leonard",
+            "chunk_id": "subliminal_how_your_mlodinow_leonar_ch5_p1",
+            "content_preview": "Prologue These subliminal aspects of everything that happens to us may seem to play very little part in our daily lives. But they are the almost invisible roots of our conscious thoughts. \u2014CARL JUNG IN JUNE 1879, the American philosopher and scientist Charles Sanders Peirce was on a steamship journe...",
+            "domain": "quest",
+            "power_level": "mystical",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.66143,
+              "knowledge_quest_level": 5,
+              "mystical_factor": 0.693278946630638,
+              "quest_theme": "mystery"
+            },
+            "quest_position": "Stage 5 of 5",
+            "relevance_rank": 0.6013,
+            "similarity_score": 0.6013,
+            "title": "Subliminal: How Your Unconscious Mind Rules Your Behavior"
+          }
+        ]
+      }
+    },
+    "timestamp": "2025-07-03T12:23:58.752084"
+  },
+  {
+    "test": {
+      "name": "ML Ethics (Precise Mode)",
+      "query": "machine learning ethics philosophy",
+      "mode": "precise"
+    },
+    "hell": {
+      "success": true,
+      "response_time_ms": 4776.784181594849,
+      "data": {
+        "available_modes": [
+          "divine",
+          "mystical",
+          "precise",
+          "enhanced"
+        ],
+        "domain_message": "\ud83d\udd25 Hell Domain: Where knowledge burns brightest in the darkness",
+        "hell_domain_status": {
+          "domain_power": "hell_standard",
+          "infernal_power": "maximum",
+          "knowledge_depth": "divine",
+          "search_intensity": "precise",
+          "seeker_activated": false,
+          "similarity_threshold": 0.1,
+          "total_results": 5
+        },
+        "query_metadata": {
+          "domain": "hell",
+          "mode": "precise",
+          "port": 5571,
+          "query": "machine learning ethics philosophy",
+          "response_time_ms": 4774.41,
+          "seeker_mode": null,
+          "timestamp": "2025-07-03T16:24:03.528049"
+        },
+        "results": [
+          {
+            "author": "Amartya Sen",
+            "chunk_id": "home_in_the_world_amartya_sen_ch46",
+            "content_preview": "PENGUIN BOOKS UK | USA | Canada | Ireland | AustraliaNew Zealand | India | South Africa Penguin Books is part of the Penguin Random House group of companies whose addresses can be found at global.penguinrandomhouse.com. First published by Allen Lane in 2021 Copyright \u00a9 Amartya Sen, 2021 The moral ri...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.9175787127535686,
+              "infernal_relevance": 0.6303599999999999,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "precise",
+            "relevance_rank": 0.5253,
+            "similarity_score": 0.5253,
+            "title": "Home in the World"
+          },
+          {
+            "author": "Amartya Sen",
+            "chunk_id": "home_in_the_world_amartya_sen_ch46_p1",
+            "content_preview": "PENGUIN BOOKS UK | USA | Canada | Ireland | AustraliaNew Zealand | India | South Africa Penguin Books is part of the Penguin Random House group of companies whose addresses can be found at global.penguinrandomhouse.com. First published by Allen Lane in 2021 Copyright \u00a9 Amartya Sen, 2021 The moral ri...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.7109332573719067,
+              "infernal_relevance": 0.6303599999999999,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "precise",
+            "relevance_rank": 0.5253,
+            "similarity_score": 0.5253,
+            "title": "Home in the World"
+          },
+          {
+            "author": "FREY, CARL BENEDIKT.;",
+            "chunk_id": "the_technology_trap_frey_carl_bened_ch24",
+            "content_preview": "PART V THE FUTURE What of the future? \u2026 The history of computing to date shows no slackening of innovation in the fundamental computational processes or in applications of computation throughout the economy. Perhaps, aside from humans, computers and software are the ultimate general purpose technolo...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.9689132230997177,
+              "infernal_relevance": 0.62988,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "precise",
+            "relevance_rank": 0.5249,
+            "similarity_score": 0.5249,
+            "title": "The Technology Trap"
+          },
+          {
+            "author": "FREY, CARL BENEDIKT.;",
+            "chunk_id": "the_technology_trap_frey_carl_bened_ch24_p1",
+            "content_preview": "PART V THE FUTURE What of the future? \u2026 The history of computing to date shows no slackening of innovation in the fundamental computational processes or in applications of computation throughout the economy. Perhaps, aside from humans, computers and software are the ultimate general purpose technolo...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.8731219393048442,
+              "infernal_relevance": 0.62988,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "precise",
+            "relevance_rank": 0.5249,
+            "similarity_score": 0.5249,
+            "title": "The Technology Trap"
+          },
+          {
+            "author": "Erich Fromm",
+            "chunk_id": "escape_from_freedom_erich_fromm_ch4",
+            "content_preview": "If I am not for myself, who will be for me? If I am for myself only, what am I? If not now\u2014when? Talmudic Saying Mishnah, Abot Neither heavenly nor earthly, neither mortal nor immortal have we created thee, so that thou mightest be free according to thy own will and honor, to be thy own creator and ...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.7544185849427292,
+              "infernal_relevance": 0.62376,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "precise",
+            "relevance_rank": 0.5198,
+            "similarity_score": 0.5198,
+            "title": "Escape from Freedom"
+          }
+        ]
+      }
+    },
+    "quest": {
+      "success": true,
+      "response_time_ms": 4772.387266159058,
+      "data": {
+        "available_modes": [
+          "mystical",
+          "precise",
+          "enhanced",
+          "adventure"
+        ],
+        "domain_message": "\u2694\ufe0f Quest Domain: Your adventure through knowledge begins",
+        "query_metadata": {
+          "domain": "quest",
+          "mode": "precise",
+          "port": 5572,
+          "query": "machine learning ethics philosophy",
+          "response_time_ms": 4769.76,
+          "seeker_mode": null,
+          "timestamp": "2025-07-03T16:24:08.300532"
+        },
+        "quest_domain_status": {
+          "adventure_power": "mystical",
+          "domain_power": "quest_standard",
+          "knowledge_depth": "quest-driven",
+          "search_mode": "precise",
+          "seeker_activated": false,
+          "similarity_threshold": 0.2,
+          "total_results": 5
+        },
+        "quest_guidance": "Each result is a step in your knowledge journey",
+        "results": [
+          {
+            "author": "Amartya Sen",
+            "chunk_id": "home_in_the_world_amartya_sen_ch46",
+            "content_preview": "PENGUIN BOOKS UK | USA | Canada | Ireland | AustraliaNew Zealand | India | South Africa Penguin Books is part of the Penguin Random House group of companies whose addresses can be found at global.penguinrandomhouse.com. First published by Allen Lane in 2021 Copyright \u00a9 Amartya Sen, 2021 The moral ri...",
+            "domain": "quest",
+            "power_level": "precise",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.5778300000000001,
+              "knowledge_quest_level": 1,
+              "mystical_factor": 0.8588665326353766,
+              "quest_theme": "discovery"
+            },
+            "quest_position": "Stage 1 of 5",
+            "relevance_rank": 0.5253,
+            "similarity_score": 0.5253,
+            "title": "Home in the World"
+          },
+          {
+            "author": "Amartya Sen",
+            "chunk_id": "home_in_the_world_amartya_sen_ch46_p1",
+            "content_preview": "PENGUIN BOOKS UK | USA | Canada | Ireland | AustraliaNew Zealand | India | South Africa Penguin Books is part of the Penguin Random House group of companies whose addresses can be found at global.penguinrandomhouse.com. First published by Allen Lane in 2021 Copyright \u00a9 Amartya Sen, 2021 The moral ri...",
+            "domain": "quest",
+            "power_level": "precise",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.5778300000000001,
+              "knowledge_quest_level": 2,
+              "mystical_factor": 0.8169001660628572,
+              "quest_theme": "mystery"
+            },
+            "quest_position": "Stage 2 of 5",
+            "relevance_rank": 0.5253,
+            "similarity_score": 0.5253,
+            "title": "Home in the World"
+          },
+          {
+            "author": "FREY, CARL BENEDIKT.;",
+            "chunk_id": "the_technology_trap_frey_carl_bened_ch24",
+            "content_preview": "PART V THE FUTURE What of the future? \u2026 The history of computing to date shows no slackening of innovation in the fundamental computational processes or in applications of computation throughout the economy. Perhaps, aside from humans, computers and software are the ultimate general purpose technolo...",
+            "domain": "quest",
+            "power_level": "precise",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.5773900000000001,
+              "knowledge_quest_level": 3,
+              "mystical_factor": 0.7737725746895807,
+              "quest_theme": "wisdom"
+            },
+            "quest_position": "Stage 3 of 5",
+            "relevance_rank": 0.5249,
+            "similarity_score": 0.5249,
+            "title": "The Technology Trap"
+          },
+          {
+            "author": "FREY, CARL BENEDIKT.;",
+            "chunk_id": "the_technology_trap_frey_carl_bened_ch24_p1",
+            "content_preview": "PART V THE FUTURE What of the future? \u2026 The history of computing to date shows no slackening of innovation in the fundamental computational processes or in applications of computation throughout the economy. Perhaps, aside from humans, computers and software are the ultimate general purpose technolo...",
+            "domain": "quest",
+            "power_level": "precise",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.5773900000000001,
+              "knowledge_quest_level": 4,
+              "mystical_factor": 0.9438685525647564,
+              "quest_theme": "discovery"
+            },
+            "quest_position": "Stage 4 of 5",
+            "relevance_rank": 0.5249,
+            "similarity_score": 0.5249,
+            "title": "The Technology Trap"
+          },
+          {
+            "author": "Erich Fromm",
+            "chunk_id": "escape_from_freedom_erich_fromm_ch4",
+            "content_preview": "If I am not for myself, who will be for me? If I am for myself only, what am I? If not now\u2014when? Talmudic Saying Mishnah, Abot Neither heavenly nor earthly, neither mortal nor immortal have we created thee, so that thou mightest be free according to thy own will and honor, to be thy own creator and ...",
+            "domain": "quest",
+            "power_level": "precise",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.5717800000000001,
+              "knowledge_quest_level": 5,
+              "mystical_factor": 0.8787183662160489,
+              "quest_theme": "wisdom"
+            },
+            "quest_position": "Stage 5 of 5",
+            "relevance_rank": 0.5198,
+            "similarity_score": 0.5198,
+            "title": "Escape from Freedom"
+          }
+        ]
+      }
+    },
+    "timestamp": "2025-07-03T12:24:08.301395"
+  },
+  {
+    "test": {
+      "name": "Digital Humanities (Enhanced Mode)",
+      "query": "digital humanities computational literature",
+      "mode": "enhanced"
+    },
+    "hell": {
+      "success": true,
+      "response_time_ms": 4809.821844100952,
+      "data": {
+        "available_modes": [
+          "divine",
+          "mystical",
+          "precise",
+          "enhanced"
+        ],
+        "domain_message": "\ud83d\udd25 Hell Domain: Where knowledge burns brightest in the darkness",
+        "hell_domain_status": {
+          "domain_power": "hell_standard",
+          "infernal_power": "maximum",
+          "knowledge_depth": "divine",
+          "search_intensity": "enhanced",
+          "seeker_activated": false,
+          "similarity_threshold": 0.1,
+          "total_results": 5
+        },
+        "query_metadata": {
+          "domain": "hell",
+          "mode": "enhanced",
+          "port": 5571,
+          "query": "digital humanities computational literature",
+          "response_time_ms": 4807.43,
+          "seeker_mode": null,
+          "timestamp": "2025-07-03T16:24:13.110418"
+        },
+        "results": [
+          {
+            "author": "Stephenson, Neal",
+            "chunk_id": "fall_or_dodge_in_hel_stephenson_neal_ch77",
+            "content_preview": "Copyright This is a work of fiction. Names, characters, places, and incidents are products of the author\u2019s imagination or are used fictitiously and are not to be construed as real. Any resemblance to actual events, locales, organizations, or persons, living or dead, is entirely coincidental. FALL; O...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.9646593624649107,
+              "infernal_relevance": 0.67752,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "enhanced",
+            "relevance_rank": 0.5646,
+            "similarity_score": 0.5646,
+            "title": "Fall; or, Dodge in Hell"
+          },
+          {
+            "author": "Stephenson, Neal",
+            "chunk_id": "fall_or_dodge_in_hel_stephenson_neal_ch77_p1",
+            "content_preview": "Copyright This is a work of fiction. Names, characters, places, and incidents are products of the author\u2019s imagination or are used fictitiously and are not to be construed as real. Any resemblance to actual events, locales, organizations, or persons, living or dead, is entirely coincidental. FALL; O...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.8799871909588584,
+              "infernal_relevance": 0.67752,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "enhanced",
+            "relevance_rank": 0.5646,
+            "similarity_score": 0.5646,
+            "title": "Fall; or, Dodge in Hell"
+          },
+          {
+            "author": "V.E Schwab",
+            "chunk_id": "a_darker_shade_of_ma_ve_schwab_ch89",
+            "content_preview": "\u201cSmart, funny, fast, more than a little terrifying.\u201dKim Stanley Robinson, Hugo Award-winning author of the Mars trilogy\u201cBrain-stretching speculation in brain science and metaphysics.\u201dWalter Jon Williams, Nebula Award-winning author of Daddy\u2019s World\u201c[A] new highpoint in the subgenre of Future Noir.\u201dG...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.8531173264399037,
+              "infernal_relevance": 0.67236,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "enhanced",
+            "relevance_rank": 0.5603,
+            "similarity_score": 0.5603,
+            "title": "A Darker Shade of Magic"
+          },
+          {
+            "author": "V.E Schwab",
+            "chunk_id": "a_darker_shade_of_ma_ve_schwab_ch89_p1",
+            "content_preview": "\u201cSmart, funny, fast, more than a little terrifying.\u201dKim Stanley Robinson, Hugo Award-winning author of the Mars trilogy\u201cBrain-stretching speculation in brain science and metaphysics.\u201dWalter Jon Williams, Nebula Award-winning author of Daddy\u2019s World\u201c[A] new highpoint in the subgenre of Future Noir.\u201dG...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.7345419837937416,
+              "infernal_relevance": 0.67236,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "enhanced",
+            "relevance_rank": 0.5603,
+            "similarity_score": 0.5603,
+            "title": "A Darker Shade of Magic"
+          },
+          {
+            "author": "Naomi Novik",
+            "chunk_id": "spinning_silver_naomi_novik_ch31",
+            "content_preview": "First published 2018 by Del Rey, an imprint of Random House, a division of Random House LLC, a Penguin Random House Company, New York First published in the UK 2018 by Macmillan This electronic edition published 2018 by Macmillan an imprint of Pan Macmillan 20 New Wharf Road, London N1 9RR Associate...",
+            "domain": "hell",
+            "hell_domain_metrics": {
+              "esoteric_factor": 0.8516491353910296,
+              "infernal_relevance": 0.66516,
+              "knowledge_intensity": "mortal"
+            },
+            "power_level": "enhanced",
+            "relevance_rank": 0.5543,
+            "similarity_score": 0.5543,
+            "title": "Spinning Silver"
+          }
+        ]
+      }
+    },
+    "quest": {
+      "success": true,
+      "response_time_ms": 4796.77414894104,
+      "data": {
+        "available_modes": [
+          "mystical",
+          "precise",
+          "enhanced",
+          "adventure"
+        ],
+        "domain_message": "\u2694\ufe0f Quest Domain: Your adventure through knowledge begins",
+        "query_metadata": {
+          "domain": "quest",
+          "mode": "enhanced",
+          "port": 5572,
+          "query": "digital humanities computational literature",
+          "response_time_ms": 4794.11,
+          "seeker_mode": null,
+          "timestamp": "2025-07-03T16:24:17.907227"
+        },
+        "quest_domain_status": {
+          "adventure_power": "mystical",
+          "domain_power": "quest_standard",
+          "knowledge_depth": "quest-driven",
+          "search_mode": "enhanced",
+          "seeker_activated": false,
+          "similarity_threshold": 0.2,
+          "total_results": 5
+        },
+        "quest_guidance": "Each result is a step in your knowledge journey",
+        "results": [
+          {
+            "author": "Stephenson, Neal",
+            "chunk_id": "fall_or_dodge_in_hel_stephenson_neal_ch77",
+            "content_preview": "Copyright This is a work of fiction. Names, characters, places, and incidents are products of the author\u2019s imagination or are used fictitiously and are not to be construed as real. Any resemblance to actual events, locales, organizations, or persons, living or dead, is entirely coincidental. FALL; O...",
+            "domain": "quest",
+            "power_level": "enhanced",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.6210600000000001,
+              "knowledge_quest_level": 1,
+              "mystical_factor": 0.6358932262876372,
+              "quest_theme": "enlightenment"
+            },
+            "quest_position": "Stage 1 of 5",
+            "relevance_rank": 0.5646,
+            "similarity_score": 0.5646,
+            "title": "Fall; or, Dodge in Hell"
+          },
+          {
+            "author": "Stephenson, Neal",
+            "chunk_id": "fall_or_dodge_in_hel_stephenson_neal_ch77_p1",
+            "content_preview": "Copyright This is a work of fiction. Names, characters, places, and incidents are products of the author\u2019s imagination or are used fictitiously and are not to be construed as real. Any resemblance to actual events, locales, organizations, or persons, living or dead, is entirely coincidental. FALL; O...",
+            "domain": "quest",
+            "power_level": "enhanced",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.6210600000000001,
+              "knowledge_quest_level": 2,
+              "mystical_factor": 0.6076774342524723,
+              "quest_theme": "discovery"
+            },
+            "quest_position": "Stage 2 of 5",
+            "relevance_rank": 0.5646,
+            "similarity_score": 0.5646,
+            "title": "Fall; or, Dodge in Hell"
+          },
+          {
+            "author": "V.E Schwab",
+            "chunk_id": "a_darker_shade_of_ma_ve_schwab_ch89",
+            "content_preview": "\u201cSmart, funny, fast, more than a little terrifying.\u201dKim Stanley Robinson, Hugo Award-winning author of the Mars trilogy\u201cBrain-stretching speculation in brain science and metaphysics.\u201dWalter Jon Williams, Nebula Award-winning author of Daddy\u2019s World\u201c[A] new highpoint in the subgenre of Future Noir.\u201dG...",
+            "domain": "quest",
+            "power_level": "enhanced",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.61633,
+              "knowledge_quest_level": 3,
+              "mystical_factor": 0.6146723333997544,
+              "quest_theme": "journey"
+            },
+            "quest_position": "Stage 3 of 5",
+            "relevance_rank": 0.5603,
+            "similarity_score": 0.5603,
+            "title": "A Darker Shade of Magic"
+          },
+          {
+            "author": "V.E Schwab",
+            "chunk_id": "a_darker_shade_of_ma_ve_schwab_ch89_p1",
+            "content_preview": "\u201cSmart, funny, fast, more than a little terrifying.\u201dKim Stanley Robinson, Hugo Award-winning author of the Mars trilogy\u201cBrain-stretching speculation in brain science and metaphysics.\u201dWalter Jon Williams, Nebula Award-winning author of Daddy\u2019s World\u201c[A] new highpoint in the subgenre of Future Noir.\u201dG...",
+            "domain": "quest",
+            "power_level": "enhanced",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.61633,
+              "knowledge_quest_level": 4,
+              "mystical_factor": 0.6356953222294577,
+              "quest_theme": "enlightenment"
+            },
+            "quest_position": "Stage 4 of 5",
+            "relevance_rank": 0.5603,
+            "similarity_score": 0.5603,
+            "title": "A Darker Shade of Magic"
+          },
+          {
+            "author": "Naomi Novik",
+            "chunk_id": "spinning_silver_naomi_novik_ch31",
+            "content_preview": "First published 2018 by Del Rey, an imprint of Random House, a division of Random House LLC, a Penguin Random House Company, New York First published in the UK 2018 by Macmillan This electronic edition published 2018 by Macmillan an imprint of Pan Macmillan 20 New Wharf Road, London N1 9RR Associate...",
+            "domain": "quest",
+            "power_level": "enhanced",
+            "quest_domain_metrics": {
+              "adventure_relevance": 0.6097300000000001,
+              "knowledge_quest_level": 5,
+              "mystical_factor": 0.659283870434121,
+              "quest_theme": "enlightenment"
+            },
+            "quest_position": "Stage 5 of 5",
+            "relevance_rank": 0.5543,
+            "similarity_score": 0.5543,
+            "title": "Spinning Silver"
+          }
+        ]
+      }
+    },
+    "timestamp": "2025-07-03T12:24:17.908137"
+  }
+]

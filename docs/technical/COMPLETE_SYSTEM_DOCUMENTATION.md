@@ -8,15 +8,25 @@ This document traces the **complete pipeline** from building a vector-embedded k
 
 ## System Architecture Overview
 
-### Three-Layer Knowledge Production System
+### Four-Layer Intelligent Research System
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
+│                  Layer 0: Intelligent Acquisition          │
+│  🔗 Babel's Archive Integration + Priority Downloads       │
+│  • 5,839 audiobook collection drives EPUB acquisition      │
+│  • Reading completion history prioritizes downloads        │
+│  • Mass download orchestrator (800 books/day capacity)     │
+│  • Automatic pipeline: Downloads → Processing → Knowledge  │
+└─────────────────────────────────────────────────────────────┘
+                                ↓
+┌─────────────────────────────────────────────────────────────┐
 │                    Layer 1: Knowledge Corpus                │
 │  📚 PostgreSQL Database + Vector Embeddings                 │
-│  • 35 books processed into 1,286 searchable chunks         │
-│  • 5.49M words with 768-dimensional vector representations  │
+│  • Automated EPUB processing pipeline                      │
+│  • Scalable vector embeddings with 768-dimensional reps    │
 │  • Full-text search + semantic similarity                  │
+│  • Priority processing for completed books                 │
 └─────────────────────────────────────────────────────────────┘
                                 ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -39,6 +49,43 @@ This document traces the **complete pipeline** from building a vector-embedded k
 ---
 
 ## Implementation Components
+
+### 0. Intelligent Book Acquisition (Layer 0)
+
+**Files:**
+- `process_reading_completion.py` - Reading history processor
+- `mass_download_orchestrator.py` - Mass download coordinator
+- `src/automated_ebook_processor.py` - Auto-EPUB processing
+- `database/data/audiobook_ebook_tracker.db` - 5,839 audiobook collection
+
+**Key Features:**
+- **Reading-Driven Acquisition**: 5,839 audiobook collection drives EPUB downloads
+- **Priority Processing**: Completed books downloaded first (57 matched from reading history)
+- **Mass Download Orchestration**: 800 books/day capacity with rate limiting
+- **Automatic Integration**: Downloads → Processing → Knowledge Base seamlessly
+- **Completion Tracking**: Database schema extensions for reading progress
+
+**Integration Pipeline:**
+```python
+# Reading History → Priority Queue → Mass Downloads → Auto-Processing
+reading_data = parse_completion_history()  # 150+ completed books
+priority_queue = cross_reference_audiobooks()  # 57 matches found
+mass_downloads = orchestrate_downloads(limit=800)  # Babel's Archive API
+auto_processing = trigger_epub_pipeline()  # LibraryOfBabel ingestion
+```
+
+**Database Schema Extensions:**
+```sql
+-- Completion tracking added to audiobooks table
+ALTER TABLE audiobooks ADD COLUMN is_completed INTEGER DEFAULT 0;
+ALTER TABLE audiobooks ADD COLUMN date_completed TEXT;
+ALTER TABLE audiobooks ADD COLUMN reading_priority INTEGER DEFAULT 0;
+```
+
+**APIs Integration:**
+- **Babel's Archive**: `localhost:8181/api` - Search and download coordination
+- **LibraryOfBabel**: `localhost:5560/api` - Processing and knowledge base
+- **Cross-System Communication**: Symbolic links and automated triggers
 
 ### 1. Vector Knowledge Base (Layer 1)
 
