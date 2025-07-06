@@ -17,7 +17,8 @@
       "Bash(git push:*)",
       "Bash(kill:*)",
       "Bash(pkill:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git filter-branch:*)"
     ],
     "deny": []
   }
