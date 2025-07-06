@@ -14,7 +14,10 @@
       "Bash(python:*)",
       "Bash(git check-ignore:*)",
       "Bash(git add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(kill:*)",
+      "Bash(pkill:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }

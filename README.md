@@ -61,10 +61,10 @@ The system enables instant AI-powered research across thousands of books, revolu
 - **Knowledge Discovery**: Find connections between philosophy, technology, politics
 - **Research Acceleration**: Query concepts across entire personal library instantly
 
-### 🔐 Secure External Access
+### 🔐 Secure Local Access
 - **HTTPS/TLS Encryption**: Production-grade SSL with iOS-compatible certificates
 - **Multi-Method Authentication**: Bearer tokens, API key headers, URL parameters
-- **External IP Access**: 73.161.54.75:5562 accessible from anywhere
+- **Local Network Access**: Available on localhost and local network
 - **iOS Shortcuts Integration**: Optimized for mobile research workflows
 - **Security Monitoring**: Rate limiting, request logging, intrusion detection
 
