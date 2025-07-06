@@ -34,7 +34,7 @@ DATABASE_CONFIG = {
 
 # Paths
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-OUTPUT_DIR = PROJECT_ROOT / 'output'
+OUTPUT_DIR = Path(sys.argv[1]) if len(sys.argv) > 1 else PROJECT_ROOT / 'database' / 'data'
 LOG_FILE = PROJECT_ROOT / 'database' / 'ingestion.log'
 
 class DatabaseIngester:
