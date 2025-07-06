@@ -15,6 +15,11 @@ import time
 import requests
 import json
 import numpy as np
+import uuid
+import threading
+import subprocess
+from pathlib import Path
+from werkzeug.utils import secure_filename
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
 
@@ -28,6 +33,14 @@ DB_CONFIG = {
     'database': os.getenv('DB_NAME', 'knowledge_base'),
     'user': os.getenv('DB_USER', 'weixiangzhang'),
     'port': 5432
+}
+
+# Upload configuration
+UPLOAD_CONFIG = {
+    'upload_folder': '/Users/weixiangzhang/Local Dev/LibraryOfBabel/ebooks/downloads',
+    'max_file_size': 100 * 1024 * 1024,  # 100MB
+    'allowed_extensions': {'.epub', '.mobi', '.azw3', '.azw'},
+    'processing_script': '/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/automated_ebook_processor.py'
 }
 
 class BookSearchEngine:
@@ -279,7 +292,8 @@ def api_info():
                     '/api/secure/books/search/<book_id>',
                     '/api/secure/books/outline/<book_id>',
                     '/api/secure/books/chapter/<book_id>/<chapter>',
-                    '/api/secure/books/search-across'
+                    '/api/secure/books/search-across',
+                    '/api/secure/upload-epub'
                 ]
             },
             'auth_methods': [
@@ -514,6 +528,19 @@ def secure_get_api_docs():
                         'author': 'Author filter (optional)'
                     },
                     'example': 'GET /api/secure/books/search-across?q=power&author=Foucault'
+                },
+                'upload_epub': {
+                    'path': '/api/secure/upload-epub',
+                    'method': 'POST',
+                    'description': 'Upload EPUB file for automated processing and database ingestion',
+                    'auth_required': True,
+                    'content_type': 'multipart/form-data',
+                    'parameters': {
+                        'file': 'EPUB file to upload (required)'
+                    },
+                    'supported_formats': ['.epub', '.mobi', '.azw3', '.azw'],
+                    'max_file_size': '100MB',
+                    'example': 'POST /api/secure/upload-epub (with file in form data)'
                 }
             }
         }
@@ -525,6 +552,142 @@ def secure_get_api_docs():
         'security': {'authenticated': True, 'api_key_valid': True},
         'timestamp': datetime.now().isoformat()
     })
+
+@app.route('/api/secure/upload-epub', methods=['POST'])
+@require_api_key
+def secure_upload_epub():
+    """Upload EPUB file for processing - SECURED"""
+    start_time = time.time()
+    
+    # Check if file is present
+    if 'file' not in request.files:
+        return jsonify({
+            'success': False,
+            'error': 'No file provided',
+            'message': 'Please include an EPUB file in the "file" parameter'
+        }), 400
+    
+    file = request.files['file']
+    
+    # Check if file was actually selected
+    if file.filename == '':
+        return jsonify({
+            'success': False,
+            'error': 'No file selected',
+            'message': 'Please select a file to upload'
+        }), 400
+    
+    # Validate file extension
+    filename = secure_filename(file.filename)
+    file_ext = Path(filename).suffix.lower()
+    
+    if file_ext not in UPLOAD_CONFIG['allowed_extensions']:
+        return jsonify({
+            'success': False,
+            'error': 'Invalid file type',
+            'message': f'Only {", ".join(UPLOAD_CONFIG["allowed_extensions"])} files are supported',
+            'allowed_types': list(UPLOAD_CONFIG['allowed_extensions'])
+        }), 400
+    
+    # Generate unique filename to prevent conflicts
+    upload_id = str(uuid.uuid4())[:8]
+    safe_filename = f"{upload_id}_{filename}"
+    upload_path = Path(UPLOAD_CONFIG['upload_folder']) / safe_filename
+    
+    try:
+        # Ensure upload directory exists
+        os.makedirs(UPLOAD_CONFIG['upload_folder'], exist_ok=True)
+        
+        # Save file
+        file.save(str(upload_path))
+        
+        # Check file size after saving
+        file_size = upload_path.stat().st_size
+        if file_size > UPLOAD_CONFIG['max_file_size']:
+            # Remove file if too large
+            upload_path.unlink()
+            return jsonify({
+                'success': False,
+                'error': 'File too large',
+                'message': f'File size ({file_size / 1024 / 1024:.1f}MB) exceeds maximum allowed size ({UPLOAD_CONFIG["max_file_size"] / 1024 / 1024}MB)',
+                'max_size_mb': UPLOAD_CONFIG['max_file_size'] / 1024 / 1024
+            }), 413
+        
+        # Start background processing
+        def process_epub_async():
+            """Process EPUB in background thread"""
+            try:
+                logger.info(f"Starting background processing for {safe_filename}")
+                
+                # Use virtual environment python if it exists
+                venv_python = "/Users/weixiangzhang/Local Dev/LibraryOfBabel/venv/bin/python"
+                python_cmd = venv_python if Path(venv_python).exists() else "python3"
+                
+                # Run automated processor
+                result = subprocess.run([
+                    python_cmd,
+                    UPLOAD_CONFIG['processing_script'],
+                    '--single-file', str(upload_path)
+                ], capture_output=True, text=True, timeout=300)  # 5 minute timeout
+                
+                if result.returncode == 0:
+                    logger.info(f"Successfully processed {safe_filename}")
+                    # Move to processed directory
+                    processed_dir = Path(UPLOAD_CONFIG['upload_folder']).parent / 'processed'
+                    processed_dir.mkdir(exist_ok=True)
+                    processed_path = processed_dir / safe_filename
+                    shutil.move(str(upload_path), str(processed_path))
+                else:
+                    logger.error(f"Failed to process {safe_filename}: {result.stderr}")
+                    # Move to failed directory
+                    failed_dir = Path(UPLOAD_CONFIG['upload_folder']).parent / 'failed'
+                    failed_dir.mkdir(exist_ok=True)
+                    failed_path = failed_dir / safe_filename
+                    shutil.move(str(upload_path), str(failed_path))
+                    
+            except subprocess.TimeoutExpired:
+                logger.error(f"Processing timeout for {safe_filename}")
+            except Exception as e:
+                logger.error(f"Processing error for {safe_filename}: {str(e)}")
+        
+        # Start processing in background thread
+        processing_thread = threading.Thread(target=process_epub_async, daemon=True)
+        processing_thread.start()
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'upload_id': upload_id,
+                'filename': filename,
+                'safe_filename': safe_filename,
+                'file_size_mb': round(file_size / 1024 / 1024, 2),
+                'file_type': file_ext,
+                'upload_path': str(upload_path),
+                'status': 'uploaded',
+                'processing_status': 'queued',
+                'message': 'File uploaded successfully and queued for processing'
+            },
+            'security': {'authenticated': True, 'api_key_valid': True},
+            'response_time_ms': round((time.time() - start_time) * 1000, 2),
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Upload error: {str(e)}")
+        
+        # Clean up file if it exists
+        if upload_path.exists():
+            try:
+                upload_path.unlink()
+            except:
+                pass
+        
+        return jsonify({
+            'success': False,
+            'error': 'Upload failed',
+            'message': str(e),
+            'security': {'authenticated': True, 'api_key_valid': True}
+        }), 500
 
 # Error handlers
 @app.errorhandler(401)
@@ -571,6 +734,7 @@ if __name__ == '__main__':
     print("   • GET /api/secure/books/outline/<id> - Book outline (auth required)")
     print("   • GET /api/secure/books/chapter/<id>/<chapter> - Chapter content (auth required)")
     print("   • GET /api/secure/books/search-across?q=query - Cross-book search (auth required)")
+    print("   • POST /api/secure/upload-epub - Upload EPUB for processing (auth required)")
     print("   • GET /api/secure/docs - API documentation (auth required)")
     print("")
     print("🌐 Starting secure server on https://localhost:5562")

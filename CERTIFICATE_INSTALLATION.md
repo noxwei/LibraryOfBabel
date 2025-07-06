@@ -9,7 +9,7 @@ Your LibraryOfBabel APIs now use proper SSL certificates! For the best experienc
 #### **Step 1: Download CA Certificate**
 Open Safari and visit:
 ```
-https://73.161.54.75:5562/api/secure/ca-cert
+https://[YOUR-SERVER-IP]:5562/api/secure/ca-cert
 ```
 
 #### **Step 2: Install Profile**
@@ -28,21 +28,21 @@ https://73.161.54.75:5562/api/secure/ca-cert
 ### 🖥️ **For Desktop Browsers**
 
 #### **Chrome/Edge:**
-1. Download certificate: `https://73.161.54.75:5562/api/secure/ca-cert`
+1. Download certificate: `https://[YOUR-SERVER-IP]:5562/api/secure/ca-cert`
 2. Chrome Settings → Privacy and Security → Security → Manage Certificates
 3. Authorities tab → Import → Select downloaded file
 4. Check "Trust this certificate for identifying websites"
 5. Restart browser
 
 #### **Firefox:**
-1. Download certificate: `https://73.161.54.75:5562/api/secure/ca-cert`
+1. Download certificate: `https://[YOUR-SERVER-IP]:5562/api/secure/ca-cert`
 2. Firefox Settings → Privacy & Security → Certificates → View Certificates
 3. Authorities tab → Import → Select downloaded file
 4. Check "Trust this CA to identify websites"
 5. Restart browser
 
 #### **Safari (macOS):**
-1. Download certificate: `https://73.161.54.75:5562/api/secure/ca-cert`
+1. Download certificate: `https://[YOUR-SERVER-IP]:5562/api/secure/ca-cert`
 2. Double-click downloaded .crt file
 3. Keychain Access opens → Add to System keychain
 4. Find certificate → Double-click → Trust → "Always Trust"
@@ -53,13 +53,13 @@ https://73.161.54.75:5562/api/secure/ca-cert
 Once installed, these URLs will work without SSL warnings:
 
 #### **Secure Book Search API:**
-- **API Info**: `https://73.161.54.75:5562/api/secure/info`
-- **Books List**: `https://73.161.54.75:5562/api/secure/books/list?api_key=YOUR_KEY`
-- **Search Book**: `https://73.161.54.75:5562/api/secure/books/search/260?api_key=YOUR_KEY&q=consciousness`
+- **API Info**: `https://[YOUR-SERVER-IP]:5562/api/secure/info`
+- **Books List**: `https://[YOUR-SERVER-IP]:5562/api/secure/books/list?api_key=YOUR_KEY`
+- **Search Book**: `https://[YOUR-SERVER-IP]:5562/api/secure/books/search/260?api_key=YOUR_KEY&q=consciousness`
 
 #### **For iOS Shortcuts:**
 ```
-https://73.161.54.75:5562/api/secure/books/search/260?api_key=M39Gqz5e8D-_qkyuy37ar87_jNU0EPs_nO6_izPnGaU&q=consciousness
+https://[YOUR-SERVER-IP]:5562/api/secure/books/search/260?api_key=M39Gqz5e8D-_qkyuy37ar87_jNU0EPs_nO6_izPnGaU&q=consciousness
 ```
 
 ### 🔑 **API Authentication**
@@ -86,7 +86,7 @@ Make sure your Xfinity router forwards:
 ### 🧪 **Test Certificate Installation**
 After installation, visit:
 ```
-https://73.161.54.75:5562/api/secure/info
+https://[YOUR-SERVER-IP]:5562/api/secure/info
 ```
 
 You should see:

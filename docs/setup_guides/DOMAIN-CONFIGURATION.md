@@ -20,7 +20,7 @@ curl ifconfig.me
 
 Or visit: https://whatismyipaddress.com/
 
-**Example:** `73.161.54.75`
+**Example:** `[YOUR-EXTERNAL-IP]`
 
 ## Step 2: DNS Configuration
 
@@ -52,7 +52,7 @@ For domain `yourdomain.com`:
 
 | Type | Host | Value | TTL | Purpose |
 |------|------|-------|-----|---------|
-| A | api | 73.161.54.75 | 15 min | LibraryOfBabel API |
+| A | api | [YOUR-EXTERNAL-IP] | 15 min | LibraryOfBabel API |
 | A | @ | 216.40.34.41 | 15 min | Main domain |
 | A | * | 216.40.34.41 | 15 min | Wildcard subdomains |
 | MX | @ | 10 mx.yourdomain.com | 15 min | Email |
@@ -108,7 +108,7 @@ nslookup -type=TXT _acme-challenge.api.yourdomain.com
 ```
 # For A record
 Name: api.yourdomain.com
-Address: 73.161.54.75
+Address: [YOUR-EXTERNAL-IP]
 
 # For TXT record
 _acme-challenge.api.yourdomain.com text = "verification-string-from-certbot"
