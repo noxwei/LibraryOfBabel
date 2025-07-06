@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 class SecurityManager:
     def __init__(self, api_key: str = None):
-        # Use provided API key or load from environment
-        self.api_key = api_key or os.getenv('LIBRARY_API_KEY', 'M39Gqz5e8D-_qkyuy37ar87_jNU0EPs_nO6_izPnGaU')
+        # Use provided API key or load from environment/file
+        self.api_key = api_key or self._load_api_key()
         self.api_key_hash = hashlib.sha256(self.api_key.encode()).hexdigest()
         
         # Rate limiting (simple in-memory store)
@@ -26,6 +26,33 @@ class SecurityManager:
         
         logger.info(f"🔐 Security Manager initialized")
         logger.info(f"🔑 API Key (last 8 chars): ...{self.api_key[-8:]}")
+    
+    def _load_api_key(self):
+        """Load API key from environment or file"""
+        # Try environment variable first
+        api_key = os.getenv('LIBRARY_API_KEY')
+        if api_key:
+            return api_key
+        
+        # Try to load from api_key.txt file
+        api_key_file = os.path.join(os.path.dirname(__file__), '..', 'api_key.txt')
+        if os.path.exists(api_key_file):
+            with open(api_key_file, 'r') as f:
+                return f.read().strip()
+        
+        # Generate new key if none exists
+        new_key = secrets.token_urlsafe(32)
+        logger.warning(f"🔑 Generated new API key - save this: {new_key}")
+        
+        # Save to file
+        try:
+            with open(api_key_file, 'w') as f:
+                f.write(new_key)
+            logger.info("🔑 API key saved to api_key.txt")
+        except Exception as e:
+            logger.error(f"Failed to save API key: {e}")
+        
+        return new_key
     
     def require_api_key(self, f):
         """Decorator to require API key authentication"""

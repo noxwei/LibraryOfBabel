@@ -59,12 +59,12 @@ Once installed, these URLs will work without SSL warnings:
 
 #### **For iOS Shortcuts:**
 ```
-https://[YOUR-SERVER-IP]:5562/api/secure/books/search/260?api_key=M39Gqz5e8D-_qkyuy37ar87_jNU0EPs_nO6_izPnGaU&q=consciousness
+https://[YOUR-SERVER-IP]:5562/api/secure/books/search/260?api_key=[YOUR-API-KEY]&q=consciousness
 ```
 
 ### 🔑 **API Authentication**
 ```
-API Key: M39Gqz5e8D-_qkyuy37ar87_jNU0EPs_nO6_izPnGaU
+API Key: [YOUR-API-KEY]
 ```
 
 **Authentication Methods:**
