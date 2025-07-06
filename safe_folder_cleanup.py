@@ -186,7 +186,7 @@ class SafeFolderCleanup:
             ("monitor_and_launch_agents.py", "src/automation/monitor_and_launch_agents.py", "(automation)"),
             
             # Utilities
-            ("src/mam_api_client.py", "src/utils/mam_api_client.py", "(utils)"),
+            # ("src/mam_api_client.py", "src/utils/mam_api_client.py", "(utils)"),  # Removed MAM
             ("src/transmission_client.py", "src/utils/transmission_client.py", "(utils)"),
             ("src/genre_classifier.py", "src/utils/genre_classifier.py", "(utils)"),
         ]
@@ -210,7 +210,7 @@ class SafeFolderCleanup:
             # Archive outdated docs
             ("EBOOK_FOCUS_BRANCH.md", "docs/archive/EBOOK_FOCUS_BRANCH.md", "(archive)"),
             ("ESSAY_CREATION_PROCESS.md", "docs/archive/ESSAY_CREATION_PROCESS.md", "(archive)"),
-            ("MAM_INTEGRATION_STATUS.md", "docs/archive/MAM_INTEGRATION_STATUS.md", "(archive)"),
+            # ("MAM_INTEGRATION_STATUS.md", "docs/archive/MAM_INTEGRATION_STATUS.md", "(archive)"),  # Removed MAM
             ("PHASE_5_LAUNCH_STATUS.md", "docs/archive/PHASE_5_LAUNCH_STATUS.md", "(archive)"),
             ("PHASE_6_FRONTEND_GUIDE.md", "docs/archive/PHASE_6_FRONTEND_GUIDE.md", "(archive)"),
             ("NEXT_AGENT_TIMELINE.md", "docs/archive/NEXT_AGENT_TIMELINE.md", "(archive)"),
@@ -242,7 +242,7 @@ class SafeFolderCleanup:
             
             # Agent logs
             ("agent_monitor.log", "logs/agents/agent_monitor.log", "(agents)"),
-            ("mam_client.log", "logs/processing/mam_client.log", "(processing)"),
+            # ("mam_client.log", "logs/processing/mam_client.log", "(processing)"),  # Removed MAM
         ]
         
         success = True

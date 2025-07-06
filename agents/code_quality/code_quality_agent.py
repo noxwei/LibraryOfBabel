@@ -89,9 +89,9 @@ class CodeQualityAgent:
         
         # Files to clean up or organize
         self.cleanup_targets = {
-            'move_to_scripts': ['setup_mam_system.py', 'analyze_completed_downloads.py'],
+            'move_to_scripts': ['analyze_completed_downloads.py'],  # Removed MAM setup
             'move_to_tests': ['test_clean_structure.py', 'test_reddit_agent.py', 'validation_test.py'],
-            'consolidate_configs': ['mam_session.json', 'missing_ebooks.json'],
+            'consolidate_configs': ['missing_ebooks.json'],  # Removed MAM session
             'organize_logs': ['*.log'],
             'archive_old_reports': ['*_report.json', 'ebook_analysis_*.json']
         }

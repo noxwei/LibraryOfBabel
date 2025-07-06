@@ -39,7 +39,7 @@ class AudiobookRecord:
 class EbookRecord:
     """Ebook availability and download status"""
     audiobook_id: int
-    mam_torrent_id: str
+    torrent_id: str
     ebook_title: str
     ebook_author: str
     file_format: str  # epub, pdf, mobi, etc.
@@ -80,11 +80,11 @@ class AudiobookEbookTracker:
                     last_updated DATETIME DEFAULT CURRENT_TIMESTAMP
                 );
                 
-                -- Ebooks table (MAM search results and downloads)
+                -- Ebooks table (search results and downloads)
                 CREATE TABLE IF NOT EXISTS ebooks (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     audiobook_id INTEGER,
-                    mam_torrent_id TEXT UNIQUE,
+                    torrent_id TEXT UNIQUE,
                     ebook_title TEXT NOT NULL,
                     ebook_author TEXT NOT NULL,
                     file_format TEXT,
@@ -108,7 +108,7 @@ class AudiobookEbookTracker:
                     search_query TEXT,
                     results_found INTEGER,
                     search_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    search_engine TEXT DEFAULT 'MAM',
+                    search_engine TEXT DEFAULT 'ANNAS_ARCHIVE',
                     FOREIGN KEY (audiobook_id) REFERENCES audiobooks (album_id)
                 );
                 
@@ -240,13 +240,13 @@ class AudiobookEbookTracker:
             with sqlite3.connect(self.db_path) as conn:
                 conn.execute("""
                     INSERT OR REPLACE INTO ebooks (
-                        audiobook_id, mam_torrent_id, ebook_title, ebook_author,
+                        audiobook_id, torrent_id, ebook_title, ebook_author,
                         file_format, file_size_mb, seeders, leechers,
                         match_confidence, download_status, torrent_file_path
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     ebook.audiobook_id,
-                    ebook.mam_torrent_id,
+                    ebook.torrent_id,
                     ebook.ebook_title,
                     ebook.ebook_author,
                     ebook.file_format,
@@ -343,13 +343,13 @@ class AudiobookEbookTracker:
                         UPDATE ebooks 
                         SET download_status = ?, download_date = CURRENT_TIMESTAMP,
                             local_file_path = ?, last_updated = CURRENT_TIMESTAMP
-                        WHERE mam_torrent_id = ?
+                        WHERE torrent_id = ?
                     """, (status, local_file_path, torrent_id))
                 else:
                     conn.execute("""
                         UPDATE ebooks 
                         SET download_status = ?, last_updated = CURRENT_TIMESTAMP
-                        WHERE mam_torrent_id = ?
+                        WHERE torrent_id = ?
                     """, (status, torrent_id))
                 conn.commit()
         except sqlite3.Error as e:

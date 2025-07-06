@@ -142,7 +142,15 @@ class SecurityManager:
         """Get SSL context for HTTPS"""
         ssl_dir = os.path.join(os.path.dirname(__file__), '..', 'ssl')
         
-        # Try fresh iOS-compatible certificate first (latest generation)
+        # Try Let's Encrypt certificate first (browser-trusted)
+        letsencrypt_cert = os.path.join(ssl_dir, 'letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem')
+        letsencrypt_key = os.path.join(ssl_dir, 'letsencrypt-config/live/api.ashortstayinhell.com/privkey.pem')
+        
+        if os.path.exists(letsencrypt_cert) and os.path.exists(letsencrypt_key):
+            logger.info("🔒 Using Let's Encrypt certificate for api.ashortstayinhell.com")
+            return (letsencrypt_cert, letsencrypt_key)
+        
+        # Try fresh iOS-compatible certificate (fallback)
         fresh_cert_file = os.path.join(ssl_dir, 'fresh-server-cert.pem')
         fresh_key_file = os.path.join(ssl_dir, 'fresh-server-key.pem')
         

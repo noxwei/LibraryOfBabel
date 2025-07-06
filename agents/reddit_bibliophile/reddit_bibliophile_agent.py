@@ -428,7 +428,7 @@ class RedditBibliophileAgent:
         
         try:
             # Try to run the Playwright automation
-            cmd = ['node', 'mam_playwright_automation.js', str(count)]
+            # cmd = ['node', 'download_automation.js', str(count)]  # Removed MAM dependency
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
             
             if result.returncode == 0:

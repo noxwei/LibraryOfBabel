@@ -12,6 +12,9 @@ import re
 import os
 import sys
 import time
+import requests
+import json
+import numpy as np
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
 
@@ -30,6 +33,8 @@ DB_CONFIG = {
 class BookSearchEngine:
     def __init__(self):
         self.db_config = DB_CONFIG
+        self.ollama_url = "http://localhost:11434/api/embeddings"
+        self.model_name = "nomic-embed-text"
     
     def get_db(self):
         """Get database connection"""
@@ -120,6 +125,127 @@ class BookSearchEngine:
             highlighted = pattern.sub(lambda m: f'<mark>{m.group()}</mark>', highlighted)
         
         return highlighted
+    
+    def generate_embedding(self, text: str) -> Optional[List[float]]:
+        """Generate embedding for text using Ollama's nomic-embed-text model"""
+        try:
+            payload = {
+                "model": self.model_name,
+                "prompt": text
+            }
+            
+            response = requests.post(
+                self.ollama_url,
+                json=payload,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                return result.get('embedding', [])
+            else:
+                logger.error(f"Ollama API error: {response.status_code} - {response.text}")
+                return None
+                
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request to Ollama failed: {e}")
+            return None
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON decode error: {e}")
+            return None
+    
+    def cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
+        """Calculate cosine similarity between two vectors"""
+        try:
+            vec1 = np.array(vec1)
+            vec2 = np.array(vec2)
+            
+            dot_product = np.dot(vec1, vec2)
+            norm_vec1 = np.linalg.norm(vec1)
+            norm_vec2 = np.linalg.norm(vec2)
+            
+            if norm_vec1 == 0 or norm_vec2 == 0:
+                return 0.0
+            
+            return dot_product / (norm_vec1 * norm_vec2)
+        except Exception as e:
+            logger.error(f"Error calculating cosine similarity: {e}")
+            return 0.0
+    
+    def search_across_books(self, query: str, author: str = None, limit: int = 10) -> Dict[str, Any]:
+        """Perform semantic search across all books using vector embeddings"""
+        # Generate embedding for query
+        query_embedding = self.generate_embedding(query)
+        if not query_embedding:
+            logger.error("Failed to generate embedding for query")
+            return {"error": "Failed to generate embedding for query"}
+        
+        # Get all chunks with embeddings
+        conn = self.get_db()
+        if not conn:
+            return {"error": "Database connection failed"}
+        
+        try:
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            
+            # Build query with optional author filter
+            if author:
+                cursor.execute("""
+                    SELECT 
+                        c.chunk_id, c.content, c.embedding_array, c.chunk_type, c.chapter_number,
+                        b.book_id, b.title, b.author, b.publication_year
+                    FROM chunks c
+                    JOIN books b ON c.book_id = b.book_id
+                    WHERE c.embedding_array IS NOT NULL
+                    AND LOWER(b.author) LIKE LOWER(%s)
+                """, (f'%{author}%',))
+            else:
+                cursor.execute("""
+                    SELECT 
+                        c.chunk_id, c.content, c.embedding_array, c.chunk_type, c.chapter_number,
+                        b.book_id, b.title, b.author, b.publication_year
+                    FROM chunks c
+                    JOIN books b ON c.book_id = b.book_id
+                    WHERE c.embedding_array IS NOT NULL
+                """)
+            
+            chunks = cursor.fetchall()
+            logger.info(f"Found {len(chunks)} chunks with embeddings")
+            
+            # Calculate similarities
+            results = []
+            for chunk in chunks:
+                similarity = self.cosine_similarity(query_embedding, chunk['embedding_array'])
+                
+                if similarity >= 0.1:  # Minimum similarity threshold
+                    result = {
+                        'chunk_id': chunk['chunk_id'],
+                        'book_id': chunk['book_id'],
+                        'title': chunk['title'],
+                        'author': chunk['author'],
+                        'publication_year': chunk['publication_year'],
+                        'chunk_type': chunk['chunk_type'],
+                        'chapter_number': chunk['chapter_number'],
+                        'content_preview': chunk['content'][:300] + "..." if len(chunk['content']) > 300 else chunk['content'],
+                        'similarity_score': round(similarity, 4)
+                    }
+                    results.append(result)
+            
+            # Sort by similarity score (highest first)
+            results.sort(key=lambda x: x['similarity_score'], reverse=True)
+            
+            return {
+                'query': query,
+                'author_filter': author,
+                'total_matches': len(results),
+                'results': results[:limit]
+            }
+            
+        except psycopg2.Error as e:
+            logger.error(f"Error performing semantic search: {e}")
+            return {"error": f"Database error: {str(e)}"}
+        finally:
+            conn.close()
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)

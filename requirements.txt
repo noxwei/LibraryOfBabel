@@ -12,6 +12,7 @@ SQLAlchemy>=2.0.0
 # API Framework
 Flask>=2.3.0
 Flask-CORS>=4.0.0
+requests>=2.28.0
 
 # Text Processing
 nltk>=3.8.0
