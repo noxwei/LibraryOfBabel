@@ -86,6 +86,13 @@ config/local_config.json
 .env.local
 .env.production
 
+# API Keys and Security
+api_key.txt
+*api_key*
+*API_KEY*
+security_config.json
+auth_tokens.json
+
 # MAM System Files
 mam_downloads/
 *.torrent
@@ -133,6 +140,10 @@ tunnel-credentials.json
 # Domain Configuration (contains sensitive info)
 domain-config.json
 production-config.json
+external-ip.txt
+network-config.json
+router-config.json
+port-forwarding.json
 
 # Analytics & Monitoring Keys
 analytics-keys.json
