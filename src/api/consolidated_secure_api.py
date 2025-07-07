@@ -962,10 +962,20 @@ if __name__ == '__main__':
     logger.info(f"🤖 AI Components: {sum([bool(genre_classifier), bool(serendipity_engine), bool(librarian_agent)])}/3 available")
     logger.info(f"🔗 Database: {DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}")
     
-    # Production HTTPS server
+    # Production HTTPS server with Let's Encrypt certificates
+    ssl_cert_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'ssl', 'production_certs', 'fullchain.pem')
+    ssl_key_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'ssl', 'production_certs', 'privkey.pem')
+    
+    if os.path.exists(ssl_cert_path) and os.path.exists(ssl_key_path):
+        logger.info(f"🔐 Using production SSL certificates")
+        ssl_context = (ssl_cert_path, ssl_key_path)
+    else:
+        logger.warning("⚠️ Production SSL certs not found, using adhoc SSL")
+        ssl_context = 'adhoc'
+    
     app.run(
         host='0.0.0.0',
         port=5563,
         debug=False,
-        ssl_context='adhoc'  # Use Flask's adhoc SSL for development
+        ssl_context=ssl_context
     )

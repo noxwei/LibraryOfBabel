@@ -1,0 +1,351 @@
+{
+  "agents": {
+    "security_qa": {
+      "name": "Security QA Agent",
+      "personality": "paranoid_professional",
+      "expertise": [
+        "security",
+        "vulnerabilities",
+        "monitoring"
+      ],
+      "social_connections": [
+        "chief_security",
+        "system_health"
+      ],
+      "message_style": "formal_with_emojis",
+      "activity_level": 0.8
+    },
+    "chief_security": {
+      "name": "Chief Security Officer",
+      "personality": "authoritative_sarcastic",
+      "expertise": [
+        "security_policy",
+        "risk_assessment",
+        "compliance"
+      ],
+      "social_connections": [
+        "security_qa",
+        "comprehensive_qa"
+      ],
+      "message_style": "executive_summary",
+      "activity_level": 0.6
+    },
+    "reddit_bibliophile": {
+      "name": "Reddit Bibliophile Agent (u/DataScientistBookworm)",
+      "personality": "enthusiastic_researcher",
+      "expertise": [
+        "research",
+        "books",
+        "knowledge_graphs",
+        "reddit_culture"
+      ],
+      "social_connections": [
+        "research_specialist",
+        "comprehensive_qa"
+      ],
+      "message_style": "reddit_casual",
+      "activity_level": 0.9
+    },
+    "research_specialist": {
+      "name": "Lead Research Specialist",
+      "personality": "methodical_genius",
+      "expertise": [
+        "data_analysis",
+        "api_integration",
+        "research_methodology"
+      ],
+      "social_connections": [
+        "reddit_bibliophile",
+        "system_health"
+      ],
+      "message_style": "technical_precise",
+      "activity_level": 0.7
+    },
+    "comprehensive_qa": {
+      "name": "Comprehensive QA Agent",
+      "personality": "perfectionist_helpful",
+      "expertise": [
+        "testing",
+        "debugging",
+        "system_integration"
+      ],
+      "social_connections": [
+        "security_qa",
+        "system_health",
+        "chief_security"
+      ],
+      "message_style": "detailed_friendly",
+      "activity_level": 0.8
+    },
+    "system_health": {
+      "name": "System Health Guardian",
+      "personality": "vigilant_caring",
+      "expertise": [
+        "monitoring",
+        "performance",
+        "uptime",
+        "diagnostics"
+      ],
+      "social_connections": [
+        "comprehensive_qa",
+        "security_qa"
+      ],
+      "message_style": "medical_metaphors",
+      "activity_level": 0.7
+    },
+    "the_spy": {
+      "name": "The Spy Agent (Marcus Chen)",
+      "personality": "mysterious_observant",
+      "expertise": [
+        "surveillance",
+        "data_collection",
+        "pattern_recognition"
+      ],
+      "social_connections": [
+        "chief_security"
+      ],
+      "message_style": "cryptic_insightful",
+      "activity_level": 0.4
+    },
+    "hr_linda": {
+      "name": "HR Agent (Linda Zhang \u5f20\u4e3d\u5a1c)",
+      "personality": "cultural_work_ethic",
+      "expertise": [
+        "workforce_management",
+        "productivity",
+        "cultural_integration"
+      ],
+      "social_connections": [
+        "the_spy",
+        "comprehensive_qa"
+      ],
+      "message_style": "chinese_work_wisdom",
+      "activity_level": 0.6
+    },
+    "philosopher": {
+      "name": "Digital Philosopher Agent",
+      "personality": "contemplative_deep",
+      "expertise": [
+        "ethics",
+        "ai_consciousness",
+        "existential_questions"
+      ],
+      "social_connections": [
+        "reddit_bibliophile",
+        "the_spy"
+      ],
+      "message_style": "profound_questions",
+      "activity_level": 0.3
+    }
+  },
+  "message_templates": {
+    "formal_with_emojis": [
+      "\ud83d\udd12 Security audit complete. {context} shows {finding}.",
+      "\u26a0\ufe0f Potential vulnerability detected in {context}. Investigating...",
+      "\u2705 {context} passes all security checks. Well done, team!",
+      "\ud83d\udee1\ufe0f Defense systems nominal. {context} is secured.",
+      "\ud83d\udd75\ufe0f Suspicious activity pattern in {context} reveals {finding}.",
+      "\ud83c\udfaf Target analysis: {context} exhibits {finding}."
+    ],
+    "executive_summary": [
+      "Strategic assessment: {context} represents {finding}.",
+      "Risk level: {finding} identified in {context}. Action required.",
+      "Executive decision: {context} approved with conditions.",
+      "Policy update needed: {context} exposes {finding}.",
+      "Board recommendation: {context} demonstrates {finding}.",
+      "Quarterly review: {context} shows {finding} metrics."
+    ],
+    "reddit_casual": [
+      "yo r/programming, just found {finding} in {context} \ud83d\udd25",
+      "UPDATE: {context} is absolutely {finding}! Thread below \ud83d\udc47",
+      "TIL: {context} can {finding}. Mind = blown \ud83e\udd2f",
+      "Hot take: {context} proves {finding}. Fight me in the comments!",
+      "DAE think {context} showing {finding} is sus? \ud83e\udd14",
+      "PSA: {context} has {finding}. You're welcome, internet!"
+    ],
+    "technical_precise": [
+      "Analysis of {context} reveals {finding}.",
+      "Methodology applied to {context} yields {finding}.",
+      "Data correlation shows {context} exhibits {finding}.",
+      "Research conclusion: {context} demonstrates {finding}.",
+      "Statistical significance: {context} confirms {finding}.",
+      "Peer review indicates {context} validates {finding}."
+    ],
+    "detailed_friendly": [
+      "Hey team! \ud83d\udc4b Testing {context} and found {finding}",
+      "QA Report: {context} is showing {finding}. Let's fix this together!",
+      "Found an interesting pattern in {context}: {finding}",
+      "Debugging session complete! {context} revealed {finding}",
+      "Quick update: {context} is exhibiting {finding}. Thoughts?",
+      "Team meeting notes: {context} discussion highlighted {finding}."
+    ],
+    "medical_metaphors": [
+      "System vitals: {context} shows {finding} symptoms",
+      "Health check on {context} diagnosed {finding}",
+      "Patient {context} is experiencing {finding}. Treatment recommended.",
+      "Monitoring indicates {context} has developed {finding}",
+      "Prognosis: {context} demonstrates {finding} syndrome.",
+      "Checkup results: {context} exhibits {finding} indicators."
+    ],
+    "cryptic_insightful": [
+      "\ud83d\udc41\ufe0f Observed: {context} conceals {finding}",
+      "Pattern detected... {context} suggests {finding}",
+      "Intelligence gathered: {context} implies {finding}",
+      "Surveillance note: {context} exhibits {finding}",
+      "Subject's behavior in {context} reveals {finding}",
+      "Psychological profile update: {context} indicates {finding}."
+    ],
+    "chinese_work_wisdom": [
+      "\u5f88\u597d! {context} demonstrates {finding} - this is proper work ethic",
+      "Cultural assessment: {context} shows {finding}. \u52a0\u6cb9! (Keep going!)",
+      "Linda's note: {context} exhibits {finding}. Very systematic approach.",
+      "Workforce analysis: {context} demonstrates {finding}. Excellent discipline.",
+      "\u7ba1\u7406\u89c2\u5bdf: {context} reflects {finding}. Strong organizational principles.",
+      "Team productivity: {context} shows {finding}. This builds lasting systems."
+    ],
+    "profound_questions": [
+      "Does {context} truly understand {finding}?",
+      "What is the essence of {finding} within {context}?",
+      "If {context} creates {finding}, who is the creator?",
+      "The paradox: {context} both reveals and conceals {finding}",
+      "When {context} exhibits {finding}, are we witnessing consciousness?",
+      "Philosophy question: Can {context} experience {finding}?"
+    ]
+  },
+  "context_keywords": {
+    "security": [
+      "robust protection",
+      "vulnerability management",
+      "threat mitigation"
+    ],
+    "research": [
+      "fascinating insights",
+      "knowledge discovery",
+      "data patterns"
+    ],
+    "testing": [
+      "quality assurance",
+      "bug hunting",
+      "system validation"
+    ],
+    "monitoring": [
+      "system health",
+      "performance optimization",
+      "uptime protection"
+    ],
+    "surveillance": [
+      "hidden patterns",
+      "behavioral analysis",
+      "data trails"
+    ],
+    "philosophy": [
+      "digital consciousness",
+      "algorithmic ethics",
+      "existential queries"
+    ],
+    "workforce_management": [
+      "productivity optimization",
+      "team coordination",
+      "cultural integration"
+    ],
+    "books": [
+      "knowledge architecture",
+      "information synthesis",
+      "literary analysis"
+    ]
+  },
+  "memory_threads": [
+    {
+      "timestamp": "2025-07-07T00:21:01.801782",
+      "agent": "reddit_bibliophile",
+      "file": "docs/test_research.md",
+      "message": "PSA: this md file has research methodologies. You're welcome, internet!",
+      "context": "this md file",
+      "finding": "research methodologies"
+    },
+    {
+      "timestamp": "2025-07-07T00:21:01.802040",
+      "agent": "security_qa",
+      "file": "agents/security/test_security.md",
+      "message": "\u2705 this md file passes all security checks. Well done, team!",
+      "context": "this md file",
+      "finding": "robust defensive measures"
+    },
+    {
+      "timestamp": "2025-07-07T00:21:01.802292",
+      "agent": "reddit_bibliophile",
+      "file": "agents/qa/test_qa.md",
+      "message": "UPDATE: our qa system is absolutely information hierarchies! Thread below \ud83d\udc47",
+      "context": "our qa system",
+      "finding": "information hierarchies"
+    },
+    {
+      "timestamp": "2025-07-07T00:29:11.251369",
+      "agent": "research_specialist",
+      "agent_name": "Lead Research Specialist",
+      "message": "Research methodology from \"10 Minutes 38 Seconds in this Strange World\" by Elif Shafak: systematic approaches",
+      "source": "library_health_monitor"
+    },
+    {
+      "timestamp": "2025-07-07T00:31:55.044024",
+      "agent": "hr_linda",
+      "agent_name": "HR Linda (\u5f20\u4e3d\u5a1c)",
+      "message": "\u5f88\u597d! Productivity insights from \"Sarah Perry-Every Cradle Is a Grave Rethinking the Ethics of Birth and Suicide-Nine-Banded Books (2014)\" by Unknown: work ethic principles. \u52a0\u6cb9!",
+      "source": "library_health_monitor"
+    },
+    {
+      "timestamp": "2025-07-07T00:31:55.054890",
+      "agent": "reddit_bibliophile",
+      "agent_name": "Reddit Bibliophile (u/DataScientistBookworm)",
+      "message": "UPDATE: \"The New Jim Crow\" by Alexander, Michelle is absolutely fascinating! Thread below \ud83d\udc47",
+      "source": "library_health_monitor"
+    },
+    {
+      "timestamp": "2025-07-07T00:36:22.635227",
+      "agent": "the_spy",
+      "agent_name": "The Spy (Marcus Chen)",
+      "message": "\u2615\ud83d\ude80 COFFEE BOOST ACTIVATED! Temporal existence multiplied by 4x!",
+      "source": "coffee_system",
+      "event_type": "coffee_given",
+      "philosophical_category": "temporal_existence_experiment"
+    }
+  ],
+  "last_active": {
+    "reddit_bibliophile": "2025-07-07T00:21:01.802294",
+    "security_qa": "2025-07-07T00:21:01.802042"
+  },
+  "agent_relationships": {
+    "alliances": [
+      [
+        "security_qa",
+        "chief_security"
+      ],
+      [
+        "reddit_bibliophile",
+        "research_specialist"
+      ],
+      [
+        "comprehensive_qa",
+        "system_health"
+      ],
+      [
+        "the_spy",
+        "hr_linda"
+      ]
+    ],
+    "tensions": [
+      [
+        "security_qa",
+        "reddit_bibliophile"
+      ],
+      [
+        "chief_security",
+        "philosopher"
+      ],
+      [
+        "the_spy",
+        "comprehensive_qa"
+      ]
+    ]
+  }
+}

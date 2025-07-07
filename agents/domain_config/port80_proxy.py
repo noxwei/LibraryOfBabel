@@ -12,7 +12,7 @@ import os
 app = Flask(__name__)
 
 # Target API configuration
-TARGET_API = "https://localhost:5563"
+TARGET_API = "http://localhost:5563"
 API_KEY = os.getenv('API_KEY')
 if not API_KEY:
     print("🚨 CRITICAL ERROR: API_KEY environment variable not set!")
