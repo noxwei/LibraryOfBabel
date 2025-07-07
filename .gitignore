@@ -54,12 +54,37 @@ __pycache__/
 *.so
 .Python
 
-# Environment & Config
+# === SECURITY CREDENTIALS ===
+# Environment & Config files with secrets
 .env
 .env.local
 .env.production
+.env.*
+
+# API Keys and tokens
 *api_key*
 *API_KEY*
+api_key.txt
+*.key
+*.token
+*secret*
+*SECRET*
+*password*
+*PASSWORD*
+
+# Security reports (may contain sensitive data)
+reports/security_report_*.json
+*security_scan*.json
+*vulnerability*.json
+
+# SSL/TLS certificates and private keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+ssl/
+certificates/
 
 # Logs (but not agent architecture)
 *.log
