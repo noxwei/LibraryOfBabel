@@ -7,12 +7,18 @@ Quick solution while waiting for port 443 forwarding to work
 from flask import Flask, request, jsonify
 import requests
 import json
+import os
 
 app = Flask(__name__)
 
 # Target API configuration
 TARGET_API = "https://localhost:5563"
-API_KEY = "NvuWhzAVx9w1zNNhYrdl84lOeGPfpKk6VVoyAU71amU"
+API_KEY = os.getenv('API_KEY')
+if not API_KEY:
+    print("🚨 CRITICAL ERROR: API_KEY environment variable not set!")
+    print("Set API_KEY environment variable before starting the proxy.")
+    print("Example: export API_KEY=your_secure_api_key_here")
+    exit(1)
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

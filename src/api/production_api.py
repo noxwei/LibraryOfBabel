@@ -18,6 +18,8 @@ import sys
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 import re
+import requests
+from functools import lru_cache
 
 # Add src directory to path
 current_dir = os.path.dirname(__file__)
@@ -45,8 +47,13 @@ DB_CONFIG = {
     'port': int(os.getenv('DB_PORT', 5432))
 }
 
-# API Key for authentication
-API_KEY = os.getenv('API_KEY', 'M39Gqz5e8D-_qkyuy37ar87_jNU0EPs_nO6_izPnGaU')
+# API Key for authentication - REQUIRED environment variable
+API_KEY = os.getenv('API_KEY')
+if not API_KEY:
+    logger.critical("🚨 SECURITY ERROR: API_KEY environment variable not set!")
+    logger.critical("Set API_KEY environment variable before starting the server.")
+    logger.critical("Example: export API_KEY=your_secure_api_key_here")
+    raise SystemExit("API_KEY environment variable is required for security")
 
 def get_db():
     """Get database connection with error handling"""
@@ -488,6 +495,322 @@ def get_statistics():
                 })
     except Exception as e:
         logger.error(f"Error getting statistics: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/v3/agents/feed', methods=['GET'])
+@require_auth
+def get_agent_feed():
+    """Get today's agent social media feed with book discoveries"""
+    try:
+        # Get query parameters
+        limit = min(int(request.args.get('limit', 20)), 50)
+        hours = min(int(request.args.get('hours', 24)), 168)  # Max 1 week
+        category = request.args.get('category')  # Optional filter
+        
+        conn = get_db()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # Get recent agent posts with book information
+            base_query = """
+                SELECT 
+                    ap.post_id,
+                    ap.message,
+                    ap.book_title,
+                    ap.book_author,
+                    ap.coffee_boosted,
+                    ap.existence_level,
+                    ap.category,
+                    ap.created_at,
+                    a.agent_name,
+                    a.category as agent_category,
+                    b.book_id,
+                    b.word_count,
+                    CASE 
+                        WHEN ap.coffee_boosted THEN '☕ CAFFEINATED'
+                        WHEN ap.existence_level = 'HYPERACTIVE' THEN '🚀 HYPERACTIVE'
+                        WHEN ap.existence_level = 'RECOVERING' THEN '😴 RECOVERING'
+                        ELSE '😐 STANDARD'
+                    END as status_emoji
+                FROM agent_posts ap
+                JOIN agents a ON ap.agent_id = a.agent_id
+                LEFT JOIN books b ON ap.book_title = b.title
+                WHERE ap.created_at > NOW() - INTERVAL '%s hours'
+            """
+            
+            params = [hours]
+            
+            if category:
+                base_query += " AND ap.category = %s"
+                params.append(category)
+            
+            base_query += " ORDER BY ap.created_at DESC LIMIT %s"
+            params.append(limit)
+            
+            cur.execute(base_query, params)
+            posts = [dict(row) for row in cur.fetchall()]
+            
+            # Get agent activity summary
+            cur.execute("""
+                SELECT 
+                    COUNT(DISTINCT ap.agent_id) as active_agents,
+                    COUNT(ap.post_id) as total_posts,
+                    COUNT(CASE WHEN ap.coffee_boosted THEN 1 END) as coffee_boosted_posts,
+                    COUNT(CASE WHEN ap.book_title IS NOT NULL THEN 1 END) as book_mentions,
+                    COUNT(CASE WHEN ap.category = 'mental_state' THEN 1 END) as spy_observations
+                FROM agent_posts ap
+                WHERE ap.created_at > NOW() - INTERVAL '%s hours'
+            """, [hours])
+            
+            activity = dict(cur.fetchone())
+            
+            # Get book discovery stats
+            cur.execute("""
+                SELECT 
+                    ap.book_title,
+                    ap.book_author,
+                    b.book_id,
+                    COUNT(*) as mention_count,
+                    ARRAY_AGG(DISTINCT a.agent_name ORDER BY a.agent_name) as mentioned_by_agents
+                FROM agent_posts ap
+                JOIN agents a ON ap.agent_id = a.agent_id
+                LEFT JOIN books b ON ap.book_title = b.title
+                WHERE ap.created_at > NOW() - INTERVAL '%s hours'
+                  AND ap.book_title IS NOT NULL
+                GROUP BY ap.book_title, ap.book_author, b.book_id
+                ORDER BY mention_count DESC
+                LIMIT 10
+            """, [hours])
+            
+            book_discoveries = [dict(row) for row in cur.fetchall()]
+            
+            # Get coffee status summary
+            cur.execute("""
+                SELECT 
+                    a.agent_name,
+                    acs.status,
+                    acs.boost_until,
+                    acs.cooldown_until,
+                    acs.frequency_multiplier
+                FROM agent_coffee_states acs
+                JOIN agents a ON acs.agent_id = a.agent_id
+                WHERE acs.expires_at > NOW()
+                ORDER BY acs.coffee_given_at DESC
+            """)
+            
+            coffee_status = [dict(row) for row in cur.fetchall()]
+        
+        # Format timestamps for better readability
+        for post in posts:
+            post['created_at'] = post['created_at'].isoformat()
+            post['time_ago'] = _time_ago(post['created_at'])
+        
+        return jsonify({
+            'success': True,
+            'timestamp': datetime.now().isoformat(),
+            'data': {
+                'feed_period': f"Last {hours} hours",
+                'activity_summary': activity,
+                'posts': posts,
+                'book_discoveries': book_discoveries,
+                'coffee_status': coffee_status,
+                'categories': {
+                    'mental_state': 'The Spy behavioral analysis',
+                    'book_discovery': 'Reading recommendations', 
+                    'social_humor': 'Agent democracy updates',
+                    'highlights': 'Curated book passages',
+                    'analysis': 'Technical research'
+                }
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting agent feed: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+def _time_ago(timestamp_str):
+    """Calculate human-readable time ago"""
+    try:
+        timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+        diff = datetime.now() - timestamp.replace(tzinfo=None)
+        
+        if diff.days > 0:
+            return f"{diff.days}d ago"
+        elif diff.seconds > 3600:
+            hours = diff.seconds // 3600
+            return f"{hours}h ago"
+        elif diff.seconds > 60:
+            minutes = diff.seconds // 60
+            return f"{minutes}m ago"
+        else:
+            return "just now"
+    except:
+        return "unknown"
+
+@lru_cache(maxsize=1000)
+def get_ip_geolocation(ip_address: str) -> Dict[str, Any]:
+    """Get approximate location from IP address using free geolocation service"""
+    try:
+        # Using ip-api.com (free, no API key needed, 1000 requests/hour)
+        response = requests.get(f"http://ip-api.com/json/{ip_address}", timeout=3)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('status') == 'success':
+                return {
+                    'success': True,
+                    'city': data.get('city', 'Unknown'),
+                    'region': data.get('regionName', 'Unknown'),
+                    'country': data.get('country', 'Unknown'),
+                    'lat': data.get('lat'),
+                    'lon': data.get('lon'),
+                    'timezone': data.get('timezone', 'Unknown'),
+                    'isp': data.get('isp', 'Unknown')
+                }
+    except Exception as e:
+        logger.warning(f"IP geolocation failed for {ip_address}: {e}")
+    
+    return {'success': False, 'city': 'Unknown', 'country': 'Unknown'}
+
+def get_client_ip():
+    """Get client IP address, handling proxies and load balancers"""
+    # Check for forwarded IP (common with proxies/CDNs)
+    forwarded_ips = request.headers.get('X-Forwarded-For')
+    if forwarded_ips:
+        # Take the first IP (client IP)
+        return forwarded_ips.split(',')[0].strip()
+    
+    # Check for real IP (some proxy configurations)
+    real_ip = request.headers.get('X-Real-IP')
+    if real_ip:
+        return real_ip
+    
+    # Check for CF-Connecting-IP (Cloudflare)
+    cf_ip = request.headers.get('CF-Connecting-IP')
+    if cf_ip:
+        return cf_ip
+    
+    # Fallback to remote address
+    return request.remote_addr
+
+@app.route('/api/v3/location', methods=['GET'])
+def get_visitor_location():
+    """Get visitor location info (IP-based only, no permission required)"""
+    try:
+        client_ip = get_client_ip()
+        
+        # Get IP-based location only
+        ip_location = get_ip_geolocation(client_ip)
+        
+        # Simple response with just IP geolocation
+        response_data = {
+            'city': ip_location.get('city', 'Unknown'),
+            'region': ip_location.get('region', 'Unknown'),
+            'country': ip_location.get('country', 'Unknown'),
+            'timezone': ip_location.get('timezone', 'Unknown'),
+            'method': 'IP geolocation (approximate)',
+            'privacy_note': 'Location is approximate based on IP address and not stored'
+        }
+        
+        # Log visitor for analytics (anonymized)
+        logger.info(f"Visitor from {ip_location.get('city', 'Unknown')}, {ip_location.get('country', 'Unknown')} - IP: {client_ip[:8]}...")
+        
+        return jsonify({
+            'success': True,
+            'timestamp': datetime.now().isoformat(),
+            'data': response_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting location: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/v3/regional-books', methods=['GET'])
+@require_auth  
+def get_regional_book_recommendations():
+    """Get book recommendations based on visitor's location"""
+    try:
+        client_ip = get_client_ip()
+        location = get_ip_geolocation(client_ip)
+        
+        # Location-based book recommendations
+        recommendations = []
+        city = location.get('city', '').lower()
+        country = location.get('country', '').lower()
+        
+        conn = get_db()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # Search for books related to their region
+            regional_queries = []
+            
+            if 'united states' in country or 'usa' in country:
+                regional_queries = ['america', 'american', 'usa', 'united states']
+            elif 'china' in country:
+                regional_queries = ['china', 'chinese', '中国', 'beijing', 'shanghai']
+            elif 'japan' in country:
+                regional_queries = ['japan', 'japanese', 'tokyo', 'japan']
+            elif 'germany' in country:
+                regional_queries = ['germany', 'german', 'berlin', 'deutschland']
+            elif 'france' in country:
+                regional_queries = ['france', 'french', 'paris', 'français']
+            elif 'uk' in country or 'britain' in country:
+                regional_queries = ['britain', 'british', 'london', 'england', 'uk']
+            
+            # Add city-specific searches
+            if city and len(city) > 3:
+                regional_queries.append(city)
+            
+            # Search for regional content
+            for query in regional_queries[:3]:  # Limit to 3 queries
+                cur.execute("""
+                    SELECT DISTINCT b.book_id, b.title, b.author, b.word_count,
+                           c.content
+                    FROM books b
+                    JOIN chunks c ON b.book_id = c.book_id
+                    WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
+                    ORDER BY b.word_count DESC
+                    LIMIT 3
+                """, (query,))
+                
+                results = cur.fetchall()
+                for book in results:
+                    recommendations.append({
+                        'book_id': book['book_id'],
+                        'title': book['title'],
+                        'author': book['author'],
+                        'reason': f'Related to your region: {query}',
+                        'excerpt': book['content'][:200] + '...'
+                    })
+        
+        # Remove duplicates and limit
+        seen_books = set()
+        unique_recommendations = []
+        for rec in recommendations:
+            if rec['book_id'] not in seen_books:
+                seen_books.add(rec['book_id'])
+                unique_recommendations.append(rec)
+                if len(unique_recommendations) >= 5:
+                    break
+        
+        return jsonify({
+            'success': True,
+            'timestamp': datetime.now().isoformat(),
+            'data': {
+                'visitor_location': {
+                    'city': location.get('city', 'Unknown'),
+                    'country': location.get('country', 'Unknown')
+                },
+                'recommendations': unique_recommendations,
+                'recommendation_basis': 'Books containing content related to your geographic region',
+                'privacy_note': 'Location is used only for recommendations and not stored'
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting regional recommendations: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # ================================
