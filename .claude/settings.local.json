@@ -37,7 +37,12 @@
       "Bash(nslookup:*)",
       "Bash(nc:*)",
       "Bash(gh repo edit:*)",
-      "Bash(gh repo view:*)"
+      "Bash(gh repo view:*)",
+      "Bash(openssl x509:*)",
+      "Bash(./scripts/renew-certificates.sh:*)",
+      "Bash(certbot:*)",
+      "Bash(brew list:*)",
+      "Bash(launchctl:*)"
     ],
     "deny": []
   }
