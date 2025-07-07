@@ -1,0 +1,38 @@
+{
+  "bulletin_board": {
+    "enabled": true,
+    "auto_commentary": true,
+    "min_agents_per_file": 2,
+    "max_agents_per_file": 4,
+    "commentary_frequency": "on_file_creation",
+    "excluded_files": [
+      "README.md",
+      "LICENSE.md",
+      "CHANGELOG.md"
+    ],
+    "excluded_directories": [
+      ".git",
+      "node_modules",
+      "__pycache__",
+      ".cache"
+    ]
+  },
+  "agents": {
+    "enabled_agents": [
+      "marcus_the_spy",
+      "linda_hr",
+      "tech_analyst",
+      "project_philosopher",
+      "security_paranoid",
+      "productivity_optimizer",
+      "cultural_observer"
+    ],
+    "commentary_style": "professional",
+    "personality_strength": "medium"
+  },
+  "logging": {
+    "enabled": true,
+    "log_level": "INFO",
+    "log_file": "reports/agent_bulletin_board/system.log"
+  }
+}
