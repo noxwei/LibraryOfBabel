@@ -35,7 +35,9 @@
       "Bash(unset API_KEY)",
       "Bash(git gc:*)",
       "Bash(nslookup:*)",
-      "Bash(nc:*)"
+      "Bash(nc:*)",
+      "Bash(gh repo edit:*)",
+      "Bash(gh repo view:*)"
     ],
     "deny": []
   }
