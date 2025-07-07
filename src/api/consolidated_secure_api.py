@@ -37,7 +37,7 @@ sys.path.insert(0, src_dir)
 try:
     from security_middleware import SecurityManager
     from vector_embeddings import VectorEmbeddingGenerator
-    from epub_processor import EpubProcessor
+    from epub_processor import EPUBProcessor
     from text_chunker import TextChunker
 except ImportError as e:
     print(f"Core import error: {e}")
@@ -73,7 +73,7 @@ security_manager = SecurityManager()
 # Initialize components
 try:
     vector_generator = VectorEmbeddingGenerator()
-    epub_processor = EpubProcessor()
+    epub_processor = EPUBProcessor()
     text_chunker = TextChunker()
     logger.info("✅ Core components initialized")
 except Exception as e:
