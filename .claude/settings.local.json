@@ -42,7 +42,11 @@
       "Bash(./scripts/renew-certificates.sh:*)",
       "Bash(certbot:*)",
       "Bash(brew list:*)",
-      "Bash(launchctl:*)"
+      "Bash(launchctl:*)",
+      "Bash(openssl s_client:*)",
+      "Bash(openssl rand:*)",
+      "Bash(cp:*)",
+      "Bash(true)"
     ],
     "deny": []
   }

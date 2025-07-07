@@ -841,9 +841,13 @@ if __name__ == '__main__':
     logger.info(f"🔐 Security: API Key Authentication Required")
     logger.info(f"🔗 Database: {DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}")
     
-    # Production server
+    # Production server with SSL
+    ssl_cert_path = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem'
+    ssl_key_path = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/privkey.pem'
+    
     app.run(
         host='0.0.0.0',
         port=5563,
-        debug=False
+        debug=False,
+        ssl_context=(ssl_cert_path, ssl_key_path)
     )
