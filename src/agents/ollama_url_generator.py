@@ -15,12 +15,12 @@ Team Development:
 """
 
 import asyncio
-import aiohttp
 import json
 import logging
 import os
 import re
 import time
+import requests
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from urllib.parse import urlencode, quote_plus
@@ -192,34 +192,33 @@ Focus on semantic understanding and concept extraction for the best search resul
     async def _call_ollama(self, prompt: str) -> Dict[str, Any]:
         """Call Ollama API to process the prompt"""
         try:
-            async with aiohttp.ClientSession() as session:
-                payload = {
-                    "model": self.ollama_model,
-                    "prompt": prompt,
-                    "stream": False,
+            payload = {
+                "model": self.ollama_model,
+                "prompt": prompt,
+                "stream": False,
                     "options": {
                         "temperature": 0.1,  # Low temperature for consistent output
                         "top_p": 0.9,
                         "top_k": 40
                     }
-                }
-                
-                async with session.post(
-                    f"{self.ollama_endpoint}/api/generate",
-                    json=payload,
-                    timeout=aiohttp.ClientTimeout(total=30)
-                ) as response:
-                    
-                    if response.status != 200:
-                        raise Exception(f"Ollama API error: {response.status}")
-                    
-                    result = await response.json()
-                    ollama_text = result.get('response', '').strip()
-                    
-                    # Extract JSON from response
-                    structured_query = self._extract_json_from_text(ollama_text)
-                    
-                    return structured_query
+            }
+            
+            response = requests.post(
+                f"{self.ollama_endpoint}/api/generate",
+                json=payload,
+                timeout=30
+            )
+            
+            if response.status_code != 200:
+                raise Exception(f"Ollama API error: {response.status_code}")
+            
+            result = response.json()
+            ollama_text = result.get('response', '').strip()
+            
+            # Extract JSON from response
+            structured_query = self._extract_json_from_text(ollama_text)
+            
+            return structured_query
                     
         except Exception as e:
             logger.error(f"❌ Ollama API call failed: {e}")
