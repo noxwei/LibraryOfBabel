@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 LibraryOfBabel AI Chat - 360 Books</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .chat-bubble {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .typing-indicator {
+            animation: pulse 1.5s infinite;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Header -->
+    <div class="gradient-bg text-white p-6 shadow-lg">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold mb-2">
+                🤖 LibraryOfBabel AI Chat
+            </h1>
+            <p class="text-blue-100">
+                Natural language search across 360 books • 34+ million words • Powered by Ollama
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Chat Interface -->
+    <div class="max-w-4xl mx-auto p-6">
+        
+        <!-- Quick Examples -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4 text-gray-800">
+                <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                Try these example queries:
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <button onclick="useExample('Find books about artificial intelligence and consciousness')" 
+                        class="text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
+                    <i class="fas fa-robot text-blue-600 mr-2"></i>
+                    "Find books about artificial intelligence and consciousness"
+                </button>
+                <button onclick="useExample('Show me Octavia Butler approach to social justice')"
+                        class="text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
+                    <i class="fas fa-balance-scale text-green-600 mr-2"></i>
+                    "Show me Octavia Butler's approach to social justice"
+                </button>
+                <button onclick="useExample('Books that bridge science and spirituality')"
+                        class="text-left p-3 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors">
+                    <i class="fas fa-atom text-purple-600 mr-2"></i>
+                    "Books that bridge science and spirituality"
+                </button>
+                <button onclick="useExample('Contemporary analysis of digital surveillance')"
+                        class="text-left p-3 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
+                    <i class="fas fa-eye text-red-600 mr-2"></i>
+                    "Contemporary analysis of digital surveillance"
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="bg-white rounded-lg shadow-md">
+            
+            <!-- Chat Messages -->
+            <div id="chat-messages" class="p-6 max-h-96 overflow-y-auto">
+                <div class="chat-bubble bg-blue-50 p-4 rounded-lg mb-4 border-l-4 border-blue-500">
+                    <div class="flex items-start">
+                        <i class="fas fa-robot text-blue-600 text-xl mr-3 mt-1"></i>
+                        <div>
+                            <p class="text-gray-800">
+                                Hello! I'm your AI research assistant for the LibraryOfBabel collection. 
+                                Ask me anything about our 360 books covering philosophy, technology, social theory, and more.
+                            </p>
+                            <p class="text-sm text-gray-600 mt-2">
+                                I'll analyze your question with Ollama and search through 34+ million words to find the most relevant content.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-gray-200 p-6">
+                <div class="flex space-x-4">
+                    <div class="flex-1">
+                        <input 
+                            type="text" 
+                            id="chat-input" 
+                            placeholder="Ask me about any topic in our 360-book collection..."
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            onkeypress="handleKeyPress(event)"
+                        />
+                    </div>
+                    <button 
+                        onclick="submitQuery()" 
+                        id="submit-btn"
+                        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                    >
+                        <i class="fas fa-search mr-2"></i>
+                        Search
+                    </button>
+                </div>
+                
+                <!-- API Key Input (hidden by default) -->
+                <div id="api-key-section" class="mt-4 hidden">
+                    <input 
+                        type="password" 
+                        id="api-key-input" 
+                        placeholder="Enter your API key..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                    />
+                </div>
+                
+                <div class="flex justify-between items-center mt-3">
+                    <button 
+                        onclick="toggleApiKey()" 
+                        class="text-sm text-gray-500 hover:text-gray-700"
+                    >
+                        <i class="fas fa-key mr-1"></i>
+                        API Key
+                    </button>
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-database mr-1"></i>
+                        360 books • 34M+ words
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div id="system-status" class="mt-6 p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
+            <i class="fas fa-info-circle mr-2"></i>
+            Status: Ready • Ollama: Checking... • LibraryOfBabel API: Checking...
+        </div>
+    </div>
+
+    <script>
+        let apiKey = '';
+        let chatHistory = [];
+
+        // API Configuration
+        const API_BASE = 'https://api.ashortstayinhell.com/api/v3';
+        
+        function useExample(query) {
+            document.getElementById('chat-input').value = query;
+            submitQuery();
+        }
+        
+        function toggleApiKey() {
+            const section = document.getElementById('api-key-section');
+            section.classList.toggle('hidden');
+            if (!section.classList.contains('hidden')) {
+                document.getElementById('api-key-input').focus();
+            }
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                submitQuery();
+            }
+        }
+        
+        async function submitQuery() {
+            const input = document.getElementById('chat-input');
+            const query = input.value.trim();
+            
+            if (!query) {
+                alert('Please enter a question!');
+                return;
+            }
+            
+            // Get API key
+            const keyInput = document.getElementById('api-key-input');
+            if (keyInput.value.trim()) {
+                apiKey = keyInput.value.trim();
+            }
+            
+            if (!apiKey) {
+                alert('Please enter your API key first!');
+                toggleApiKey();
+                return;
+            }
+            
+            // Clear input and add user message
+            input.value = '';
+            addUserMessage(query);
+            addTypingIndicator();
+            
+            // Disable submit button
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
+            try {
+                // Make API call
+                const response = await fetch(`${API_BASE}/ollama/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+                
+                const data = await response.json();
+                
+                // Remove typing indicator
+                removeTypingIndicator();
+                
+                if (data.success) {
+                    addBotResponse(data.data);
+                } else {
+                    addErrorMessage(data.error || 'Query failed');
+                }
+                
+            } catch (error) {
+                removeTypingIndicator();
+                addErrorMessage('Network error: ' + error.message);
+            }
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-search mr-2"></i>Search';
+        }
+        
+        function addUserMessage(message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-bubble mb-4 flex justify-end';
+            messageDiv.innerHTML = `
+                <div class="bg-blue-600 text-white p-4 rounded-lg max-w-md">
+                    <p>${escapeHtml(message)}</p>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function addBotResponse(data) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-bubble mb-4';
+            
+            // Create response content
+            let booksHtml = '';
+            let totalBooks = 0;
+            
+            if (data.search_results && data.search_results.length > 0) {
+                data.search_results.forEach(result => {
+                    if (result.books && result.books.length > 0) {
+                        totalBooks += result.books_found;
+                        booksHtml += `
+                            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                                <h4 class="font-semibold text-sm text-gray-700 mb-2">
+                                    <i class="fas fa-search mr-1"></i>
+                                    ${result.description} (${result.books_found} found)
+                                </h4>
+                                <div class="space-y-2">
+                        `;
+                        
+                        result.books.slice(0, 3).forEach(book => {
+                            const excerpt = book.content ? book.content.substring(0, 150) + '...' : '';
+                            booksHtml += `
+                                <div class="bg-white p-3 rounded border">
+                                    <h5 class="font-semibold text-blue-700">${escapeHtml(book.title)}</h5>
+                                    <p class="text-sm text-gray-600">by ${escapeHtml(book.author || 'Unknown')}</p>
+                                    ${excerpt ? `<p class="text-sm text-gray-700 mt-1">${escapeHtml(excerpt)}</p>` : ''}
+                                </div>
+                            `;
+                        });
+                        
+                        booksHtml += '</div></div>';
+                    }
+                });
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="bg-white border border-gray-200 p-4 rounded-lg max-w-3xl">
+                    <div class="flex items-start mb-3">
+                        <i class="fas fa-robot text-blue-600 text-xl mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <p class="text-gray-800 mb-2">
+                                <strong>Analysis:</strong> ${escapeHtml(data.explanation)}
+                            </p>
+                            <p class="text-sm text-gray-600">
+                                Found ${totalBooks} relevant results using ${data.search_strategies} search strategies
+                            </p>
+                        </div>
+                    </div>
+                    ${booksHtml}
+                    <div class="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                        <i class="fas fa-clock mr-1"></i>
+                        Processed in ${(data.performance?.processing_time || 0).toFixed(3)}s
+                    </div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function addTypingIndicator() {
+            const chatMessages = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'typing-indicator mb-4';
+            typingDiv.innerHTML = `
+                <div class="bg-gray-100 p-4 rounded-lg max-w-md">
+                    <div class="flex items-center">
+                        <i class="fas fa-robot text-gray-600 text-xl mr-3"></i>
+                        <div class="flex space-x-1">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        </div>
+                        <span class="ml-3 text-gray-600 text-sm">Analyzing with Ollama...</span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            scrollToBottom();
+        }
+        
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+        
+        function addErrorMessage(error) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-bubble mb-4';
+            messageDiv.innerHTML = `
+                <div class="bg-red-50 border border-red-200 p-4 rounded-lg max-w-md">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle text-red-600 text-xl mr-3 mt-1"></i>
+                        <div>
+                            <p class="text-red-800 font-semibold">Error</p>
+                            <p class="text-red-700 text-sm">${escapeHtml(error)}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Check system status on load
+        async function checkSystemStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const healthData = await response.json();
+                
+                let statusText = 'LibraryOfBabel API: ';
+                statusText += response.ok ? 'Connected ✅' : 'Error ❌';
+                
+                // Try Ollama health check if we have API key
+                if (apiKey) {
+                    try {
+                        const ollamaResponse = await fetch(`${API_BASE}/ollama/health`, {
+                            headers: { 'X-API-Key': apiKey }
+                        });
+                        const ollamaData = await ollamaResponse.json();
+                        statusText += ' • Ollama: ';
+                        statusText += ollamaResponse.ok ? 'Connected ✅' : 'Unavailable ❌';
+                    } catch {
+                        statusText += ' • Ollama: Unknown';
+                    }
+                } else {
+                    statusText += ' • Ollama: API key required';
+                }
+                
+                document.getElementById('system-status').innerHTML = `
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Status: ${statusText}
+                `;
+                
+            } catch (error) {
+                document.getElementById('system-status').innerHTML = `
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Status: Connection Error ❌
+                `;
+            }
+        }
+        
+        // Initialize
+        checkSystemStatus();
+        document.getElementById('chat-input').focus();
+    </script>
+</body>
+</html>

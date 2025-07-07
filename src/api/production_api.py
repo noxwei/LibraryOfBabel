@@ -18,11 +18,21 @@ import sys
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 import re
+import requests
+from functools import lru_cache
+from werkzeug.utils import secure_filename
+import hashlib
+import subprocess
+import asyncio
 
 # Add src directory to path
 current_dir = os.path.dirname(__file__)
 src_dir = os.path.dirname(current_dir)
+
+# Import Ollama URL Generator Agent
 sys.path.insert(0, src_dir)
+sys.path.append(os.path.join(src_dir, 'agents'))
+from ollama_url_generator import OllamaUrlGeneratorAgent
 
 app = Flask(__name__)
 
@@ -45,8 +55,13 @@ DB_CONFIG = {
     'port': int(os.getenv('DB_PORT', 5432))
 }
 
-# API Key for authentication
-API_KEY = os.getenv('API_KEY', 'M39Gqz5e8D-_qkyuy37ar87_jNU0EPs_nO6_izPnGaU')
+# API Key for authentication - REQUIRED environment variable
+API_KEY = os.getenv('API_KEY')
+if not API_KEY:
+    logger.critical("🚨 SECURITY ERROR: API_KEY environment variable not set!")
+    logger.critical("Set API_KEY environment variable before starting the server.")
+    logger.critical("Example: export API_KEY=your_secure_api_key_here")
+    raise SystemExit("API_KEY environment variable is required for security")
 
 def get_db():
     """Get database connection with error handling"""
@@ -159,7 +174,8 @@ def api_info():
             ],
             'endpoints': {
                 'public': ['/api/v3/info', '/api/v3/health'],
-                'secured': 'All other endpoints require API key authentication'
+                'secured': ['/api/v3/search', '/api/v3/books', '/api/v3/upload', '/api/v3/stats', '/api/v3/agents/feed'],
+                'note': 'All secured endpoints require API key authentication'
             },
             'authentication': {
                 'methods': ['Bearer token', 'X-API-Key header', 'Query parameter'],
@@ -490,6 +506,601 @@ def get_statistics():
         logger.error(f"Error getting statistics: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/v3/agents/feed', methods=['GET'])
+@require_auth
+def get_agent_feed():
+    """Get today's agent social media feed with book discoveries"""
+    try:
+        # Get query parameters
+        limit = min(int(request.args.get('limit', 20)), 50)
+        hours = min(int(request.args.get('hours', 24)), 168)  # Max 1 week
+        category = request.args.get('category')  # Optional filter
+        
+        conn = get_db()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # Get recent agent posts with book information
+            base_query = """
+                SELECT 
+                    ap.post_id,
+                    ap.message,
+                    ap.book_title,
+                    ap.book_author,
+                    ap.coffee_boosted,
+                    ap.existence_level,
+                    ap.category,
+                    ap.created_at,
+                    a.agent_name,
+                    a.category as agent_category,
+                    b.book_id,
+                    b.word_count,
+                    CASE 
+                        WHEN ap.coffee_boosted THEN '☕ CAFFEINATED'
+                        WHEN ap.existence_level = 'HYPERACTIVE' THEN '🚀 HYPERACTIVE'
+                        WHEN ap.existence_level = 'RECOVERING' THEN '😴 RECOVERING'
+                        ELSE '😐 STANDARD'
+                    END as status_emoji
+                FROM agent_posts ap
+                JOIN agents a ON ap.agent_id = a.agent_id
+                LEFT JOIN books b ON ap.book_title = b.title
+                WHERE ap.created_at > NOW() - INTERVAL '%s hours'
+            """
+            
+            params = [hours]
+            
+            if category:
+                base_query += " AND ap.category = %s"
+                params.append(category)
+            
+            base_query += " ORDER BY ap.created_at DESC LIMIT %s"
+            params.append(limit)
+            
+            cur.execute(base_query, params)
+            posts = [dict(row) for row in cur.fetchall()]
+            
+            # Get agent activity summary
+            cur.execute("""
+                SELECT 
+                    COUNT(DISTINCT ap.agent_id) as active_agents,
+                    COUNT(ap.post_id) as total_posts,
+                    COUNT(CASE WHEN ap.coffee_boosted THEN 1 END) as coffee_boosted_posts,
+                    COUNT(CASE WHEN ap.book_title IS NOT NULL THEN 1 END) as book_mentions,
+                    COUNT(CASE WHEN ap.category = 'mental_state' THEN 1 END) as spy_observations
+                FROM agent_posts ap
+                WHERE ap.created_at > NOW() - INTERVAL '%s hours'
+            """, [hours])
+            
+            activity = dict(cur.fetchone())
+            
+            # Get book discovery stats
+            cur.execute("""
+                SELECT 
+                    ap.book_title,
+                    ap.book_author,
+                    b.book_id,
+                    COUNT(*) as mention_count,
+                    ARRAY_AGG(DISTINCT a.agent_name ORDER BY a.agent_name) as mentioned_by_agents
+                FROM agent_posts ap
+                JOIN agents a ON ap.agent_id = a.agent_id
+                LEFT JOIN books b ON ap.book_title = b.title
+                WHERE ap.created_at > NOW() - INTERVAL '%s hours'
+                  AND ap.book_title IS NOT NULL
+                GROUP BY ap.book_title, ap.book_author, b.book_id
+                ORDER BY mention_count DESC
+                LIMIT 10
+            """, [hours])
+            
+            book_discoveries = [dict(row) for row in cur.fetchall()]
+            
+            # Get coffee status summary
+            cur.execute("""
+                SELECT 
+                    a.agent_name,
+                    acs.status,
+                    acs.boost_until,
+                    acs.cooldown_until,
+                    acs.frequency_multiplier
+                FROM agent_coffee_states acs
+                JOIN agents a ON acs.agent_id = a.agent_id
+                WHERE acs.expires_at > NOW()
+                ORDER BY acs.coffee_given_at DESC
+            """)
+            
+            coffee_status = [dict(row) for row in cur.fetchall()]
+        
+        # Format timestamps for better readability
+        for post in posts:
+            post['created_at'] = post['created_at'].isoformat()
+            post['time_ago'] = _time_ago(post['created_at'])
+        
+        return jsonify({
+            'success': True,
+            'timestamp': datetime.now().isoformat(),
+            'data': {
+                'feed_period': f"Last {hours} hours",
+                'activity_summary': activity,
+                'posts': posts,
+                'book_discoveries': book_discoveries,
+                'coffee_status': coffee_status,
+                'categories': {
+                    'mental_state': 'The Spy behavioral analysis',
+                    'book_discovery': 'Reading recommendations', 
+                    'social_humor': 'Agent democracy updates',
+                    'highlights': 'Curated book passages',
+                    'analysis': 'Technical research'
+                }
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting agent feed: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+def _time_ago(timestamp_str):
+    """Calculate human-readable time ago"""
+    try:
+        timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+        diff = datetime.now() - timestamp.replace(tzinfo=None)
+        
+        if diff.days > 0:
+            return f"{diff.days}d ago"
+        elif diff.seconds > 3600:
+            hours = diff.seconds // 3600
+            return f"{hours}h ago"
+        elif diff.seconds > 60:
+            minutes = diff.seconds // 60
+            return f"{minutes}m ago"
+        else:
+            return "just now"
+    except:
+        return "unknown"
+
+@lru_cache(maxsize=1000)
+def get_ip_geolocation(ip_address: str) -> Dict[str, Any]:
+    """Get approximate location from IP address using free geolocation service"""
+    try:
+        # Using ip-api.com (free, no API key needed, 1000 requests/hour)
+        response = requests.get(f"http://ip-api.com/json/{ip_address}", timeout=3)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('status') == 'success':
+                return {
+                    'success': True,
+                    'city': data.get('city', 'Unknown'),
+                    'region': data.get('regionName', 'Unknown'),
+                    'country': data.get('country', 'Unknown'),
+                    'lat': data.get('lat'),
+                    'lon': data.get('lon'),
+                    'timezone': data.get('timezone', 'Unknown'),
+                    'isp': data.get('isp', 'Unknown')
+                }
+    except Exception as e:
+        logger.warning(f"IP geolocation failed for {ip_address}: {e}")
+    
+    return {'success': False, 'city': 'Unknown', 'country': 'Unknown'}
+
+def get_client_ip():
+    """Get client IP address, handling proxies and load balancers"""
+    # Check for forwarded IP (common with proxies/CDNs)
+    forwarded_ips = request.headers.get('X-Forwarded-For')
+    if forwarded_ips:
+        # Take the first IP (client IP)
+        return forwarded_ips.split(',')[0].strip()
+    
+    # Check for real IP (some proxy configurations)
+    real_ip = request.headers.get('X-Real-IP')
+    if real_ip:
+        return real_ip
+    
+    # Check for CF-Connecting-IP (Cloudflare)
+    cf_ip = request.headers.get('CF-Connecting-IP')
+    if cf_ip:
+        return cf_ip
+    
+    # Fallback to remote address
+    return request.remote_addr
+
+@app.route('/api/v3/location', methods=['GET'])
+def get_visitor_location():
+    """Get visitor location info (IP-based only, no permission required)"""
+    try:
+        client_ip = get_client_ip()
+        
+        # Get IP-based location only
+        ip_location = get_ip_geolocation(client_ip)
+        
+        # Simple response with just IP geolocation
+        response_data = {
+            'city': ip_location.get('city', 'Unknown'),
+            'region': ip_location.get('region', 'Unknown'),
+            'country': ip_location.get('country', 'Unknown'),
+            'timezone': ip_location.get('timezone', 'Unknown'),
+            'method': 'IP geolocation (approximate)',
+            'privacy_note': 'Location is approximate based on IP address and not stored'
+        }
+        
+        # Log visitor for analytics (anonymized)
+        logger.info(f"Visitor from {ip_location.get('city', 'Unknown')}, {ip_location.get('country', 'Unknown')} - IP: {client_ip[:8]}...")
+        
+        return jsonify({
+            'success': True,
+            'timestamp': datetime.now().isoformat(),
+            'data': response_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting location: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/v3/regional-books', methods=['GET'])
+@require_auth  
+def get_regional_book_recommendations():
+    """Get book recommendations based on visitor's location"""
+    try:
+        client_ip = get_client_ip()
+        location = get_ip_geolocation(client_ip)
+        
+        # Location-based book recommendations
+        recommendations = []
+        city = location.get('city', '').lower()
+        country = location.get('country', '').lower()
+        
+        conn = get_db()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # Search for books related to their region
+            regional_queries = []
+            
+            if 'united states' in country or 'usa' in country:
+                regional_queries = ['america', 'american', 'usa', 'united states']
+            elif 'china' in country:
+                regional_queries = ['china', 'chinese', '中国', 'beijing', 'shanghai']
+            elif 'japan' in country:
+                regional_queries = ['japan', 'japanese', 'tokyo', 'japan']
+            elif 'germany' in country:
+                regional_queries = ['germany', 'german', 'berlin', 'deutschland']
+            elif 'france' in country:
+                regional_queries = ['france', 'french', 'paris', 'français']
+            elif 'uk' in country or 'britain' in country:
+                regional_queries = ['britain', 'british', 'london', 'england', 'uk']
+            
+            # Add city-specific searches
+            if city and len(city) > 3:
+                regional_queries.append(city)
+            
+            # Search for regional content
+            for query in regional_queries[:3]:  # Limit to 3 queries
+                cur.execute("""
+                    SELECT DISTINCT b.book_id, b.title, b.author, b.word_count,
+                           c.content
+                    FROM books b
+                    JOIN chunks c ON b.book_id = c.book_id
+                    WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
+                    ORDER BY b.word_count DESC
+                    LIMIT 3
+                """, (query,))
+                
+                results = cur.fetchall()
+                for book in results:
+                    recommendations.append({
+                        'book_id': book['book_id'],
+                        'title': book['title'],
+                        'author': book['author'],
+                        'reason': f'Related to your region: {query}',
+                        'excerpt': book['content'][:200] + '...'
+                    })
+        
+        # Remove duplicates and limit
+        seen_books = set()
+        unique_recommendations = []
+        for rec in recommendations:
+            if rec['book_id'] not in seen_books:
+                seen_books.add(rec['book_id'])
+                unique_recommendations.append(rec)
+                if len(unique_recommendations) >= 5:
+                    break
+        
+        return jsonify({
+            'success': True,
+            'timestamp': datetime.now().isoformat(),
+            'data': {
+                'visitor_location': {
+                    'city': location.get('city', 'Unknown'),
+                    'country': location.get('country', 'Unknown')
+                },
+                'recommendations': unique_recommendations,
+                'recommendation_basis': 'Books containing content related to your geographic region',
+                'privacy_note': 'Location is used only for recommendations and not stored'
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting regional recommendations: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ================================
+# EPUB UPLOAD ENDPOINT
+# ================================
+
+def allowed_file(filename):
+    """Check if file is allowed EPUB format"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'epub'
+
+def validate_epub_file(file_path):
+    """Validate EPUB file format and security"""
+    try:
+        # Check file size (max 50MB)
+        file_size = os.path.getsize(file_path)
+        if file_size > 50 * 1024 * 1024:  # 50MB
+            return False, "File too large (max 50MB)"
+        
+        # Check if it's a valid EPUB file
+        result = subprocess.run(['file', file_path], capture_output=True, text=True)
+        if 'EPUB document' not in result.stdout and 'Zip archive' not in result.stdout:
+            return False, "Invalid EPUB format"
+        
+        return True, "Valid EPUB file"
+    except Exception as e:
+        return False, f"Validation error: {str(e)}"
+
+@app.route('/api/v3/upload', methods=['POST'])
+@require_auth
+def upload_epub():
+    """Upload EPUB file for processing"""
+    start_time = time.time()
+    
+    try:
+        # Check if file is in request
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'}), 400
+        
+        # Validate file type
+        if not allowed_file(file.filename):
+            return jsonify({'success': False, 'error': 'Only EPUB files allowed'}), 400
+        
+        # Create secure filename
+        filename = secure_filename(file.filename)
+        if not filename:
+            filename = f"upload_{int(time.time())}.epub"
+        
+        # Ensure upload directory exists
+        upload_dir = os.path.join(os.getcwd(), 'ebooks', 'uploads')
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Save file
+        file_path = os.path.join(upload_dir, filename)
+        file.save(file_path)
+        
+        # Validate uploaded file
+        is_valid, message = validate_epub_file(file_path)
+        if not is_valid:
+            os.remove(file_path)  # Clean up invalid file
+            return jsonify({'success': False, 'error': message}), 400
+        
+        # Generate file hash for tracking
+        with open(file_path, 'rb') as f:
+            file_hash = hashlib.md5(f.read()).hexdigest()
+        
+        # Move to processing directory
+        processing_dir = os.path.join(os.getcwd(), 'ebooks', 'downloads')
+        os.makedirs(processing_dir, exist_ok=True)
+        
+        final_path = os.path.join(processing_dir, filename)
+        os.rename(file_path, final_path)
+        
+        # Log successful upload
+        processing_time = time.time() - start_time
+        logger.info(f"EPUB upload successful: {filename} ({file_hash}) - {processing_time:.3f}s")
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'filename': filename,
+                'file_hash': file_hash,
+                'size_bytes': os.path.getsize(final_path),
+                'upload_time': datetime.utcnow().isoformat(),
+                'status': 'uploaded',
+                'message': 'EPUB uploaded successfully and queued for processing'
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error uploading EPUB: {e}")
+        return jsonify({'success': False, 'error': 'Upload failed'}), 500
+
+# ================================
+# OLLAMA INTEGRATION ENDPOINTS
+# ================================
+
+# Initialize Ollama agent
+try:
+    ollama_agent = OllamaUrlGeneratorAgent(
+        ollama_endpoint=os.getenv('OLLAMA_ENDPOINT', 'http://localhost:11434'),
+        ollama_model=os.getenv('OLLAMA_MODEL', 'llama2'),
+        api_key=API_KEY,
+        library_api_base=f"https://api.ashortstayinhell.com/api/v3"
+    )
+    logger.info("🤖 Ollama URL Generator Agent initialized successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to initialize Ollama agent: {e}")
+    ollama_agent = None
+
+@app.route('/api/v3/ollama/query', methods=['POST'])
+@require_auth
+def ollama_natural_language_query():
+    """Natural language query via Ollama integration"""
+    start_time = time.time()
+    
+    try:
+        if not ollama_agent:
+            return jsonify({
+                'success': False, 
+                'error': 'Ollama agent not available'
+            }), 503
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No JSON data provided'}), 400
+        
+        user_query = data.get('query', '').strip()
+        
+        # Validate input
+        if not user_query or len(user_query) < 3:
+            return jsonify({'success': False, 'error': 'Query too short (minimum 3 characters)'}), 400
+        
+        if len(user_query) > 500:
+            return jsonify({'success': False, 'error': 'Query too long (maximum 500 characters)'}), 400
+        
+        # Process query with Ollama agent (run in asyncio)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(ollama_agent.natural_language_to_url(user_query))
+        finally:
+            loop.close()
+        
+        if not result.get('success'):
+            return jsonify({
+                'success': False,
+                'error': result.get('error', 'Query processing failed')
+            }), 500
+        
+        # Execute the generated searches
+        search_results = []
+        total_books_found = 0
+        
+        for url_config in result['search_urls']:
+            try:
+                # Extract search parameters from the generated URL
+                search_params = url_config['url'].split('?')[1] if '?' in url_config['url'] else ''
+                params = dict(param.split('=') for param in search_params.split('&') if '=' in param)
+                
+                # Execute search using existing search function
+                search_query = params.get('q', '')
+                search_limit = int(params.get('limit', 10))
+                
+                if search_query:
+                    # Call internal search function
+                    conn = get_db()
+                    if conn:
+                        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                            cur.execute("""
+                                SELECT b.book_id, b.title, b.author, b.word_count,
+                                       c.content, c.chunk_id
+                                FROM books b
+                                JOIN chunks c ON b.book_id = c.book_id
+                                WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
+                                ORDER BY ts_rank(to_tsvector('english', c.content), plainto_tsquery('english', %s)) DESC
+                                LIMIT %s
+                            """, (search_query, search_query, search_limit))
+                            
+                            books = [dict(row) for row in cur.fetchall()]
+                            
+                            search_result = {
+                                'strategy': url_config['strategy'],
+                                'description': url_config['description'],
+                                'query': search_query,
+                                'books_found': len(books),
+                                'books': books[:5],  # Limit to top 5 for response size
+                                'priority': url_config.get('priority', 999)
+                            }
+                            
+                            search_results.append(search_result)
+                            total_books_found += len(books)
+                        
+                        conn.close()
+                
+            except Exception as search_error:
+                logger.warning(f"Search execution failed for strategy {url_config.get('strategy', 'unknown')}: {search_error}")
+                continue
+        
+        # Sort results by priority
+        search_results.sort(key=lambda x: x.get('priority', 999))
+        
+        processing_time = time.time() - start_time
+        
+        # Log successful query
+        logger.info(f"🔍 Ollama query: '{user_query[:50]}...' - {total_books_found} results in {processing_time:.3f}s")
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'original_query': user_query,
+                'ollama_analysis': result['structured_query'],
+                'explanation': result['explanation'],
+                'search_strategies': len(result['search_urls']),
+                'search_results': search_results,
+                'total_books_found': total_books_found,
+                'performance': {
+                    'processing_time': processing_time,
+                    'ollama_time': result.get('performance', {}).get('response_time', 0)
+                },
+                'knowledge_base': {
+                    'total_books': 360,
+                    'total_words': 34236988,
+                    'searched_via': 'Natural language processing with Ollama'
+                }
+            },
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        processing_time = time.time() - start_time
+        logger.error(f"❌ Ollama query error: {e} - {processing_time:.3f}s")
+        return jsonify({
+            'success': False, 
+            'error': 'Query processing failed',
+            'processing_time': processing_time
+        }), 500
+
+@app.route('/api/v3/ollama/health', methods=['GET'])
+@require_auth
+def ollama_health_check():
+    """Check Ollama integration health"""
+    try:
+        if not ollama_agent:
+            return jsonify({
+                'success': False,
+                'status': 'ollama_agent_unavailable',
+                'message': 'Ollama agent not initialized'
+            }), 503
+        
+        # Run health check
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            health_result = loop.run_until_complete(ollama_agent.test_connection())
+        finally:
+            loop.close()
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'ollama_agent': 'initialized',
+                'connection_test': health_result,
+                'agent_stats': {
+                    'queries_processed': ollama_agent.query_count,
+                    'avg_response_time': ollama_agent.total_response_time / max(ollama_agent.query_count, 1)
+                }
+            },
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Ollama health check failed: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Health check failed'
+        }), 500
+
 # ================================
 # ERROR HANDLERS
 # ================================
@@ -518,9 +1129,13 @@ if __name__ == '__main__':
     logger.info(f"🔐 Security: API Key Authentication Required")
     logger.info(f"🔗 Database: {DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}")
     
-    # Production server
+    # Production server with SSL
+    ssl_cert_path = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem'
+    ssl_key_path = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/privkey.pem'
+    
     app.run(
         host='0.0.0.0',
         port=5563,
-        debug=False
+        debug=False,
+        ssl_context=(ssl_cert_path, ssl_key_path)
     )
