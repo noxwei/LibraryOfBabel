@@ -1,0 +1,114 @@
+{
+  "timestamp": "2025-07-07T00:47:51.638523",
+  "duration_seconds": 0.05262899398803711,
+  "statistics": {
+    "total_tests": 6,
+    "passed": 4,
+    "failed": 1,
+    "warnings": 1,
+    "critical_issues": 0,
+    "high_issues": 1,
+    "total_duration_seconds": 0.05262899398803711
+  },
+  "health_score": 56.67,
+  "health_status": "poor",
+  "test_results": [
+    {
+      "test_name": "database_connectivity",
+      "category": "system",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.01714611053466797,
+      "details": {
+        "book_count": 129,
+        "chunk_count": 3839,
+        "connection_successful": true
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:47:51.603057"
+    },
+    {
+      "test_name": "api_endpoint_info",
+      "category": "system",
+      "status": "failed",
+      "severity": "high",
+      "duration_seconds": 0.002933979034423828,
+      "details": {
+        "endpoint": "http://localhost:5563/api/v3/info"
+      },
+      "error_message": "('Connection aborted.', ConnectionResetError(54, 'Connection reset by peer'))",
+      "timestamp": "2025-07-07T00:47:51.606150"
+    },
+    {
+      "test_name": "transmission_connectivity",
+      "category": "system",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.014271974563598633,
+      "details": {
+        "transmission_accessible": true,
+        "output_lines": 12
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:47:51.620444"
+    },
+    {
+      "test_name": "chaos_report_analysis",
+      "category": "performance",
+      "status": "warning",
+      "severity": "low",
+      "duration_seconds": 0.0005080699920654297,
+      "details": {
+        "total_attacks": 10,
+        "performance_issues": {
+          "unicode_performance": [
+            {
+              "query": "\u601d\u60f3 Denken pens\u00e9e...",
+              "response_time": 1579.30588722229,
+              "severity": "high"
+            }
+          ],
+          "sql_injection_speed": [],
+          "missing_intersections": [],
+          "response_time_variance": []
+        },
+        "issue_count": 1
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:47:51.621096"
+    },
+    {
+      "test_name": "unicode_optimization",
+      "category": "database",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.008124828338623047,
+      "details": {
+        "optimization_applied": true,
+        "function_created": "optimize_unicode_search",
+        "index_created": "idx_chunks_content_unicode"
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:47:51.629280"
+    },
+    {
+      "test_name": "sql_injection_protection",
+      "category": "security",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.009167909622192383,
+      "details": {
+        "protection_implemented": true,
+        "validation_function": "validate_search_input",
+        "secure_search_function": "secure_text_search"
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:47:51.638506"
+    }
+  ],
+  "improvements_applied": {
+    "performance": 1,
+    "security": 1,
+    "total_fixes": 0
+  }
+}

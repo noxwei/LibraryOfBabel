@@ -1,229 +1,117 @@
-# LibraryOfBabel - Personal Knowledge Base Project
+# LibraryOfBabel - Calibrated Privacy Protection
+# Protects personal data while preserving shareable architecture
 
+# === PERSONAL IDENTITY PROTECTION ===
+# Specific personal identifiers
+*weixiangzhang*
+*wei_maybe_foucault*
+*maybe_foucault*
+*zhang*personal*
+*linda_zhang*
+
+# Personal data files
+*user_profile*.json
+*personal_info*.json
+*real_name*.json
+*identity*.json
+*biography*.json
+
+# === HR & PERFORMANCE DATA ===
+# Sensitive workforce analytics
+reports/hr_analytics/
+*interaction*.json
+*performance_metrics*.json
+*workforce_status*.json
+*comprehensive_hr_report*.json
+
+# Session and conversation logs
+*session_*.json
+*conversation_*.log
+*user_session*.log
+
+# === DATABASE PERSONAL DATA ===
+# Database exports with personal information
+pg_dump_*personal*.sql
+pg_dump_*hr*.sql
+pg_dump_*users*.sql
+
+# === AGENT PERSONAL DATA (NOT ARCHITECTURE) ===
+# Agent memory and personal interactions (keeps architecture)
+agents/*/memory/
+agents/*/personal_data/
+agents/*/user_interactions/
+agents/*/conversations/
+
+# Specific agent personal files (not the agent code itself)
+agents/*/_personal_*.json
+agents/*/_user_*.json
+agents/*/_private_*.json
+
+# === STANDARD DEVELOPMENT EXCLUDES ===
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
 
-# Virtual Environment
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-postgresql_data/
-pgdata/
-*.dump
-
-# Logs
-*.log
-logs/
-.agents/agent_logs/
-
-# Output Data
-output/
-processed_books/
-temp/
-tmp/
-
-# Test Books (large files)
-ebooktestsamples/
-audiobook_samples/
-book_collection/
-
-# Audio Files (exclude files larger than 20MB)
-*.m4b
-*.mp3
-*.wav
-*.flac
-*.aac
-*.ogg
-*.wma
-*.m4a
-
-# Configuration (may contain sensitive paths)
-config/local_config.json
+# === SECURITY CREDENTIALS ===
+# Environment & Config files with secrets
 .env
 .env.local
 .env.production
+.env.*
 
-# API Keys and Security
-api_key.txt
+# API Keys and tokens
 *api_key*
 *API_KEY*
-security_config.json
-auth_tokens.json
+api_key.txt
+*.key
+*.token
+*secret*
+*SECRET*
+*password*
+*PASSWORD*
 
-# MAM System Files
-mam_downloads/
-*.torrent
-mam_session.json
-mam_request_log.json
-mam_setup.log
-mam_client.log
+# Security reports (may contain sensitive data)
+reports/security_report_*.json
+*security_scan*.json
+*vulnerability*.json
 
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-
-# Backend Development
-babel-backend/node_modules/
-babel-backend/.env
-babel-backend/.env.local
-babel-backend/.env.production
-babel-backend/logs/
-babel-backend/temp/
-babel-backend/build/
-babel-backend/dist/
-
-# Production Secrets & Security
-babel-backend/src/production-server.js.secrets
-cloudflare-setup.md
-cloudflare-credentials/
+# SSL/TLS certificates and private keys
 *.pem
 *.key
 *.crt
 *.p12
-*.csr
+*.pfx
 ssl/
 certificates/
-deployment-notes.md
-production-domains.txt
 
-# Let's Encrypt Certificates & Keys
-ssl/letsencrypt-config/
-ssl/letsencrypt-work/  
-ssl/letsencrypt-logs/
-ssl/verification/
-ssl/fresh-*.pem
-ssl/ios-*.pem
-
-# Production Configuration
-domain-setup.md
-production-config.json
-deployment-secrets.json
-service-config.plist
-
-# Cloudflare Tunnel Credentials
-.cloudflared/
-cloudflared.log
-cloudflared.error.log
-tunnel-credentials.json
-
-# Domain Configuration (contains sensitive info)
-domain-config.json
-production-config.json
-external-ip.txt
-network-config.json
-router-config.json
-port-forwarding.json
-
-# Analytics & Monitoring Keys
-analytics-keys.json
-monitoring-secrets.env
-
-# Frontend Development  
-frontend/node_modules/
-frontend/build/
-frontend/dist/
-frontend/.env
-frontend/.env.local
-frontend/.env.development.local
-frontend/.env.test.local
-frontend/.env.production.local
-
-# Database Files
-audiobook_ebook_tracker.db*
-missing_ebooks.json
-missing_ebooks.csv
-
-# Playwright
-test-results/
-playwright-report/
-playwright/.cache/
-
-# Transmission Downloads
-completed_ebooks/
-mam_session.json
-
-# Processing Results
-extraction_results/
-chunk_data/
-search_indexes/
-
-# Performance Monitoring
-performance_reports/
-benchmark_results/
-
-# Backup Files
-*.bak
-*.backup
-backup/
-
-# Large Models (if any)
-models/
-*.model
-*.bin
-
-# Documentation builds
-docs/_build/
-docs/build/
-
-# Jupyter Notebooks checkpoints
-.ipynb_checkpoints/
-
-# macOS
-*.app
-
-# Cache
-.cache/
-cache/
-*.epub
-*.pdf
-*.db-shm
-*.db-wal
+# Logs (but not agent architecture)
 *.log
-.env
-api_key.txt
+logs/
+
+# OS & IDE
+.DS_Store
+.vscode/settings.json
+*.swp
+*.swo
+
+# === SHAREABLE CONTENT (EXPLICITLY NOT IGNORED) ===
+# The following are INTENTIONALLY shareable:
+# - agents/*/*.py (agent architecture and design)
+# - database/schema/*.sql (database design)
+# - *.md (documentation)
+# - scripts/*.py (utility scripts)
+# - Agent class definitions and capabilities
+
+# === TEMPORARY & CACHE ===
+temp/
+tmp/
+.cache/
+*.tmp
+*.m4b
+*.mp3
+*.epub
+*.jpg
+*.opf
+*.cbr

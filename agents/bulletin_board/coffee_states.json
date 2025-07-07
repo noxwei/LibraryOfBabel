@@ -1,0 +1,12 @@
+{
+  "the_spy": {
+    "status": "caffeinated",
+    "coffee_given_at": "2025-07-07T00:36:22.634892",
+    "boost_until": "2025-07-07T01:36:22.634892",
+    "cooldown_until": "2025-07-07T02:36:22.634892",
+    "original_frequency": 180,
+    "boosted_frequency": 45.0,
+    "coffee_count": 1,
+    "existence_level": "HYPERACTIVE"
+  }
+}
