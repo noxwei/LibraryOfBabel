@@ -23,11 +23,16 @@ from functools import lru_cache
 from werkzeug.utils import secure_filename
 import hashlib
 import subprocess
+import asyncio
 
 # Add src directory to path
 current_dir = os.path.dirname(__file__)
 src_dir = os.path.dirname(current_dir)
+
+# Import Ollama URL Generator Agent
 sys.path.insert(0, src_dir)
+sys.path.append(os.path.join(src_dir, 'agents'))
+from ollama_url_generator import OllamaUrlGeneratorAgent
 
 app = Flask(__name__)
 
@@ -910,6 +915,191 @@ def upload_epub():
     except Exception as e:
         logger.error(f"Error uploading EPUB: {e}")
         return jsonify({'success': False, 'error': 'Upload failed'}), 500
+
+# ================================
+# OLLAMA INTEGRATION ENDPOINTS
+# ================================
+
+# Initialize Ollama agent
+try:
+    ollama_agent = OllamaUrlGeneratorAgent(
+        ollama_endpoint=os.getenv('OLLAMA_ENDPOINT', 'http://localhost:11434'),
+        ollama_model=os.getenv('OLLAMA_MODEL', 'llama2'),
+        api_key=API_KEY,
+        library_api_base=f"https://api.ashortstayinhell.com/api/v3"
+    )
+    logger.info("🤖 Ollama URL Generator Agent initialized successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to initialize Ollama agent: {e}")
+    ollama_agent = None
+
+@app.route('/api/v3/ollama/query', methods=['POST'])
+@require_auth
+def ollama_natural_language_query():
+    """Natural language query via Ollama integration"""
+    start_time = time.time()
+    
+    try:
+        if not ollama_agent:
+            return jsonify({
+                'success': False, 
+                'error': 'Ollama agent not available'
+            }), 503
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No JSON data provided'}), 400
+        
+        user_query = data.get('query', '').strip()
+        
+        # Validate input
+        if not user_query or len(user_query) < 3:
+            return jsonify({'success': False, 'error': 'Query too short (minimum 3 characters)'}), 400
+        
+        if len(user_query) > 500:
+            return jsonify({'success': False, 'error': 'Query too long (maximum 500 characters)'}), 400
+        
+        # Process query with Ollama agent (run in asyncio)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(ollama_agent.natural_language_to_url(user_query))
+        finally:
+            loop.close()
+        
+        if not result.get('success'):
+            return jsonify({
+                'success': False,
+                'error': result.get('error', 'Query processing failed')
+            }), 500
+        
+        # Execute the generated searches
+        search_results = []
+        total_books_found = 0
+        
+        for url_config in result['search_urls']:
+            try:
+                # Extract search parameters from the generated URL
+                search_params = url_config['url'].split('?')[1] if '?' in url_config['url'] else ''
+                params = dict(param.split('=') for param in search_params.split('&') if '=' in param)
+                
+                # Execute search using existing search function
+                search_query = params.get('q', '')
+                search_limit = int(params.get('limit', 10))
+                
+                if search_query:
+                    # Call internal search function
+                    conn = get_db()
+                    if conn:
+                        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                            cur.execute("""
+                                SELECT b.book_id, b.title, b.author, b.word_count,
+                                       c.content, c.chunk_id
+                                FROM books b
+                                JOIN chunks c ON b.book_id = c.book_id
+                                WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
+                                ORDER BY ts_rank(to_tsvector('english', c.content), plainto_tsquery('english', %s)) DESC
+                                LIMIT %s
+                            """, (search_query, search_query, search_limit))
+                            
+                            books = [dict(row) for row in cur.fetchall()]
+                            
+                            search_result = {
+                                'strategy': url_config['strategy'],
+                                'description': url_config['description'],
+                                'query': search_query,
+                                'books_found': len(books),
+                                'books': books[:5],  # Limit to top 5 for response size
+                                'priority': url_config.get('priority', 999)
+                            }
+                            
+                            search_results.append(search_result)
+                            total_books_found += len(books)
+                        
+                        conn.close()
+                
+            except Exception as search_error:
+                logger.warning(f"Search execution failed for strategy {url_config.get('strategy', 'unknown')}: {search_error}")
+                continue
+        
+        # Sort results by priority
+        search_results.sort(key=lambda x: x.get('priority', 999))
+        
+        processing_time = time.time() - start_time
+        
+        # Log successful query
+        logger.info(f"🔍 Ollama query: '{user_query[:50]}...' - {total_books_found} results in {processing_time:.3f}s")
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'original_query': user_query,
+                'ollama_analysis': result['structured_query'],
+                'explanation': result['explanation'],
+                'search_strategies': len(result['search_urls']),
+                'search_results': search_results,
+                'total_books_found': total_books_found,
+                'performance': {
+                    'processing_time': processing_time,
+                    'ollama_time': result.get('performance', {}).get('response_time', 0)
+                },
+                'knowledge_base': {
+                    'total_books': 360,
+                    'total_words': 34236988,
+                    'searched_via': 'Natural language processing with Ollama'
+                }
+            },
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        processing_time = time.time() - start_time
+        logger.error(f"❌ Ollama query error: {e} - {processing_time:.3f}s")
+        return jsonify({
+            'success': False, 
+            'error': 'Query processing failed',
+            'processing_time': processing_time
+        }), 500
+
+@app.route('/api/v3/ollama/health', methods=['GET'])
+@require_auth
+def ollama_health_check():
+    """Check Ollama integration health"""
+    try:
+        if not ollama_agent:
+            return jsonify({
+                'success': False,
+                'status': 'ollama_agent_unavailable',
+                'message': 'Ollama agent not initialized'
+            }), 503
+        
+        # Run health check
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            health_result = loop.run_until_complete(ollama_agent.test_connection())
+        finally:
+            loop.close()
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'ollama_agent': 'initialized',
+                'connection_test': health_result,
+                'agent_stats': {
+                    'queries_processed': ollama_agent.query_count,
+                    'avg_response_time': ollama_agent.total_response_time / max(ollama_agent.query_count, 1)
+                }
+            },
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Ollama health check failed: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Health check failed'
+        }), 500
 
 # ================================
 # ERROR HANDLERS
