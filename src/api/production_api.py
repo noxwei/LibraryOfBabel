@@ -20,6 +20,9 @@ from datetime import datetime
 import re
 import requests
 from functools import lru_cache
+from werkzeug.utils import secure_filename
+import hashlib
+import subprocess
 
 # Add src directory to path
 current_dir = os.path.dirname(__file__)
@@ -166,7 +169,8 @@ def api_info():
             ],
             'endpoints': {
                 'public': ['/api/v3/info', '/api/v3/health'],
-                'secured': 'All other endpoints require API key authentication'
+                'secured': ['/api/v3/search', '/api/v3/books', '/api/v3/upload', '/api/v3/stats', '/api/v3/agents/feed'],
+                'note': 'All secured endpoints require API key authentication'
             },
             'authentication': {
                 'methods': ['Bearer token', 'X-API-Key header', 'Query parameter'],
@@ -812,6 +816,100 @@ def get_regional_book_recommendations():
     except Exception as e:
         logger.error(f"Error getting regional recommendations: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# ================================
+# EPUB UPLOAD ENDPOINT
+# ================================
+
+def allowed_file(filename):
+    """Check if file is allowed EPUB format"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'epub'
+
+def validate_epub_file(file_path):
+    """Validate EPUB file format and security"""
+    try:
+        # Check file size (max 50MB)
+        file_size = os.path.getsize(file_path)
+        if file_size > 50 * 1024 * 1024:  # 50MB
+            return False, "File too large (max 50MB)"
+        
+        # Check if it's a valid EPUB file
+        result = subprocess.run(['file', file_path], capture_output=True, text=True)
+        if 'EPUB document' not in result.stdout and 'Zip archive' not in result.stdout:
+            return False, "Invalid EPUB format"
+        
+        return True, "Valid EPUB file"
+    except Exception as e:
+        return False, f"Validation error: {str(e)}"
+
+@app.route('/api/v3/upload', methods=['POST'])
+@require_auth
+def upload_epub():
+    """Upload EPUB file for processing"""
+    start_time = time.time()
+    
+    try:
+        # Check if file is in request
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'}), 400
+        
+        # Validate file type
+        if not allowed_file(file.filename):
+            return jsonify({'success': False, 'error': 'Only EPUB files allowed'}), 400
+        
+        # Create secure filename
+        filename = secure_filename(file.filename)
+        if not filename:
+            filename = f"upload_{int(time.time())}.epub"
+        
+        # Ensure upload directory exists
+        upload_dir = os.path.join(os.getcwd(), 'ebooks', 'uploads')
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Save file
+        file_path = os.path.join(upload_dir, filename)
+        file.save(file_path)
+        
+        # Validate uploaded file
+        is_valid, message = validate_epub_file(file_path)
+        if not is_valid:
+            os.remove(file_path)  # Clean up invalid file
+            return jsonify({'success': False, 'error': message}), 400
+        
+        # Generate file hash for tracking
+        with open(file_path, 'rb') as f:
+            file_hash = hashlib.md5(f.read()).hexdigest()
+        
+        # Move to processing directory
+        processing_dir = os.path.join(os.getcwd(), 'ebooks', 'downloads')
+        os.makedirs(processing_dir, exist_ok=True)
+        
+        final_path = os.path.join(processing_dir, filename)
+        os.rename(file_path, final_path)
+        
+        # Log successful upload
+        processing_time = time.time() - start_time
+        logger.info(f"EPUB upload successful: {filename} ({file_hash}) - {processing_time:.3f}s")
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'filename': filename,
+                'file_hash': file_hash,
+                'size_bytes': os.path.getsize(final_path),
+                'upload_time': datetime.utcnow().isoformat(),
+                'status': 'uploaded',
+                'message': 'EPUB uploaded successfully and queued for processing'
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error uploading EPUB: {e}")
+        return jsonify({'success': False, 'error': 'Upload failed'}), 500
 
 # ================================
 # ERROR HANDLERS
