@@ -109,3 +109,9 @@ temp/
 tmp/
 .cache/
 *.tmp
+*.m4b
+*.mp3
+*.epub
+*.jpg
+*.opf
+*.cbr

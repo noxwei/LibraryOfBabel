@@ -28,7 +28,14 @@
       "Bash(git remote add:*)",
       "Bash(sed:*)",
       "Bash(git reset:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(ping:*)",
+      "Bash(PGPASSWORD=\"\" psql -U weixiangzhang -d knowledge_base -f database/schema/hr_schema.sql)",
+      "Bash(./scripts/privacy_check.sh:*)",
+      "Bash(unset API_KEY)",
+      "Bash(git gc:*)",
+      "Bash(nslookup:*)",
+      "Bash(nc:*)"
     ],
     "deny": []
   }

@@ -1,0 +1,117 @@
+{
+  "timestamp": "2025-07-07T00:51:43.034423",
+  "duration_seconds": 0.05903935432434082,
+  "statistics": {
+    "total_tests": 6,
+    "passed": 5,
+    "failed": 0,
+    "warnings": 1,
+    "critical_issues": 0,
+    "high_issues": 0,
+    "total_duration_seconds": 0.05903935432434082
+  },
+  "health_score": 83.33,
+  "health_status": "fair",
+  "test_results": [
+    {
+      "test_name": "database_connectivity",
+      "category": "system",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.02473306655883789,
+      "details": {
+        "book_count": 129,
+        "chunk_count": 3839,
+        "connection_successful": true
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:51:43.000160"
+    },
+    {
+      "test_name": "api_endpoint_info",
+      "category": "system",
+      "status": "passed",
+      "severity": "low",
+      "duration_seconds": 0.0033550262451171875,
+      "details": {
+        "endpoint": "http://localhost:5563/api/v3/info",
+        "status_code": 200,
+        "response_time_ms": 3.3550262451171875,
+        "content_length": 612
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:51:43.003796"
+    },
+    {
+      "test_name": "transmission_connectivity",
+      "category": "system",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.01121211051940918,
+      "details": {
+        "transmission_accessible": true,
+        "output_lines": 12
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:51:43.015053"
+    },
+    {
+      "test_name": "chaos_report_analysis",
+      "category": "performance",
+      "status": "warning",
+      "severity": "low",
+      "duration_seconds": 0.0004417896270751953,
+      "details": {
+        "total_attacks": 10,
+        "performance_issues": {
+          "unicode_performance": [
+            {
+              "query": "\u601d\u60f3 Denken pens\u00e9e...",
+              "response_time": 1579.30588722229,
+              "severity": "high"
+            }
+          ],
+          "sql_injection_speed": [],
+          "missing_intersections": [],
+          "response_time_variance": []
+        },
+        "issue_count": 1
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:51:43.015678"
+    },
+    {
+      "test_name": "unicode_optimization",
+      "category": "database",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.010622262954711914,
+      "details": {
+        "optimization_applied": true,
+        "function_created": "optimize_unicode_search",
+        "index_created": "idx_chunks_content_unicode"
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:51:43.026353"
+    },
+    {
+      "test_name": "sql_injection_protection",
+      "category": "security",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.007985830307006836,
+      "details": {
+        "protection_implemented": true,
+        "validation_function": "validate_search_input",
+        "secure_search_function": "secure_text_search"
+      },
+      "error_message": null,
+      "timestamp": "2025-07-07T00:51:43.034399"
+    }
+  ],
+  "improvements_applied": {
+    "performance": 1,
+    "security": 1,
+    "total_fixes": 0
+  }
+}
