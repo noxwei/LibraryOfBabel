@@ -217,34 +217,90 @@ Query: "yo what books discuss AI consciousness and ethics?"
 ### **Example 1: AI Ethics Query**
 ```
 Input: "yo what books discuss AI consciousness and ethics?"
-Output: 
-✅ 2 search strategies generated
-🎯 Keywords: consciousness, ethics, discuss
-📚 Topics: consciousness, ethics
-⚡ 0.006s processing time
-🔗 Ready-to-use API URLs generated
+Response Time: 0.007s
+Generated URLs:
+- primary_semantic: https://api.ashortstayinhell.com/api/v3/search?q=what+discuss+consciousness+ethics&limit=10&type=semantic
+- topic_based: https://api.ashortstayinhell.com/api/v3/search?q=what+OR+discuss&limit=8&type=topic
+
+Truncated JSON Output:
+{
+  "success": true,
+  "original_query": "yo what books discuss AI consciousness and ethics?",
+  "cleaned_query": "yo what books discuss AI consciousness and ethics?",
+  "structured_query": {
+    "search_terms": ["what", "discuss", "consciousness", "ethics"],
+    "authors": [],
+    "topics": ["what", "discuss"]
+  },
+  "search_urls": [
+    {
+      "strategy": "primary_semantic",
+      "url": "https://api.ashortstayinhell.com/api/v3/search?q=what+discuss+consciousness+ethics&limit=10&type=semantic",
+      "description": "Semantic search for: what discuss consciousness ethics"
+    }
+  ]
+}...
 ```
 
 ### **Example 2: Interdisciplinary Research**
 ```
 Input: "books that bridge quantum physics and philosophy"
-Output:
-✅ 2 search strategies generated  
-🎯 Keywords: bridge, quantum, physics, philosophy
-📚 Topics: bridge, quantum
-⚡ 0.002s processing time
-🔗 Cross-domain search URLs created
+Response Time: 0.002s
+Generated URLs:
+- primary_semantic: https://api.ashortstayinhell.com/api/v3/search?q=that+bridge+quantum+physics+philosophy&limit=10&type=semantic
+- topic_based: https://api.ashortstayinhell.com/api/v3/search?q=that+OR+bridge&limit=8&type=topic
+
+Truncated JSON Output:
+{
+  "success": true,
+  "original_query": "books that bridge quantum physics and philosophy",
+  "structured_query": {
+    "search_terms": ["that", "bridge", "quantum", "physics", "philosophy"],
+    "authors": [],
+    "topics": ["that", "bridge"]
+  },
+  "search_urls": [
+    {
+      "strategy": "primary_semantic",
+      "description": "Semantic search for: that bridge quantum physics philosophy"
+    }
+  ]
+}...
 ```
 
-### **Example 3: Edge Case Handling**
+### **Example 3: Author-Specific Query**
 ```
-Input: "?!?!?!"
-Output:
-✅ System handled gracefully
-🎯 0 search strategies (appropriately)
-📚 No crashes or errors
-⚡ 0.001s processing time
-🔗 Proper error handling
+Input: "find me some Octavia Butler social justice analysis"
+Response Time: 0.002s
+Generated URLs:
+- primary_semantic: https://api.ashortstayinhell.com/api/v3/search?q=some+octavia+butler+social+justice&limit=10&type=semantic
+- topic_based: https://api.ashortstayinhell.com/api/v3/search?q=some+OR+octavia&limit=8&type=topic
+
+Truncated JSON Output:
+{
+  "success": true,
+  "original_query": "find me some Octavia Butler social justice analysis",
+  "structured_query": {
+    "search_terms": ["some", "octavia", "butler", "social", "justice"],
+    "authors": [],
+    "topics": ["some", "octavia"]
+  },
+  "explanation": "Simple keyword extraction (Ollama unavailable). Using 2 search strategies for comprehensive results. Searching across 360 books with 34,236,988 words.",
+  "performance": {
+    "response_time": 0.002
+  }
+}...
+```
+
+### **Example 4: Edge Case Handling**
+```
+Input: "CAPS LOCK QUERY ABOUT CONSCIOUSNESS"
+Response Time: 0.002s
+Generated URLs:
+- primary_semantic: https://api.ashortstayinhell.com/api/v3/search?q=caps+lock+query+consciousness&limit=10&type=semantic
+- topic_based: https://api.ashortstayinhell.com/api/v3/search?q=caps+OR+lock&limit=8&type=topic
+
+System handled CAPS gracefully with proper keyword extraction and URL generation.
 ```
 
 ---
