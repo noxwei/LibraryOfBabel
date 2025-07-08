@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Alex Chen's 留白 (liúbái) Design Philosophy */
+/* "Great design is invisible - users focus on tasks, not interface" */
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* 留白 principle: Create natural reading rhythm */
+  body {
+    line-height: 1.6;
+    color: #202124;
+    background: #ffffff;
+  }
+}
+
+@layer components {
+  /* Mobile-first search input - Alex Chen's Digital Literati Garden */
+  .search-input {
+    @apply w-full text-lg px-6 pr-14 border border-gray-300 rounded-full;
+    @apply shadow-sm hover:shadow-md transition-all duration-200;
+    @apply focus:outline-none focus:border-blue-500 focus:shadow-md;
+    @apply placeholder:text-gray-500;
+    /* Mobile Safari optimizations */
+    height: 56px; /* Increased for mobile touch targets */
+    font-size: 16px; /* Prevent zoom on iOS */
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .search-button {
+    @apply absolute right-2 top-2 rounded-full;
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+    @apply transition-colors duration-150 flex items-center justify-center;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    /* Mobile-first touch targets */
+    height: 52px;
+    width: 52px;
+    min-height: 44px;
+    min-width: 44px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .action-button {
+    @apply px-6 py-4 bg-gray-50 text-gray-800 rounded border border-gray-300;
+    @apply hover:bg-gray-100 hover:border-gray-400 hover:shadow-sm;
+    @apply transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500;
+    /* Mobile touch optimization */
+    min-height: 48px;
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* 留白 spacing system - Golden ratio inspired */
+  .space-golden {
+    @apply space-y-8;
+  }
+
+  .space-golden-sm {
+    @apply space-y-5;
+  }
+
+  /* Subtle animations for better UX */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Typography hierarchy following Song Dynasty principles */
+  .text-primary {
+    @apply text-gray-900;
+  }
+
+  .text-secondary {
+    @apply text-gray-600;
+  }
+
+  .text-tertiary {
+    @apply text-gray-500;
+  }
+  
+  /* Mobile-First Digital Literati Garden Components */
+  .mobile-garden-container {
+    @apply min-h-screen bg-white;
+    /* Mobile Safari viewport handling */
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  .mobile-search-container {
+    @apply max-w-2xl mx-auto px-4;
+    /* Mobile-optimized spacing */
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .mobile-touch-target {
+    @apply rounded-full transition-all duration-150;
+    /* Apple Human Interface Guidelines */
+    min-height: 44px;
+    min-width: 44px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  .mobile-example-button {
+    @apply text-sm px-4 py-3 text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-full;
+    @apply transition-all duration-150;
+    /* Mobile touch optimization */
+    min-height: 44px;
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  .mobile-example-button:active {
+    @apply transform scale-95;
+  }
+  
+  /* Mobile Safari scrolling optimization */
+  .mobile-scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Mobile stats display */
+  .mobile-stats {
+    @apply text-sm text-tertiary;
+    /* Better mobile readability */
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Mobile footer optimization */
+  .mobile-footer {
+    @apply border-t border-gray-200 bg-gray-50/50 backdrop-blur-sm;
+    /* Safe area insets for newer iPhones */
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
