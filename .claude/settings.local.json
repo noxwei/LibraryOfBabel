@@ -52,7 +52,16 @@
       "Bash(PGPASSWORD=\"\" psql -U weixiangzhang -d knowledge_base -c \"SELECT book_id, title, author, word_count FROM books WHERE book_id = 317;\")",
       "Bash(#!/bin/bash\nBOOKS=(\n  \"\"Dawn Octavia\"\"\n  \"\"Chain Gang All Stars\"\"\n)\n\nfor BOOK in \"\"${BOOKS[@]}\"\"\ndo\n  echo \"\"⏳ Downloading: $BOOK\"\"\n  docker exec babels-archive-web python3 book_downloader.py \"\"$BOOK\"\"\n  echo \"\"⏸️ Waiting 5 seconds...\"\"\n  sleep 5\ndone)",
       "Bash(#!/bin/bash\nBOOKS=(\n  \"\"Wild Seed Octavia Butler\"\"\n  \"\"A Fire Upon the Deep Vernor Vinge\"\"\n  \"\"The Galaxy and the Ground Within Becky Chambers\"\"\n  \"\"The Fault in Our Stars John Green\"\"\n  \"\"Dragon Springs Road Janie Chang\"\"\n  \"\"The Magician Michael Scott\"\"\n  \"\"The Magic Mountain Thomas Mann\"\"\n  \"\"Will Save the Galaxy for Food Yahtzee Croshaw\"\"\n  \"\"The History of Magic Chris Gosden\"\"\n  \"\"Fight Magic Items Aidan Moher\"\"\n)\n\necho \"\"🎉 PARTY TIME! Downloading ${#BOOKS[@]} awesome books...\"\"\n\nfor BOOK in \"\"${BOOKS[@]}\"\"\ndo\n  echo \"\"⏳ Downloading: $BOOK\"\"\n  docker exec babels-archive-web python3 book_downloader.py \"\"$BOOK\"\"\n  echo \"\"⏸️ Waiting 3 seconds...\"\"\n  sleep 3\ndone\n\necho \"\"🎊 Download party complete!\"\")",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(npx shadcn@latest init:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm test:*)",
+      "Bash(timeout 30 npx playwright test tests/demo/working-homepage-demo.spec.ts --headed --timeout=10000)"
     ],
     "deny": []
   }
