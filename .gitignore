@@ -61,16 +61,19 @@ __pycache__/
 .env.production
 .env.*
 
-# API Keys and tokens
-*api_key*
-*API_KEY*
+# API Keys and tokens (files containing actual keys)
+*api_key*.txt
+*API_KEY*.txt
 api_key.txt
-*.key
 *.token
-*secret*
-*SECRET*
-*password*
-*PASSWORD*
+*secret*.txt
+*SECRET*.txt
+*password*.txt
+*PASSWORD*.txt
+
+# Allow API key management code (no actual keys)
+!*api_key_rotation*
+!*API_KEY_ROTATION*
 
 # Security reports (may contain sensitive data)
 reports/security_report_*.json
