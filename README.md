@@ -27,19 +27,70 @@ While not truly "emergent consciousness," the LibraryOfBabel agent memory system
 
 The system enables instant AI-powered research across thousands of books, revolutionizing personal knowledge production.
 
-## Current Status: MASSIVE BREAKTHROUGH - Ollama Integration Complete! 🎉
+## 📖 Usage Guides
 
-**🏆 OLLAMA INTEGRATION SUCCESS + 360 BOOKS ACHIEVEMENT!**
-**📊 34+ Million Words | Natural Language Processing | Production-Ready AI System**
+### 🎯 **For Tired Wei (Primary User)**
+- **[WEI-PROOF Usage Guide](docs/WEI_PROOF_USAGE_GUIDE.md)** - The ultimate "I'm tired and can't think" manual
+- **[Apple Shortcuts + Siri](docs/APPLE_SHORTCUTS_PROMPT.md)** - Voice-activated search with Apple Intelligence
+
+### 🛠️ **For Developers & Advanced Users**
+- **[API Reference](docs/API-Reference.md)** - Complete API documentation
+- **[Installation Guide](docs/Installation-Guide.md)** - Setup and deployment
+- **[Security Guide](docs/Security-Guide.md)** - Security best practices
+
+### 🚨 **For Troubleshooting**
+- **[HTTPS Domain Restoration Report](docs/HTTPS_DOMAIN_RESTORATION_REPORT.md)** - Complete system recovery documentation
+- **[QA Testing Guide](docs/guides/QA_TESTING_GUIDE.md)** - Comprehensive testing procedures
+
+### 🎯 **Quick Start for Wei**
+1. **Check if working**: `curl -s https://api.ashortstayinhell.com:5563/api/v3/health`
+2. **Search books**: `curl -k "https://api.ashortstayinhell.com:5563/api/v3/search?q=consciousness&api_key=YOUR_KEY"`
+3. **If broken**: `cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel" && bash scripts/health-check.sh`
+
+**That's it. Three commands. Write them down.**
+
+## Current Status: NEXT PHASE - Borges' Library of Babel Implementation! 🎉
+
+**🏆 BULLETPROOF API SYSTEM + 363 BOOKS ACHIEVEMENT!**
+**📊 34+ Million Words | Production-Ready | Now Building Infinite Library**
+
+### 🌟 **NEW FEATURE: Authentic Library of Babel** (In Development)
+**Bringing Jorge Luis Borges' infinite library to life with deterministic generation**
+
+**🔬 Development Team:**
+- **Dr. Sophia Chen** (Digital Philosopher) - Borges theory & infinite possibility logic
+- **Alexander 'Alex' Thompson** (Security Architect) - Deterministic generation & hexagonal coordinates
+- **Linda Zhang (张丽娜)** (Project Manager) - Team coordination & resource allocation
+- **Dr. Marcus 'BookNerd' Rodriguez** (Reddit Bibliophile) - Discovery interface design
+- **Sarah Kim** (Comprehensive QA) - Authenticity testing & validation
+- **Dr. James 'Doc' Wilson** (System Health) - Performance monitoring for infinite space
+- **Marcus Chen (陈明轩)** (The Spy) - User behavior pattern analysis
+- **Dr. Priya Patel** (Research Specialist) - Mathematical verification & methodology
+
+**🏗️ Technical Architecture:**
+- **Infinite Generation**: Every possible book using Borges' 25-character alphabet
+- **Deterministic System**: Same coordinates always produce same book
+- **Hexagonal Navigation**: Authentic library structure with rooms, walls, shelves
+- **Meaning Detection**: AI algorithms to find coherent books in infinite randomness
+- **Hybrid Discovery**: Combine infinite possibility with curated 363-book collection
+- **Librarian Agents**: AI guides for navigating infinite corridors
+- **Philosophical Authenticity**: True to Borges' vision of overwhelming possibility
+
+**🎯 Implementation Goals:**
+- Generate books on-demand (no storage needed for infinite content)
+- Provide authentic "Library of Babel" experience
+- Maintain search capabilities across both finite and infinite collections
+- Create tools for exploring mathematical poetry of infinite possibility
 
 ### 🔥 **July 2025 Major Milestones**
-- **📚 Books Processed**: **360 books** (60 books over 300 target!)
-- **📝 Total Words**: **34,236,988 words** searchable instantly
-- **📄 Chunks**: 10,514 searchable sections with AI agents
-- **🤖 Ollama Integration**: Complete with intelligent fallback system
+- **📚 Books Processed**: **363 books** (21% above 300 target!)
+- **📝 Total Words**: **34,680,022 words** searchable instantly
+- **📄 Chunks**: 10,667 searchable sections with AI agents
+- **🤖 API System**: Bulletproof endpoints with <100ms response times
 - **🧠 Natural Language Processing**: Advanced query understanding ready
 - **🚀 Processing**: Individual EPUB processing pipeline proven at scale
-- **👥 Agent Team**: Reddit Bibliophile, Security QA, HR Linda, comprehensive team operational
+- **👥 Agent Team**: Full named team operational with specialized roles
+- **🌟 New Branch**: `library-of-babel` branch for infinite library development
 
 ### ✅ **Production SSL & Domain Setup**
 - 🔐 **Let's Encrypt HTTPS**: Browser-trusted certificates (no warnings!)
@@ -115,13 +166,14 @@ The system enables instant AI-powered research across thousands of books, revolu
 - **Error Recovery**: Graceful degradation with comprehensive logging
 
 ### 👥 **AI Agent Team System**
-- **Reddit Bibliophile Agent**: Expert research assistance with Reddit-style enthusiasm
-- **Security QA Agent**: Multi-layer protection with real-time threat detection
-- **HR Manager Linda Zhang**: Team coordination with Chinese-American work ethic
-- **Comprehensive QA Agent**: Testing excellence with friendly collaboration
-- **System Health Guardian**: Performance monitoring with medical metaphors
-- **The Spy Agent**: Surveillance and pattern recognition capabilities
-- **Research Specialist**: Data-driven analysis and methodology validation
+- **Dr. Marcus 'BookNerd' Rodriguez** (Reddit Bibliophile): Expert research assistance with Reddit-style enthusiasm
+- **Alexander 'Alex' Thompson** (Security Architect): Multi-layer protection with real-time threat detection
+- **Linda Zhang (张丽娜)** (HR Manager): Team coordination with Chinese-American work ethic
+- **Sarah Kim** (Comprehensive QA): Testing excellence with friendly collaboration
+- **Dr. James 'Doc' Wilson** (System Health): Performance monitoring with medical metaphors
+- **Marcus Chen (陈明轩)** (The Spy): Surveillance and pattern recognition capabilities
+- **Dr. Priya Patel** (Research Specialist): Data-driven analysis and methodology validation
+- **Dr. Sophia Chen** (Digital Philosopher): Borges theory and infinite possibility exploration
 
 ### 🗃️ Production Database Architecture
 - **PostgreSQL + Vector Extensions**: Optimized for semantic search at scale

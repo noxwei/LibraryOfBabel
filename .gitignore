@@ -122,3 +122,19 @@ tmp/
 key_rotation_config.json
 config/key_rotation_config.json
 agents/bulletin_board/agent_memory.json
+
+# === BOOK LISTS & DOWNLOADS ===
+# Dynamic book lists for downloads
+mega_book_list.txt
+*book_list*.txt
+linda_ebooks*.csv
+
+# === WEI-SPECIFIC FILES (API KEYS) ===
+# Quick access guides with embedded API keys
+QUICK_ACCESS_BOOKMARKS.html
+WEI_PROOF_USAGE_GUIDE.md
+APPLE_SHORTCUTS_PROMPT.md
+*WEI_PROOF*.md
+*QUICK_ACCESS*.html
+*wei_lazy*.md
+*wei_proof*.md

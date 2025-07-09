@@ -12,7 +12,7 @@ import os
 app = Flask(__name__)
 
 # Target API configuration
-TARGET_API = "http://localhost:5563"
+TARGET_API = "https://localhost:5563"
 API_KEY = os.getenv('API_KEY')
 if not API_KEY:
     print("🚨 CRITICAL ERROR: API_KEY environment variable not set!")
@@ -72,4 +72,4 @@ if __name__ == '__main__':
     print("🎯 Forwarding to:", TARGET_API)
     print("🔑 Using API Key:", API_KEY[-8:])
     
-    app.run(host='0.0.0.0', port=80, debug=False)
+    app.run(host='0.0.0.0', port=8080, debug=False)
