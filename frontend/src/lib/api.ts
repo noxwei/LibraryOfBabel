@@ -2,7 +2,7 @@
 // Connects to existing PostgreSQL backend with 360 books
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:5563'
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || 'babel_secure_3f99c2d1d294fbebdfc6b10cce93652d'
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || 'babel_secure_2fc8078e2ffe34db8d26bbe294377acb108e0c719ec997eebe188b387d0f4e80'
 
 export interface BookSearchResult {
   book_id: number

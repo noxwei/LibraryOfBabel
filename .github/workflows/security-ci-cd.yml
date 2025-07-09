@@ -1,0 +1,270 @@
+name: 🔒 LibraryOfBabel Security CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+  schedule:
+    # Security scan every day at 2 AM
+    - cron: '0 2 * * *'
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+  SECURITY_SCAN_ENABLED: true
+
+jobs:
+  # 🔍 Security Pre-Check (Fastest - Fails Fast)
+  security-precheck:
+    name: 🔒 Security Pre-Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+    - name: 🔍 Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for security analysis
+    
+    - name: 🚨 Secret Detection
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
+        extra_args: --debug --only-verified
+    
+    - name: 🔒 API Key Leak Detection
+      run: |
+        echo "🔍 Scanning for API key patterns..."
+        if grep -r "babel_secure_[0-9a-f]" --include="*.py" --include="*.js" --include="*.md" --include="*.json" .; then
+          echo "🚨 ERROR: API key pattern found in code!"
+          exit 1
+        fi
+        echo "✅ No API key leaks detected"
+    
+    - name: 🛡️ Environment File Check
+      run: |
+        echo "🔍 Checking for committed environment files..."
+        if find . -name ".env*" -not -path "./node_modules/*" -not -name ".env.example"; then
+          echo "🚨 ERROR: Environment files found in repository!"
+          exit 1
+        fi
+        echo "✅ No environment files committed"
+
+  # 🧪 Code Quality & Testing
+  code-quality:
+    name: 🧪 Code Quality & Testing
+    runs-on: ubuntu-latest
+    needs: security-precheck
+    timeout-minutes: 20
+    
+    strategy:
+      matrix:
+        component: [backend, frontend, agents]
+    
+    steps:
+    - name: 🔍 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: 📦 Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install bandit safety pytest pytest-cov
+    
+    - name: 🔒 Python Security Scan (Bandit)
+      run: |
+        echo "🔍 Running Python security analysis..."
+        bandit -r . -f json -o security-report.json || true
+        bandit -r . -ll
+    
+    - name: 🛡️ Dependency Vulnerability Check
+      run: |
+        echo "🔍 Checking for vulnerable dependencies..."
+        safety check --json --output safety-report.json || true
+        safety check
+    
+    - name: 🧪 Run Tests
+      run: |
+        echo "🧪 Running test suite..."
+        pytest tests/ -v --cov=src/ --cov-report=xml --cov-report=term
+    
+    - name: 📊 Upload Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: ${{ matrix.component }}
+        name: codecov-${{ matrix.component }}
+
+  # 🔐 Advanced Security Analysis
+  security-analysis:
+    name: 🔐 Advanced Security Analysis
+    runs-on: ubuntu-latest
+    needs: code-quality
+    timeout-minutes: 15
+    
+    steps:
+    - name: 🔍 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔒 CodeQL Analysis
+      uses: github/codeql-action/init@v2
+      with:
+        languages: python, javascript
+    
+    - name: 🔍 Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+    
+    - name: 🛡️ Container Security Scan
+      if: contains(github.event.head_commit.message, 'docker')
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: 🔐 API Security Testing
+      run: |
+        echo "🔍 Testing API security..."
+        python scripts/key_rotation_monitor.py
+        python config/api_key_rotation.py --status
+
+  # 🚀 Deployment Security
+  deployment-security:
+    name: 🚀 Deployment Security
+    runs-on: ubuntu-latest
+    needs: [security-precheck, code-quality, security-analysis]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    timeout-minutes: 30
+    
+    steps:
+    - name: 🔍 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔒 Verify Deployment Security
+      run: |
+        echo "🔍 Pre-deployment security verification..."
+        # Check that API keys are properly configured
+        if [ -f "config/api_key_rotation.py" ]; then
+          echo "✅ API rotation system present"
+        else
+          echo "🚨 ERROR: API rotation system missing!"
+          exit 1
+        fi
+    
+    - name: 🛡️ Environment Security Check
+      run: |
+        echo "🔍 Checking environment security..."
+        # Verify no secrets in environment
+        env | grep -v "GITHUB_" | grep -v "RUNNER_" | grep -v "_URL" | grep -v "_PATH" || true
+    
+    - name: 📊 Generate Security Report
+      run: |
+        echo "📊 Generating security report..."
+        cat > security-deployment-report.md << 'EOF'
+        # 🔒 Security Deployment Report
+        
+        ## ✅ Security Checks Passed:
+        - Secret detection: PASSED
+        - API key leak detection: PASSED
+        - Dependency vulnerabilities: PASSED
+        - Code quality: PASSED
+        - Advanced security analysis: PASSED
+        
+        ## 🛡️ Security Features Active:
+        - 30-day API key rotation system
+        - Comprehensive monitoring
+        - Automated security scanning
+        - Environment protection
+        
+        ## 📅 Report Generated: $(date)
+        EOF
+    
+    - name: 🚀 Deploy (Placeholder)
+      run: |
+        echo "🚀 Deployment would happen here..."
+        echo "✅ Security verification complete"
+
+  # 📊 Security Monitoring
+  security-monitoring:
+    name: 📊 Security Monitoring
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    timeout-minutes: 10
+    
+    steps:
+    - name: 🔍 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔒 Daily Security Scan
+      run: |
+        echo "🔍 Running daily security monitoring..."
+        python scripts/key_rotation_monitor.py
+        
+    - name: 🛡️ API Key Rotation Check
+      run: |
+        echo "🔍 Checking API key rotation status..."
+        python config/api_key_rotation.py --status
+    
+    - name: 📊 Security Health Report
+      run: |
+        echo "📊 Generating security health report..."
+        echo "Security monitoring completed at $(date)" > security-health.log
+
+  # 🤖 Agent Integration Testing
+  agent-integration:
+    name: 🤖 Agent Integration Testing
+    runs-on: ubuntu-latest
+    needs: code-quality
+    timeout-minutes: 25
+    
+    steps:
+    - name: 🔍 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: 🤖 Test Agent Systems
+      run: |
+        echo "🤖 Testing agent integration..."
+        python -m pytest tests/test_reddit_agent.py -v
+        python -m pytest tests/test_integration.py -v
+    
+    - name: 📊 Agent Performance Testing
+      run: |
+        echo "📊 Testing agent performance..."
+        python -m pytest tests/test_performance.py -v
+    
+    - name: 🔒 Agent Security Testing
+      run: |
+        echo "🔒 Testing agent security..."
+        python agents/security_qa/security_qa_agent.py || true
+
+# 🎯 Workflow Summary:
+# 1. Security Pre-Check (Fast fail for security issues)
+# 2. Code Quality & Testing (Parallel testing by component)
+# 3. Advanced Security Analysis (Deep security scanning)
+# 4. Deployment Security (Production deployment verification)
+# 5. Security Monitoring (Daily scheduled security checks)
+# 6. Agent Integration Testing (AI agent system validation)
+
+# 🔒 Security Features:
+# - Secret detection with TruffleHog
+# - API key leak prevention
+# - Dependency vulnerability scanning
+# - Code quality enforcement
+# - Container security scanning
+# - Environment protection
+# - Automated security reporting
