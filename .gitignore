@@ -121,3 +121,4 @@ tmp/
 # API Key Rotation Config
 key_rotation_config.json
 config/key_rotation_config.json
+agents/bulletin_board/agent_memory.json
