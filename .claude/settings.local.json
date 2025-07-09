@@ -69,7 +69,9 @@
       "Bash(/opt/homebrew/bin/psql --version)",
       "Bash(/opt/homebrew/bin/psql -l)",
       "Bash(/opt/homebrew/Cellar/postgresql@15/15.13/bin/psql:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(git branch:*)",
+      "Bash(./scripts/setup_rotation_cron.sh:*)"
     ],
     "deny": []
   }

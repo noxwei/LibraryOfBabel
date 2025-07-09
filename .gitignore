@@ -115,3 +115,6 @@ tmp/
 *.jpg
 *.opf
 *.cbr
+# API Key Rotation Config
+key_rotation_config.json
+config/key_rotation_config.json

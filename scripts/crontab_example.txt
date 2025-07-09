@@ -1,0 +1,5 @@
+# API Key Rotation Monitoring - Run daily at 9 AM
+0 9 * * * /Users/weixiangzhang/Local\ Dev/LibraryOfBabel/scripts/rotation_check.sh
+
+# Alternative: Run every 6 hours
+# 0 */6 * * * /Users/weixiangzhang/Local\ Dev/LibraryOfBabel/scripts/rotation_check.sh

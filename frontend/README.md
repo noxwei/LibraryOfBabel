@@ -26,7 +26,7 @@ The LibraryOfBabel frontend is now fully integrated with the production backend 
 
 1. **Backend Requirements**:
    - Ensure backend API is running on port 5563
-   - API key: `babel_secure_3f99c2d1d294fbebdfc6b10cce93652d`
+   - API key: `babel_secure_[redacted]` (stored in .env file)
    - PostgreSQL database with 360 books indexed
 
 2. **Frontend Setup**:
@@ -40,7 +40,7 @@ The LibraryOfBabel frontend is now fully integrated with the production backend 
    ```bash
    # .env.local
    NEXT_PUBLIC_API_URL=https://localhost:5563
-   NEXT_PUBLIC_API_KEY=babel_secure_3f99c2d1d294fbebdfc6b10cce93652d
+   NEXT_PUBLIC_API_KEY=babel_secure_[your_api_key_here]
    ```
 
 ### 🎯 **Features Now Working**
