@@ -61,7 +61,15 @@
       "Bash(npm run dev:*)",
       "Bash(npm run build:*)",
       "Bash(npm test:*)",
-      "Bash(timeout 30 npx playwright test tests/demo/working-homepage-demo.spec.ts --headed --timeout=10000)"
+      "Bash(timeout 30 npx playwright test tests/demo/working-homepage-demo.spec.ts --headed --timeout=10000)",
+      "Bash(psql:*)",
+      "Bash(createdb:*)",
+      "Bash(sqlite3:*)",
+      "Bash(pg_isready:*)",
+      "Bash(/opt/homebrew/bin/psql --version)",
+      "Bash(/opt/homebrew/bin/psql -l)",
+      "Bash(/opt/homebrew/Cellar/postgresql@15/15.13/bin/psql:*)",
+      "Bash(cd:*)"
     ],
     "deny": []
   }

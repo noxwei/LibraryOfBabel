@@ -3,7 +3,9 @@
 import { useState } from 'react';
 
 interface SearchResult {
-  id: number;
+  id: string; // Now a string combining book_id-chunk_id
+  bookId: number;
+  chunkId: string;
   title: string;
   author: string;
   excerpt: string;
@@ -40,14 +42,18 @@ export default function Home() {
         // Mock results for demonstration
         const mockResults = [
           {
-            id: 1,
+            id: '1-mock-chunk-1',
+            bookId: 1,
+            chunkId: 'mock-chunk-1',
             title: 'The Left Hand of Darkness',
             author: 'Ursula K. Le Guin',
             excerpt: 'A fascinating exploration of gender and society...',
             relevance: 0.95
           },
           {
-            id: 2,
+            id: '2-mock-chunk-2',
+            bookId: 2,
+            chunkId: 'mock-chunk-2',
             title: 'Neuromancer',
             author: 'William Gibson',
             excerpt: 'The matrix has its roots in primitive arcade games...',
