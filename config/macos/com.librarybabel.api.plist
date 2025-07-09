@@ -36,7 +36,9 @@
         <key>PYTHONPATH</key>
         <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/src</string>
         <key>API_KEY</key>
-        <string>babel_secure_3f99c2d1d294fbebdfc6b10cce93652d</string>
+        <string>babel_secure_8a52a0ad3a1fe3bf3ade37d04deef0054d8f58035a0e9d4760a9a08548d8cebf</string>
+        <key>OLLAMA_MODEL</key>
+        <string>llama3.2:3b</string>
     </dict>
     
     <key>ThrottleInterval</key>
