@@ -1,0 +1,95 @@
+{
+  "timestamp": "2025-07-09T02:37:37.404949",
+  "domain": "api.ashortstayinhell.com",
+  "investigation": {
+    "git_history": [
+      "38682ba \ud83d\udcda README UPDATE - Ollama Integration & Team Celebration Features",
+      "d55d153 \ud83e\udd16\ud83d\udd75\ufe0f COLLABORATIVE AGENT INTELLIGENCE - Ollama Endpoint Testing",
+      "c0888fa \ud83e\udd16 COMPLETE OLLAMA INTEGRATION: Natural Language \u2192 360 Books\\!",
+      "b6ad605 \ud83d\udcda Document Agent Memory Breadcrumb System & HTTPS API Setup",
+      "9b8677d \ud83e\uddf9 Major cleanup: Remove outdated files and consolidate SSL certificates",
+      "6ebf5fc Security fix: Remove external IP address from documentation",
+      "6721a2e Complete LibraryOfBabel production documentation overhaul",
+      "14f74b2 Update LibraryOfBabel to production-ready system with secure external access",
+      "42f2d26 feat: Add local network testing servers and GitHub Wiki documentation",
+      "4697558 feat: Complete comprehensive GitHub Wiki documentation",
+      "4a1803f feat: Add secure production deployment system with dual-domain support",
+      "8f91be1 feat: Complete hybrid search system - best of both worlds",
+      "4be586c feat: Complete vector embedding system with semantic search API",
+      "7b87075 feat: Complete LibraryOfBabel essay generation system with local Ollama",
+      "947d31e feat: Complete vector embeddings implementation with AI-powered discovery",
+      "18050e1 docs: Update README and CLAUDE.md with Phase 4 progress",
+      "eca2a3c Complete Reddit Nerd Librarian chaos testing and QA fixes",
+      "eb96dfe feat: CloudDocs custom location import SUCCESS"
+    ],
+    "ssl_status": {
+      "chain.pem": {
+        "domains": [],
+        "file_size": 1566,
+        "modified": "2025-07-06T20:04:12.216951"
+      },
+      "cert.pem": {
+        "domains": [
+          "api.ashortstayinhell.com"
+        ],
+        "file_size": 1314,
+        "modified": "2025-07-06T20:04:12.216676"
+      },
+      "fullchain.pem": {
+        "domains": [
+          "api.ashortstayinhell.com"
+        ],
+        "file_size": 2880,
+        "modified": "2025-07-06T20:04:12.217216"
+      }
+    },
+    "server_configs": [
+      "/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/api/quest_domain_server.py",
+      "/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/api/hell_domain_server.py",
+      "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/domain-config.conf",
+      "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/verification-server.py",
+      "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config/renewal/api.ashortstayinhell.com.conf"
+    ]
+  },
+  "connectivity": {
+    "dns": {
+      "resolved_ip": "73.161.54.75",
+      "expected_ip": "73.161.54.75",
+      "matches": true,
+      "status": "\u2705"
+    },
+    "port": {
+      "connected": false,
+      "port": 443,
+      "status": "\u274c"
+    },
+    "ssl": {
+      "success": false,
+      "status": "\u274c",
+      "output": "",
+      "error": "80E0360102000000:error:8000003D:system library:BIO_connect:Connection refused:crypto/bio/bio_sock2.c:178:calling connect()\n80E0360102000000:error:10000067:BIO routines:BIO_connect:connect error:crypto"
+    },
+    "http": {
+      "error": "HTTPSConnectionPool(host='api.ashortstayinhell.com', port=443): Max retries exceeded with url: /api/v3/info (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x103773380>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "status": "\u274c"
+    }
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "action": "Configure port forwarding or proxy",
+      "details": "Port 443 not accessible from external network"
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "Fix SSL certificate configuration",
+      "details": "SSL handshake failing"
+    },
+    {
+      "priority": "HIGH",
+      "action": "Configure reverse proxy or tunnel",
+      "details": "Local API server needs external routing (ngrok, nginx, cloudflare tunnel)"
+    }
+  ],
+  "agent": "DomainConfigAgent"
+}

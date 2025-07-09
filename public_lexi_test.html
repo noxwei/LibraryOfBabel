@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexi - LibraryOfBabel Mascot Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .mascot-emoji {
+            font-size: 3em;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-family: monospace;
+            word-wrap: break-word;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .status {
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #ff6b6b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 Lexi - LibraryOfBabel Mascot</h1>
+        
+        <div class="mascot-emoji">📚✨🤖</div>
+        
+        <div class="test-section">
+            <h2>🏥 Health Check</h2>
+            <button onclick="testHealth()">Test Health Endpoint</button>
+            <div id="health-status" class="status"></div>
+            <div id="health-response" class="response"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>💬 Chat with Lexi</h2>
+            <input type="text" id="chat-input" placeholder="Ask Lexi about books..." value="Hello Lexi! Are you working?">
+            <button onclick="testChat()">Send Message</button>
+            <div id="chat-status" class="status"></div>
+            <div id="chat-response" class="response"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔐 API Configuration</h2>
+            <p>API Key: <span style="font-family: monospace;">babel_secure_8a52a0ad...</span></p>
+            <p>Base URL: <span style="font-family: monospace;">http://localhost:5000</span></p>
+            <p>Endpoints:</p>
+            <ul>
+                <li><code>GET /api/v3/mascot/health</code></li>
+                <li><code>POST /api/v3/mascot/chat</code></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'babel_secure_8a52a0ad3a1fe3bf3ade37d04deef0054d8f58035a0e9d4760a9a08548d8cebf';
+        const BASE_URL = 'http://localhost:5000';
+        
+        const headers = {
+            'Authorization': `Bearer ${API_KEY}`,
+            'Content-Type': 'application/json'
+        };
+
+        async function testHealth() {
+            const statusEl = document.getElementById('health-status');
+            const responseEl = document.getElementById('health-response');
+            
+            statusEl.textContent = 'Testing...';
+            statusEl.className = 'status';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/v3/mascot/health`, {
+                    method: 'GET',
+                    headers: headers
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusEl.textContent = `✅ Success (${response.status})`;
+                    statusEl.className = 'status success';
+                    responseEl.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    const errorText = await response.text();
+                    statusEl.textContent = `❌ Error (${response.status})`;
+                    statusEl.className = 'status error';
+                    responseEl.textContent = errorText || 'No response body';
+                }
+            } catch (error) {
+                statusEl.textContent = `❌ Network Error`;
+                statusEl.className = 'status error';
+                responseEl.textContent = error.message;
+            }
+        }
+
+        async function testChat() {
+            const statusEl = document.getElementById('chat-status');
+            const responseEl = document.getElementById('chat-response');
+            const query = document.getElementById('chat-input').value;
+            
+            statusEl.textContent = 'Sending message...';
+            statusEl.className = 'status';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/v3/mascot/chat`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        query: query,
+                        context: 'public_test_page'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusEl.textContent = `✅ Success (${response.status})`;
+                    statusEl.className = 'status success';
+                    responseEl.textContent = `Lexi says: ${data.response || 'No response'}\n\nFull response:\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    const errorText = await response.text();
+                    statusEl.textContent = `❌ Error (${response.status})`;
+                    statusEl.className = 'status error';
+                    responseEl.textContent = errorText || 'No response body';
+                }
+            } catch (error) {
+                statusEl.textContent = `❌ Network Error`;
+                statusEl.className = 'status error';
+                responseEl.textContent = error.message;
+            }
+        }
+        
+        // Auto-test health on page load
+        window.addEventListener('load', testHealth);
+    </script>
+</body>
+</html>
