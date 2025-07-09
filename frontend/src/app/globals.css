@@ -33,26 +33,30 @@
 @layer components {
   /* Mobile-first search input - Alex Chen's Digital Literati Garden */
   .search-input {
-    @apply w-full text-lg px-6 pr-14 border border-gray-300 rounded-full;
+    @apply w-full text-lg px-6 border border-gray-300 rounded-full;
     @apply shadow-sm hover:shadow-md transition-all duration-200;
     @apply focus:outline-none focus:border-blue-500 focus:shadow-md;
     @apply placeholder:text-gray-500;
     /* Mobile Safari optimizations */
     height: 56px; /* Increased for mobile touch targets */
     font-size: 16px; /* Prevent zoom on iOS */
+    padding-right: 60px; /* Space for perfectly aligned button */
     -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
 
   .search-button {
-    @apply absolute right-2 top-2 rounded-full;
+    @apply absolute rounded-full;
     @apply bg-blue-600 text-white hover:bg-blue-700;
     @apply transition-colors duration-150 flex items-center justify-center;
     @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
-    /* Mobile-first touch targets */
-    height: 52px;
-    width: 52px;
+    /* Perfect alignment using 留白 principles */
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 48px;
+    width: 48px;
     min-height: 44px;
     min-width: 44px;
     -webkit-tap-highlight-color: transparent;
