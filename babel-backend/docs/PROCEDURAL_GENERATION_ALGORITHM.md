@@ -347,6 +347,47 @@ const proceduralConfig = {
 This configuration allows for fine-tuning of the generation algorithm to balance content quality, diversity, and educational value.
 
 ---
+chatgpt 3o updates
+Key math/notation fixes
+
+Section	Issue	Correct form / explanation
+2.1 Coordinate system	W = Wall position (0 to 5) implies 6 book-filled walls, but Borges specifies 4 bookshelf walls per hexagon; two are for the entryway and sleeping alcove. Use W ∈ {0,1,2,3}.	
+2.2 Deterministic generation	The comment “library is truly infinite” is conceptually true, but the seed string baseSeed-H-W-S-V only enumerates 4 × 5 × 32 = 640 books per hexagon. Specify that infinity arises from unbounded H.	
+4.1 conceptToCoordinates	Variable i is undefined. Replace with an explicit probe index, e.g. for (let i = 0; i < probes; i++) { … }.	
+4.1 modulus math	Current formulas may yield negative values if hash is negative. Use unsigned 32-bit arithmetic or (hash >>> 0) before modulus.	
+Appendix A complexity	Search Performance line mixes two variables. If k is the number of coordinates explored, total time is O(k log k) when you need a priority queue; otherwise O(k).	
+Appendix A complexity	Deterministic Generation “O(n) where n is desired content length” – clarify that n = number of tokens generated (≈ 4 200 words × avg token/word).	
+Appendix B publicationYearRange	Upper bound should reflect present year. Change [1850, 2025].	
+
+
+⸻
+
+Minimal code corrections
+
+// 2.1 – 4-wall model
+const WALLS_PER_HEX = 4;      // 0-3
+
+// 2.2 – seed: unbounded H gives countably infinite library
+const bookSeed = `${baseSeed}-${H}-${W}-${S}-${V}`;
+
+// 4.1 – safe deterministic mapping
+function conceptToCoordinates(concept, probes = 1) {
+  const h = hashString(concept) >>> 0;   // force unsigned
+  const results = [];
+  for (let i = 0; i < probes; i++) {
+    results.push({
+      hexagon: (h + i * 1000) % 1_000_000,
+      wall:    (h + i * 100)  % WALLS_PER_HEX,
+      shelf:   (h + i * 10)   % 5,
+      volume:  (h + i)        % 32,
+    });
+  }
+  return results;
+}
+
+These adjustments keep the algorithm internally consistent with Borges’ parameters and remove the undefined or ambiguous variables.
+
+---
 
 *This paper was written as part of the Library of Babel educational project, demonstrating the intersection of literature, mathematics, and computer science in realizing Borges' infinite library through procedural generation.*
 <!-- Agent Commentary -->
