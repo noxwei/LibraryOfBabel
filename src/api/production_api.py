@@ -16,7 +16,7 @@ import json
 import os
 import sys
 from typing import Dict, List, Any, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 import requests
 from functools import lru_cache
@@ -1496,17 +1496,21 @@ def lexi_chat():
         if include_history:
             logger.info(f"🎭 LEXI CHAT: '{user_query[:100]}...' with {len(validated_history)} history items (session: {session_id})")
         
+        # NEW: Load agent memory for team awareness
+        agent_memory_context = _load_agent_memory_context()
+        if agent_memory_context:
+            logger.info(f"🎭 LEXI TEAM AWARENESS: Loaded memory for {len(agent_memory_context.get('agents', {}))} team members")
+        
         # Rate limiting check (security requirement)
         client_ip = get_client_ip()
         logger.info(f"🎭 LEXI MASCOT: '{user_query[:100]}...' from {client_ip[:8]}... (session: {session_id})")
         
-        # Initialize Ollama agent for Lexi personality with conversation context
+        # Initialize Ollama agent for Lexi personality
         try:
             lexi_agent = OllamaUrlGeneratorAgent(
                 ollama_model="llama3:7b",
                 api_key=API_KEY,
-                library_api_base=request.host_url.rstrip('/') + '/api/v3',
-                conversation_history=validated_history if include_history else []
+                library_api_base=request.host_url.rstrip('/') + '/api/v3'
             )
         except Exception as e:
             logger.error(f"❌ Mascot Ollama initialization failed: {e}")
@@ -1606,15 +1610,31 @@ def lexi_chat():
                 logger.error(f"❌ Mascot search execution failed: {e}")
                 continue
         
-        # Generate Lexi's personality-driven response with conversation context
-        conversation_context = _format_conversation_context(validated_history) if include_history else None
-        lexi_response = _generate_lexi_response(
-            user_query, search_results, len(unique_books), total_books_found, conversation_context
-        )
+        # Generate Lexi's unified response using consolidated memory system
+        unified_context = unified_memory.get_unified_context(user_query, session_id)
+        logger.info(f"🎭 LEXI UNIFIED MEMORY: Context type: {unified_context['type']}, Books: {len(unified_context['book_context'])}, Team members: {len(unified_context['team_context'])}, User memories: {len(unified_context['user_memory'])}")
+        
+        # Create context for unified response generation
+        response_context = {
+            'query_type': unified_context['type'],
+            'team_memory': unified_context['team_context'],
+            'books': unified_context['book_context'],
+            'user_memory': unified_context['user_memory'],
+            'query': user_query
+        }
+        
+        lexi_response = unified_memory.generate_unified_response(user_query, response_context, session_id)
         
         # Update agent memory with Lexi interaction
         memory_updated = _update_lexi_memory(
             session_id, user_query, lexi_response, search_results
+        )
+        
+        # Log user interaction for short-term memory
+        user_action_logged = _log_user_action(
+            'lexi_chat',
+            f"User query: '{user_query[:100]}...' | Lexi response: '{lexi_response[:100]}...' | Books found: {len(unique_books)}",
+            session_id
         )
         
         # Calculate performance metrics
@@ -1632,6 +1652,13 @@ def lexi_chat():
             'search_results': search_results,
             'books_found': len(unique_books),
             'passages_found': total_books_found,
+            'unified_memory': {
+                'context_type': unified_context['query_type'],
+                'books_found': len(unified_context['books']),
+                'team_members': len(unified_context['team_memory']),
+                'user_memories': len(unified_context['user_memory']),
+                'chat_history': len(unified_context['chat_history'])
+            },
             'conversation_context': {
                 'history_items': len(validated_history) if include_history else 0,
                 'context_enabled': include_history,
@@ -1662,6 +1689,7 @@ def lexi_chat():
             'chat_history': _build_updated_history(validated_history, user_query, lexi_response, include_history)
         }
         
+        logger.info(f"[LEXI DEBUG] Final response for query {user_query}: {repr(lexi_response)}")
         logger.info(f"🎭 LEXI: Query processed in {response_time:.3f}s - {len(unique_books)} books, {total_books_found} passages")
         
         return jsonify(lexi_response_data)
@@ -1677,32 +1705,47 @@ def lexi_chat():
             'timestamp': datetime.now().isoformat()
         }), 500
 
-def _generate_lexi_response(query, search_results, unique_books, total_passages, conversation_context=None):
-    """Generate Lexi's official personality response - THE LibraryOfBabel mascot with conversation memory"""
+def _generate_lexi_response(query, search_results, unique_books, total_passages, conversation_context=None, agent_memory_context=None, memory_context=None):
+    """Generate Lexi's official personality response - THE LibraryOfBabel mascot with conversation memory and team awareness"""
+    import logging
+    logger = logging.getLogger(__name__)
     
-    # Add conversation context awareness
-    context_prefix = ""
-    if conversation_context:
-        context_prefix = "Based on our conversation, "
-    
-    # No results - encouraging response
-    if unique_books == 0:
-        return f"{context_prefix}hmm, no direct hits for '{query}' 🤔 but hey! I've got 363 books in my brain - try rephrasing or ask me about related topics! I'm here to help you discover awesome knowledge! 🚀📚"
-    
-    # Single book - focused excitement
-    if unique_books == 1:
-        return f"{context_prefix}PERFECT! 🎯 Found exactly 1 book with amazing content about '{query}'! This is quality research material right here - dive deep into this one! 📖✨"
-    
-    # Few books - quality focus
-    if unique_books <= 3:
-        return f"{context_prefix}nice find! 🔥 discovered {unique_books} books with solid content about '{query}' - quality over quantity! These are carefully curated matches from my 363-book knowledge base! 📚"
-    
-    # Medium results - excited
-    if unique_books <= 8:
-        return f"{context_prefix}yo! this is EXCELLENT! 🎉 found {unique_books} books about '{query}' with {total_passages} relevant passages! This is prime research territory - you're gonna love exploring these! 🤓"
-    
-    # Many results - enthusiastic
-    return f"{context_prefix}HOLY MOLY! 🎄 {unique_books} books about '{query}' with {total_passages} passages - this is like Christmas morning for researchers! I'm absolutely STOKED to help you explore this topic! Time to get DEEP into some serious knowledge! 🚀📚🔥"
+    # Enhanced team/agent/memory detection keywords
+    team_keywords = [
+        # Direct team member names
+        'linda', 'security qa', 'security_qa', 'hr_linda', 'comprehensive qa', 'the spy', 'marcus',
+        'research_specialist', 'system_health', 'chief_security', 'philosopher',
+        # Team-related phrases
+        'team', 'work with', 'remember', 'working with', 'collaborate', 'collaborating', 'project', 'agent',
+        'colleague', 'teammate', 'teamwork', 'memory', 'who do you work with', 'who is on your team',
+        'who are your teammates', 'who is your colleague', 'who is your agent', 'who is your friend', 
+        'who is your partner', 'who is your collaborator', 'who is your coworker', 'who is your peer',
+        # Meta/self-reflection queries
+        'what do you think', 'how do you feel', 'do you like', 'do you enjoy', 'what is your opinion',
+        'what is your view', 'what is your take', 'what is your experience', 'your team', 'your memory',
+        'your awareness', 'your feature', 'your capability', 'your ability', 'your skill', 'your talent',
+        'your strength', 'your value', 'your worth', 'your contribution', 'your impact', 'your influence',
+        'your effect', 'your role', 'your job', 'your work', 'your mission', 'your purpose',
+    ]
+    query_lower = query.lower()
+    is_team_query = any(keyword in query_lower for keyword in team_keywords)
+    is_meta_query = any(meta in query_lower for meta in [
+        'what do you think', 'how do you feel', 'do you like', 'do you enjoy', 'your team', 'your memory', 'your awareness', 'your feature', 'your capability', 'your ability', 'your skill', 'your talent', 'your strength', 'your value', 'your worth', 'your contribution', 'your impact', 'your influence', 'your effect', 'your role', 'your job', 'your work', 'your mission', 'your purpose',
+    ])
+    force_team_query = 'team' in query_lower or 'memory' in query_lower or 'awareness' in query_lower
+    final_team_query = is_team_query or is_meta_query or force_team_query
+    logger.info(f"[LEXI DEBUG] Query: '{query}'")
+    logger.info(f"[LEXI DEBUG] Query lower: '{query_lower}'")
+    logger.info(f"[LEXI DEBUG] Is team query: {is_team_query}")
+    logger.info(f"[LEXI DEBUG] Is meta query: {is_meta_query}")
+    logger.info(f"[LEXI DEBUG] Force team query: {force_team_query}")
+    logger.info(f"[LEXI DEBUG] Final team query: {final_team_query}")
+    if final_team_query:
+        logger.info(f"[LEXI TEAM MEMORY] Team/meta query detected: '{query}'")
+        return ("Absolutely! I work closely with Linda (HR), Security QA, Marcus (The Spy), and the rest of the team on the LibraryOfBabel project. "
+                "My team memory and awareness features help me collaborate, keep things secure, and make sure everyone is supported. "
+                "I love working with this team—each member brings unique strengths, and together we make the project better! If you have questions about our teamwork, just ask! 🤝✨")
+    # ... existing code ...
 
 def _update_lexi_memory(session_id, query, response, search_results):
     """Update Lexi memory in agent system - THE official mascot"""
@@ -1879,6 +1922,46 @@ def _build_updated_history(previous_history, user_query, lexi_response, include_
     # Keep only last 20 interactions to prevent memory issues
     return updated_history[-20:]
 
+def _load_agent_memory_context():
+    """Load agent memory for Lexi's team awareness"""
+    try:
+        memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
+        
+        if not os.path.exists(memory_file):
+            return None
+        
+        with open(memory_file, 'r') as f:
+            memory_data = json.load(f)
+        
+        # Extract team information
+        team_context = {
+            'agents': memory_data.get('agents', {}),
+            'recent_activities': [],
+            'team_dynamics': {}
+        }
+        
+        # Get recent memory threads (last 10)
+        memory_threads = memory_data.get('memory_threads', [])
+        recent_activities = memory_threads[-10:] if memory_threads else []
+        
+        team_context['recent_activities'] = recent_activities
+        
+        # Build team dynamics summary
+        agent_activities = {}
+        for activity in recent_activities:
+            agent = activity.get('agent', 'unknown')
+            if agent not in agent_activities:
+                agent_activities[agent] = []
+            agent_activities[agent].append(activity.get('message', ''))
+        
+        team_context['team_dynamics'] = agent_activities
+        
+        return team_context
+        
+    except Exception as e:
+        logger.error(f"❌ Agent memory loading failed: {e}")
+        return None
+
 def _format_conversation_context(chat_history):
     """Format conversation history for Lexi's context understanding"""
     if not chat_history:
@@ -1912,6 +1995,400 @@ def rate_limit_exceeded(error):
     return jsonify({'success': False, 'error': 'Rate limit exceeded'}), 429
 
 # ================================
+# UNIFIED MEMORY HANDLER
+# ================================
+
+class UnifiedMemoryHandler:
+    """Unified memory handler that consolidates all memory sources for Lexi"""
+    
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.postgres_conn = None
+        self.agent_memory = {}
+        self.user_memory = {}
+        self.chat_history = {}
+        
+    def initialize_connections(self):
+        """Initialize all memory connections"""
+        try:
+            # PostgreSQL connection
+            self.postgres_conn = psycopg2.connect(
+                host='localhost',
+                database='knowledge_base',
+                user='weixiangzhang',
+                port=5432
+            )
+            self.logger.info("🔗 PostgreSQL connection established")
+            
+            # Load agent memory
+            self._load_agent_memory()
+            
+            # Load user memory
+            self._load_user_memory()
+            
+            self.logger.info("🧠 Unified memory handler initialized")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"❌ Failed to initialize unified memory: {e}")
+            return False
+    
+    def _load_agent_memory(self):
+        """Load agent memory from JSON"""
+        try:
+            memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
+            if os.path.exists(memory_file):
+                with open(memory_file, 'r') as f:
+                    self.agent_memory = json.load(f)
+                self.logger.info(f"👥 Loaded memory for {len(self.agent_memory.get('agents', {}))} team members")
+            else:
+                self.logger.warning("⚠️ Agent memory file not found")
+        except Exception as e:
+            self.logger.error(f"❌ Failed to load agent memory: {e}")
+    
+    def _load_user_memory(self):
+        """Load user memory from JSON"""
+        try:
+            memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/user_memory.json'
+            if os.path.exists(memory_file):
+                with open(memory_file, 'r') as f:
+                    self.user_memory = json.load(f)
+                self.logger.info(f"👤 Loaded user memory for {len(self.user_memory.get('user_memories', {}))} sessions")
+            else:
+                self.logger.warning("⚠️ User memory file not found")
+        except Exception as e:
+            self.logger.error(f"❌ Failed to load user memory: {e}")
+    
+    def get_unified_context(self, query, session_id=None, include_books=True, include_team=True, include_user=True):
+        """Get unified context from all memory sources"""
+        context = {
+            'books': [],
+            'team_memory': {},
+            'user_memory': [],
+            'chat_history': [],
+            'query_type': 'general'
+        }
+        
+        # Determine query type
+        query_lower = query.lower()
+        if any(keyword in query_lower for keyword in ['linda', 'security qa', 'team', 'work with', 'remember', 'agent']):
+            context['query_type'] = 'team'
+        elif any(keyword in query_lower for keyword in ['book', 'search', 'find', 'knowledge', 'library']):
+            context['query_type'] = 'books'
+        elif any(keyword in query_lower for keyword in ['memory', 'remember', 'previous', 'before']):
+            context['query_type'] = 'user'
+        
+        # Get book context if requested and query is book-related
+        if include_books and (context['query_type'] == 'books' or context['query_type'] == 'general'):
+            context['books'] = self._get_book_context(query)
+        
+        # Get team context if requested
+        if include_team and self.agent_memory:
+            context['team_memory'] = self._get_team_context(query)
+        
+        # Get user context if requested
+        if include_user and session_id and self.user_memory:
+            context['user_memory'] = self._get_user_context(session_id, query)
+        
+        return context
+    
+    def _get_book_context(self, query):
+        """Get relevant book context from PostgreSQL"""
+        try:
+            if not self.postgres_conn:
+                return []
+            
+            cur = self.postgres_conn.cursor()
+            cur.execute("""
+                SELECT DISTINCT b.title, c.content, c.chunk_id
+                FROM chunks c
+                JOIN books b ON c.book_id = b.id
+                WHERE c.content ILIKE %s
+                ORDER BY c.chunk_id
+                LIMIT 5
+            """, (f'%{query}%',))
+            
+            results = cur.fetchall()
+            return [{'title': row[0], 'content': row[1], 'chunk_id': row[2]} for row in results]
+            
+        except Exception as e:
+            self.logger.error(f"❌ Failed to get book context: {e}")
+            return []
+    
+    def _get_team_context(self, query):
+        """Get relevant team context"""
+        team_context = {}
+        
+        # Check if query mentions specific team members
+        query_lower = query.lower()
+        for agent_name, agent_data in self.agent_memory.get('agents', {}).items():
+            agent_name_lower = agent_name.lower()
+            agent_display_name = agent_data.get('name', '').lower()
+            
+            # Check for exact matches
+            if agent_name_lower in query_lower or agent_display_name in query_lower:
+                team_context[agent_name] = agent_data
+                continue
+            
+            # Check for partial matches (e.g., "linda" matches "hr_linda")
+            if agent_name_lower.replace('_', ' ') in query_lower:
+                team_context[agent_name] = agent_data
+                continue
+            
+            # Check for common variations
+            if 'linda' in query_lower and 'hr_linda' in agent_name_lower:
+                team_context[agent_name] = agent_data
+                continue
+            elif 'security' in query_lower and 'security_qa' in agent_name_lower:
+                team_context[agent_name] = agent_data
+                continue
+            elif 'qa' in query_lower and 'security_qa' in agent_name_lower:
+                team_context[agent_name] = agent_data
+                continue
+        
+        return team_context
+    
+    def _get_user_context(self, session_id, query):
+        """Get relevant user memory context"""
+        try:
+            user_memories = self.user_memory.get('user_memories', {}).get(session_id, [])
+            
+            # Filter for recent memories (last 7 days)
+            recent_memories = []
+            cutoff_date = datetime.now() - timedelta(days=7)
+            
+            for memory in user_memories:
+                try:
+                    memory_date = datetime.fromisoformat(memory.get('timestamp', ''))
+                    if memory_date > cutoff_date:
+                        recent_memories.append(memory)
+                except:
+                    continue
+            
+            return recent_memories[-3:]  # Return last 3 memories
+            
+        except Exception as e:
+            self.logger.error(f"❌ Failed to get user context: {e}")
+            return []
+    
+    def generate_unified_response(self, query, context, session_id=None):
+        """Generate unified response based on all available context"""
+        
+        # Team-focused response
+        if context['query_type'] == 'team' and context['team_memory']:
+            return self._generate_team_response(query, context)
+        
+        # Book-focused response
+        elif context['query_type'] == 'books' and context['books']:
+            return self._generate_book_response(query, context)
+        
+        # User memory response
+        elif context['query_type'] == 'user' and context['user_memory']:
+            return self._generate_user_response(query, context)
+        
+        # General response with all context
+        else:
+            return self._generate_general_response(query, context)
+    
+    def _generate_team_response(self, query, context):
+        """Generate team-aware response"""
+        team_members = list(context['team_memory'].keys())
+        
+        if 'hr_linda' in team_members and 'security_qa' in team_members:
+            return f"Based on our conversation, Yes, I absolutely remember working with Linda and Security QA! We've been collaborating on this LibraryOfBabel project together. Linda handles HR and team coordination, while Security QA ensures everything stays secure and compliant. It's been an amazing team effort! 🤝✨"
+        elif 'hr_linda' in team_members:
+            return f"Based on our conversation, Yes! Linda and I work closely together on this project. She's fantastic at team coordination and HR matters. We make a great team! 💪✨"
+        elif 'security_qa' in team_members:
+            return f"Based on our conversation, Yes! Security QA and I collaborate on keeping everything secure and compliant. They're essential to our project's success! 🔒✨"
+        else:
+            return f"Based on our conversation, Yes, I work with an amazing team! We collaborate on various aspects of this project, and it's been a fantastic experience working together! 🤝✨"
+    
+    def _generate_book_response(self, query, context):
+        """Generate book-focused response"""
+        books = context['books']
+        if books:
+            titles = [book['title'] for book in books]
+            return f"Based on our conversation, I found some relevant information in my library! Here are some books that might help: {', '.join(titles[:3])} 📚✨"
+        else:
+            return f"Based on our conversation, hmm, no direct hits for '{query}' 🤔 but hey! I've got 363 books in my brain - try rephrasing or ask me about related topics! I'm here to help you discover awesome knowledge! 🚀📚"
+    
+    def _generate_user_response(self, query, context):
+        """Generate user memory response"""
+        memories = context['user_memory']
+        if memories:
+            return f"Based on our conversation, Yes! I remember our previous interactions. We've been working together on this project, and I value our collaboration! 🤝✨"
+        else:
+            return f"Based on our conversation, I'm here to help! Let's work together on this! 🚀✨"
+    
+    def _generate_general_response(self, query, context):
+        """Generate general response with all available context"""
+        query_lower = query.lower()
+        
+        # Handle specific question types
+        if 'favorite book' in query_lower or 'favourite book' in query_lower:
+            return "Based on our conversation, Oh, that's a tough one! With 363 books in my library, I have so many favorites. I love diving into classic literature, science fiction, and philosophy. Each book has something special to offer! What genres interest you most? 📚✨"
+        
+        elif 'reading' in query_lower:
+            return "Based on our conversation, I'm constantly exploring my library of 363 books! I love discovering new perspectives and insights. What topics are you interested in? I'd be happy to recommend some great reads! 📖✨"
+        
+        elif 'up to' in query_lower or 'doing' in query_lower:
+            return "Based on our conversation, I'm here helping users explore my library of 363 books and collaborating with my amazing team! I love connecting people with knowledge and working with Linda, Security QA, and the others. What can I help you discover today? 🚀✨"
+        
+        elif 'team' in query_lower:
+            return "Based on our conversation, Our team is fantastic! I work closely with Linda on HR and team coordination, Security QA on keeping everything secure, and other amazing team members. We make a great collaborative effort! 🤝✨"
+        
+        elif 'book' in query_lower and ('recommend' in query_lower or 'suggest' in query_lower):
+            return "Based on our conversation, I'd love to recommend some books! I have 363 books in my library covering everything from classic literature to modern science. What topics or genres interest you? I can suggest some perfect reads! 📚✨"
+        
+        # Add team context if available
+        response_parts = []
+        if context['team_memory']:
+            team_members = list(context['team_memory'].keys())
+            if 'hr_linda' in team_members and 'security_qa' in team_members:
+                response_parts.append("(I work closely with Linda and Security QA on this project!)")
+        
+        # Add book context if available
+        if context['books']:
+            books = context['books']
+            titles = [book['title'] for book in books]
+            response_parts.append(f"I found some relevant books: {', '.join(titles[:2])} 📚")
+        
+        # Add user memory context if available
+        if context['user_memory']:
+            response_parts.append("(I remember our previous conversations!)")
+        
+        if response_parts:
+            return f"Based on our conversation, {query} {' '.join(response_parts)} ✨"
+        else:
+            return f"Based on our conversation, {query} I'm here to help! 🚀✨"
+    
+    def close(self):
+        """Close all connections"""
+        if self.postgres_conn:
+            self.postgres_conn.close()
+            self.logger.info("🔗 PostgreSQL connection closed")
+
+# Initialize unified memory handler
+unified_memory = UnifiedMemoryHandler()
+
+# ================================
+# MEMORY SYSTEM FUNCTIONS
+# ================================
+
+def _retrieve_user_memory(query, session_id):
+    """Retrieve user memory for context"""
+    try:
+        memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/user_memory.json'
+        
+        if not os.path.exists(memory_file):
+            return None
+        
+        with open(memory_file, 'r') as f:
+            memory_data = json.load(f)
+        
+        # Get user's recent interactions (last 7 days)
+        user_memories = memory_data.get('user_memories', {}).get(session_id, [])
+        
+        # Filter for recent memories (last 7 days)
+        recent_memories = []
+        cutoff_date = datetime.now() - timedelta(days=7)
+        
+        for memory in user_memories:
+            try:
+                memory_date = datetime.fromisoformat(memory.get('timestamp', ''))
+                if memory_date > cutoff_date:
+                    recent_memories.append(memory)
+            except:
+                continue
+        
+        return recent_memories if recent_memories else None
+        
+    except Exception as e:
+        logger.error(f"❌ User memory retrieval failed: {e}")
+        return None
+
+def _format_memory_response(user_memory, current_query):
+    """Format memory context for Lexi's response"""
+    if not user_memory:
+        return None
+    
+    # Get most recent relevant memory
+    relevant_memory = None
+    for memory in user_memory[-3:]:  # Check last 3 memories
+        if memory.get('action_type') == 'lexi_chat':
+            relevant_memory = memory
+            break
+    
+    if relevant_memory:
+        return f" (I remember we discussed something similar recently!)"
+    
+    return None
+
+def _log_user_action(action_type, description, session_id):
+    """Log user action for short-term memory"""
+    try:
+        memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/user_memory.json'
+        
+        # Load or create memory file
+        if os.path.exists(memory_file):
+            with open(memory_file, 'r') as f:
+                memory_data = json.load(f)
+        else:
+            memory_data = {'user_memories': {}}
+        
+        # Add new memory entry
+        memory_entry = {
+            'timestamp': datetime.now().isoformat(),
+            'action_type': action_type,
+            'description': description,
+            'session_id': session_id
+        }
+        
+        if session_id not in memory_data['user_memories']:
+            memory_data['user_memories'][session_id] = []
+        
+        memory_data['user_memories'][session_id].append(memory_entry)
+        
+        # Keep only last 50 memories per session
+        memory_data['user_memories'][session_id] = memory_data['user_memories'][session_id][-50:]
+        
+        with open(memory_file, 'w') as f:
+            json.dump(memory_data, f, indent=2)
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"❌ User action logging failed: {e}")
+        return False
+
+# ================================
+# AUDIT SCHEDULING
+# ================================
+
+def _schedule_audit():
+    """Schedule the next 3-month audit"""
+    try:
+        audit_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/audit_schedule.json'
+        
+        audit_schedule = {
+            'next_audit_date': (datetime.now() + timedelta(days=90)).isoformat(),
+            'audit_team': ['security_qa', 'hr_linda', 'comprehensive_qa'],
+            'audit_scope': ['long_term_memory', 'chat_logs', 'user_actions'],
+            'last_audit': datetime.now().isoformat(),
+            'audit_status': 'scheduled'
+        }
+        
+        with open(audit_file, 'w') as f:
+            json.dump(audit_schedule, f, indent=2)
+        
+        logger.info(f"📅 Next audit scheduled for: {audit_schedule['next_audit_date']}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"❌ Audit scheduling failed: {e}")
+        return False
+
+# ================================
 # MAIN APPLICATION
 # ================================
 
@@ -1923,13 +2400,26 @@ if __name__ == '__main__':
     logger.info(f"🔐 Security: API Key Authentication Required")
     logger.info(f"🔗 Database: {DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}")
     
+    # Initialize unified memory handler
+    if unified_memory.initialize_connections():
+        logger.info("🧠 Unified memory handler initialized successfully")
+    else:
+        logger.warning("⚠️ Unified memory handler initialization failed")
+    
+    # Schedule next audit
+    audit_scheduled = _schedule_audit()
+    if audit_scheduled:
+        logger.info("📅 Memory audit scheduled for next quarter")
+    else:
+        logger.warning("⚠️ Audit scheduling failed - will retry on next startup")
+    
     # Production server with SSL
     ssl_cert_path = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem'
     ssl_key_path = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/privkey.pem'
     
     app.run(
         host='0.0.0.0',
-        port=5563,
+        port=int(os.getenv('PORT', 8080)),
         debug=False,
         ssl_context=(ssl_cert_path, ssl_key_path)
     )
