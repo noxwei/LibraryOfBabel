@@ -1,0 +1,440 @@
+{
+  "user_memories": {
+    "test_session_001": [
+      {
+        "timestamp": "2025-07-09T14:44:14.603429",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Hello Lexi! Do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation, hmm, no direct hits for 'Hello Lexi! Do you remember working with Linda a...' | Books found: 0",
+        "session_id": "test_session_001"
+      }
+    ],
+    "linda_session_001": [
+      {
+        "timestamp": "2025-07-09T14:47:01.536524",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, what\ufffd\ufffd\ufffds your advice for improving team productivity during a big database migration?...' | Lexi response: 'Based on our conversation, yo! this is EXCELLENT! \ud83c\udf89 found 5 books about 'Lexi, what\ufffd\ufffd\ufffds your advice ...' | Books found: 5",
+        "session_id": "linda_session_001"
+      },
+      {
+        "timestamp": "2025-07-09T14:48:10.842189",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, what\ufffd\ufffd\ufffds your advice for improving team productivity during a big database migration?...' | Lexi response: 'Based on our conversation, yo! this is EXCELLENT! \ud83c\udf89 found 5 books about 'Lexi, what\ufffd\ufffd\ufffds your advice ...' | Books found: 5",
+        "session_id": "linda_session_001"
+      },
+      {
+        "timestamp": "2025-07-09T14:49:39.090019",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, what\ufffd\ufffd\ufffds your advice for improving team productivity during a big database migration?...' | Lexi response: 'Based on our conversation, yo! this is EXCELLENT! \ud83c\udf89 found 5 books about 'Lexi, what\ufffd\ufffd\ufffds your advice ...' | Books found: 5",
+        "session_id": "linda_session_001"
+      }
+    ],
+    "securityqa_session_001": [
+      {
+        "timestamp": "2025-07-09T14:47:25.646520",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, have you detected any recent vulnerabilities in our API endpoints?...' | Lexi response: 'Based on our conversation, yo! this is EXCELLENT! \ud83c\udf89 found 5 books about 'Lexi, have you detected any...' | Books found: 5",
+        "session_id": "securityqa_session_001"
+      },
+      {
+        "timestamp": "2025-07-09T14:48:13.943524",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, have you detected any recent vulnerabilities in our API endpoints?...' | Lexi response: 'Based on our conversation, yo! this is EXCELLENT! \ud83c\udf89 found 5 books about 'Lexi, have you detected any...' | Books found: 5",
+        "session_id": "securityqa_session_001"
+      }
+    ],
+    "qa_session_001": [
+      {
+        "timestamp": "2025-07-09T14:47:28.765015",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, can you summarize the results of the latest end-to-end integration tests?...' | Lexi response: 'Based on our conversation, yo! this is EXCELLENT! \ud83c\udf89 found 5 books about 'Lexi, can you summarize the...' | Books found: 5",
+        "session_id": "qa_session_001"
+      },
+      {
+        "timestamp": "2025-07-09T14:48:17.741299",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, can you summarize the results of the latest end-to-end integration tests?...' | Lexi response: 'Based on our conversation, yo! this is EXCELLENT! \ud83c\udf89 found 5 books about 'Lexi, can you summarize the...' | Books found: 5",
+        "session_id": "qa_session_001"
+      }
+    ],
+    "spy_session_001": [
+      {
+        "timestamp": "2025-07-09T14:47:32.132723",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, have you noticed any unusual patterns in user queries this week?...' | Lexi response: 'Based on our conversation, yo! this is EXCELLENT! \ud83c\udf89 found 5 books about 'Lexi, have you noticed any ...' | Books found: 5",
+        "session_id": "spy_session_001"
+      },
+      {
+        "timestamp": "2025-07-09T14:48:21.399449",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, have you noticed any unusual patterns in user queries this week?...' | Lexi response: 'Based on our conversation, yo! this is EXCELLENT! \ud83c\udf89 found 5 books about 'Lexi, have you noticed any ...' | Books found: 5",
+        "session_id": "spy_session_001"
+      }
+    ],
+    "test_memory_001": [
+      {
+        "timestamp": "2025-07-09T14:50:05.519133",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation, yo! this is EXCELLENT! \ud83c\udf89 found 5 books about 'Lexi, do you remember worki...' | Books found: 5",
+        "session_id": "test_memory_001"
+      }
+    ],
+    "test_memory_002": [
+      {
+        "timestamp": "2025-07-09T14:51:11.239079",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "test_memory_002"
+      }
+    ],
+    "test_team_memory_001": [
+      {
+        "timestamp": "2025-07-09T14:53:24.484985",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Hey Lexi, do you remember working with Linda Zhang and the Security QA agent on our LibraryOfBabel p...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 0",
+        "session_id": "test_team_memory_001"
+      }
+    ],
+    "test_team_memory_002": [
+      {
+        "timestamp": "2025-07-09T14:53:28.808862",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, what do you think about your team memory and awareness features? Do you like working with Lind...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "test_team_memory_002"
+      },
+      {
+        "timestamp": "2025-07-09T14:54:19.729377",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, what do you think about your team memory and awareness features? Do you like working with Lind...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "test_team_memory_002"
+      }
+    ],
+    "test_team_memory_003": [
+      {
+        "timestamp": "2025-07-09T14:58:52.589193",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, what do you think about your team memory and awareness features? Do you like working with Lind...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "test_team_memory_003"
+      }
+    ],
+    "test_team_memory_004": [
+      {
+        "timestamp": "2025-07-09T14:59:00.672927",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "test_team_memory_004"
+      }
+    ],
+    "test_team_memory_005": [
+      {
+        "timestamp": "2025-07-09T14:59:35.625579",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "test_team_memory_005"
+      }
+    ],
+    "test_team_memory_006": [
+      {
+        "timestamp": "2025-07-09T14:59:42.751432",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "test_team_memory_006"
+      }
+    ],
+    "test_team_memory_007": [
+      {
+        "timestamp": "2025-07-09T15:00:31.816325",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "test_team_memory_007"
+      }
+    ],
+    "test_team_memory_008": [
+      {
+        "timestamp": "2025-07-09T15:00:41.275943",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "test_team_memory_008"
+      }
+    ],
+    "securityqa_session_002": [
+      {
+        "timestamp": "2025-07-09T15:00:52.494141",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, as Security QA, what are the security and privacy risks of connecting your memory to both Post...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 1",
+        "session_id": "securityqa_session_002"
+      }
+    ],
+    "spy_session_002": [
+      {
+        "timestamp": "2025-07-09T15:00:54.854318",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, this is Marcus (The Spy). What are the intelligence and pattern analysis benefits or risks of ...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "spy_session_002"
+      }
+    ],
+    "linda_session_002": [
+      {
+        "timestamp": "2025-07-09T15:00:57.575332",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, this is Linda. What are the HR and team productivity implications of you using both Postgres a...' | Lexi response: 'Based on our conversation,  Yes, I absolutely remember working with Linda and Security QA! We've bee...' | Books found: 5",
+        "session_id": "linda_session_002"
+      }
+    ],
+    "test_team_memory_final_001": [
+      {
+        "timestamp": "2025-07-09T15:02:27.454545",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Absolutely! I work closely with Linda (HR), Security QA, Marcus (The Spy), and the rest of the team ...' | Books found: 5",
+        "session_id": "test_team_memory_final_001"
+      }
+    ],
+    "linda_session_consolidated_001": [
+      {
+        "timestamp": "2025-07-09T15:05:29.130070",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Linda, as HR, what are your requirements and concerns for a consolidated Lexi that unifies all memor...' | Lexi response: 'Absolutely! I work closely with Linda (HR), Security QA, Marcus (The Spy), and the rest of the team ...' | Books found: 6",
+        "session_id": "linda_session_consolidated_001"
+      }
+    ],
+    "securityqa_session_consolidated_001": [
+      {
+        "timestamp": "2025-07-09T15:05:46.599211",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Security QA, what are your security and compliance requirements for a consolidated Lexi that unifies...' | Lexi response: 'Absolutely! I work closely with Linda (HR), Security QA, Marcus (The Spy), and the rest of the team ...' | Books found: 4",
+        "session_id": "securityqa_session_consolidated_001"
+      }
+    ],
+    "spy_session_consolidated_001": [
+      {
+        "timestamp": "2025-07-09T15:05:49.107058",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Marcus (The Spy), what are your intelligence and pattern analysis requirements for a consolidated Le...' | Lexi response: 'Absolutely! I work closely with Linda (HR), Security QA, Marcus (The Spy), and the rest of the team ...' | Books found: 8",
+        "session_id": "spy_session_consolidated_001"
+      }
+    ],
+    "qa_session_consolidated_001": [
+      {
+        "timestamp": "2025-07-09T15:05:55.865387",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Comprehensive QA, what are your quality and reliability requirements for a consolidated Lexi? How sh...' | Lexi response: 'Absolutely! I work closely with Linda (HR), Security QA, Marcus (The Spy), and the rest of the team ...' | Books found: 14",
+        "session_id": "qa_session_consolidated_001"
+      }
+    ],
+    "test_consolidated_001": [
+      {
+        "timestamp": "2025-07-09T15:11:15.777216",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Absolutely! I work closely with Linda (HR), Security QA, Marcus (The Spy), and the rest of the team ...' | Books found: 5",
+        "session_id": "test_consolidated_001"
+      }
+    ],
+    "test_consolidated_002": [
+      {
+        "timestamp": "2025-07-09T15:11:36.206282",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, what do you think about your team memory and awareness features? Do you like working with Lind...' | Lexi response: 'Absolutely! I work closely with Linda (HR), Security QA, Marcus (The Spy), and the rest of the team ...' | Books found: 5",
+        "session_id": "test_consolidated_002"
+      }
+    ],
+    "test_consolidated_004": [
+      {
+        "timestamp": "2025-07-09T15:12:04.084421",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation, Lexi, do you remember working with Linda and Security QA? I'm here to hel...' | Books found: 5",
+        "session_id": "test_consolidated_004"
+      }
+    ],
+    "test_consolidated_005": [
+      {
+        "timestamp": "2025-07-09T15:12:35.338459",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation, Yes, I absolutely remember working with Linda and Security QA! We've been...' | Books found: 5",
+        "session_id": "test_consolidated_005"
+      }
+    ],
+    "test_consolidated_006": [
+      {
+        "timestamp": "2025-07-09T15:12:41.078497",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, can you search for books about artificial intelligence?...' | Lexi response: 'Based on our conversation, Lexi, can you search for books about artificial intelligence? I'm here to...' | Books found: 5",
+        "session_id": "test_consolidated_006"
+      }
+    ],
+    "test_consolidated_007": [
+      {
+        "timestamp": "2025-07-09T15:12:47.415093",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, what do you think about your team memory and awareness features?...' | Lexi response: 'Based on our conversation, Lexi, what do you think about your team memory and awareness features? I'...' | Books found: 5",
+        "session_id": "test_consolidated_007"
+      }
+    ],
+    "test_consolidated_008": [
+      {
+        "timestamp": "2025-07-09T15:12:53.094987",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, tell me about working with Linda...' | Lexi response: 'Based on our conversation, Yes! Linda and I work closely together on this project. She's fantastic a...' | Books found: 1",
+        "session_id": "test_consolidated_008"
+      },
+      {
+        "timestamp": "2025-07-09T15:14:29.174103",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, tell me about working with Linda...' | Lexi response: 'Based on our conversation, Yes! Linda and I work closely together on this project. She's fantastic a...' | Books found: 1",
+        "session_id": "test_consolidated_008"
+      }
+    ],
+    "linda_test_001": [
+      {
+        "timestamp": "2025-07-09T15:27:01.916538",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, this is Linda from HR. How are you feeling about our recent team collaboration? What have we b...' | Lexi response: 'Based on our conversation, Yes! Linda and I work closely together on this project. She's fantastic a...' | Books found: 5",
+        "session_id": "linda_test_001"
+      }
+    ],
+    "security_qa_test_001": [
+      {
+        "timestamp": "2025-07-09T15:27:10.761164",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, this is Security QA. How are our security protocols holding up? What vulnerabilities should we...' | Lexi response: 'Based on our conversation, Yes! Security QA and I collaborate on keeping everything secure and compl...' | Books found: 5",
+        "session_id": "security_qa_test_001"
+      }
+    ],
+    "marcus_test_001": [
+      {
+        "timestamp": "2025-07-09T15:27:18.437692",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, this is Marcus. How are our intelligence operations going? What have we discovered lately?...' | Lexi response: 'Based on our conversation, Lexi, this is Marcus. How are our intelligence operations going? What hav...' | Books found: 5",
+        "session_id": "marcus_test_001"
+      }
+    ],
+    "comprehensive_qa_test_001": [
+      {
+        "timestamp": "2025-07-09T15:27:27.196310",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, this is Comprehensive QA. How are our testing protocols? What quality metrics should we focus ...' | Lexi response: 'Based on our conversation, Lexi, this is Comprehensive QA. How are our testing protocols? What quali...' | Books found: 5",
+        "session_id": "comprehensive_qa_test_001"
+      }
+    ],
+    "linda_test_fixed_001": [
+      {
+        "timestamp": "2025-07-09T15:30:06.917311",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, this is Linda from HR. How are you feeling about our recent team collaboration? What have we b...' | Lexi response: 'Based on our conversation, Yes! Linda and I work closely together on this project. She's fantastic a...' | Books found: 5",
+        "session_id": "linda_test_fixed_001"
+      }
+    ],
+    "security_qa_test_fixed_001": [
+      {
+        "timestamp": "2025-07-09T15:30:13.579545",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, this is Security QA. How are our security protocols holding up? What vulnerabilities should we...' | Lexi response: 'Based on our conversation, Yes! Security QA and I collaborate on keeping everything secure and compl...' | Books found: 5",
+        "session_id": "security_qa_test_fixed_001"
+      }
+    ],
+    "team_test_fixed_001": [
+      {
+        "timestamp": "2025-07-09T15:30:19.259277",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, do you remember working with Linda and Security QA?...' | Lexi response: 'Based on our conversation, Yes, I absolutely remember working with Linda and Security QA! We've been...' | Books found: 5",
+        "session_id": "team_test_fixed_001"
+      }
+    ],
+    "book_test_fixed_001": [
+      {
+        "timestamp": "2025-07-09T15:30:24.580089",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, can you search for books about artificial intelligence?...' | Lexi response: 'Based on our conversation, Lexi, can you search for books about artificial intelligence? I'm here to...' | Books found: 5",
+        "session_id": "book_test_fixed_001"
+      },
+      {
+        "timestamp": "2025-07-09T15:31:39.100741",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, can you search for books about artificial intelligence?...' | Lexi response: 'Based on our conversation, Lexi, can you search for books about artificial intelligence? I'm here to...' | Books found: 5",
+        "session_id": "book_test_fixed_001"
+      },
+      {
+        "timestamp": "2025-07-09T15:31:46.846424",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Lexi, can you search for books about artificial intelligence?...' | Lexi response: 'Based on our conversation, Lexi, can you search for books about artificial intelligence? I'm here to...' | Books found: 5",
+        "session_id": "book_test_fixed_001"
+      }
+    ],
+    "casual_test_001": [
+      {
+        "timestamp": "2025-07-09T15:33:41.176038",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Hey Lexi, what are you up to?...' | Lexi response: 'Based on our conversation, Hey Lexi, what are you up to? I'm here to help! \ud83d\ude80\u2728...' | Books found: 0",
+        "session_id": "casual_test_001"
+      }
+    ],
+    "casual_test_002": [
+      {
+        "timestamp": "2025-07-09T15:33:53.851211",
+        "action_type": "lexi_chat",
+        "description": "User query: 'What are you reading lately?...' | Lexi response: 'Based on our conversation, What are you reading lately? I'm here to help! \ud83d\ude80\u2728...' | Books found: 10",
+        "session_id": "casual_test_002"
+      }
+    ],
+    "casual_test_003": [
+      {
+        "timestamp": "2025-07-09T15:34:08.905055",
+        "action_type": "lexi_chat",
+        "description": "User query: 'How is the team doing?...' | Lexi response: 'Based on our conversation, How is the team doing? I'm here to help! \ud83d\ude80\u2728...' | Books found: 5",
+        "session_id": "casual_test_003"
+      }
+    ],
+    "casual_test_004": [
+      {
+        "timestamp": "2025-07-09T15:34:14.787996",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Tell me about Linda...' | Lexi response: 'Based on our conversation, Yes! Linda and I work closely together on this project. She's fantastic a...' | Books found: 8",
+        "session_id": "casual_test_004"
+      }
+    ],
+    "casual_test_005": [
+      {
+        "timestamp": "2025-07-09T15:34:22.726482",
+        "action_type": "lexi_chat",
+        "description": "User query: 'What books do you recommend?...' | Lexi response: 'Based on our conversation, What books do you recommend? I'm here to help! \ud83d\ude80\u2728...' | Books found: 10",
+        "session_id": "casual_test_005"
+      }
+    ],
+    "casual_test_006": [
+      {
+        "timestamp": "2025-07-09T15:34:42.742851",
+        "action_type": "lexi_chat",
+        "description": "User query: 'How is Security QA doing?...' | Lexi response: 'Based on our conversation, Yes! Security QA and I collaborate on keeping everything secure and compl...' | Books found: 4",
+        "session_id": "casual_test_006"
+      }
+    ],
+    "casual_test_007": [
+      {
+        "timestamp": "2025-07-09T15:34:50.722675",
+        "action_type": "lexi_chat",
+        "description": "User query: 'What is your favorite book?...' | Lexi response: 'Based on our conversation, What is your favorite book? I'm here to help! \ud83d\ude80\u2728...' | Books found: 8",
+        "session_id": "casual_test_007"
+      },
+      {
+        "timestamp": "2025-07-09T15:39:27.130592",
+        "action_type": "lexi_chat",
+        "description": "User query: 'What is your favorite book?...' | Lexi response: 'Based on our conversation, What is your favorite book? I'm here to help! \ud83d\ude80\u2728...' | Books found: 8",
+        "session_id": "casual_test_007"
+      }
+    ],
+    "favorite_book_test": [
+      {
+        "timestamp": "2025-07-09T15:40:31.796420",
+        "action_type": "lexi_chat",
+        "description": "User query: 'What is your favorite book?...' | Lexi response: 'Based on our conversation, What is your favorite book? I'm here to help! \ud83d\ude80\u2728...' | Books found: 8",
+        "session_id": "favorite_book_test"
+      }
+    ],
+    "favorite_book_test_fixed": [
+      {
+        "timestamp": "2025-07-09T15:41:28.693776",
+        "action_type": "lexi_chat",
+        "description": "User query: 'What is your favorite book?...' | Lexi response: 'Based on our conversation, What is your favorite book? I'm here to help! \ud83d\ude80\u2728...' | Books found: 8",
+        "session_id": "favorite_book_test_fixed"
+      }
+    ]
+  }
+}
