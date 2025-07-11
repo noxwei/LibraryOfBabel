@@ -121,7 +121,22 @@ tmp/
 # API Key Rotation Config
 key_rotation_config.json
 config/key_rotation_config.json
+
+# === AGENT MEMORY & AUDIT SYSTEMS ===
+# Agent memory and audit data (contains personal interactions)
 agents/bulletin_board/agent_memory.json
+agents/bulletin_board/user_memory.json
+agents/bulletin_board/audit_schedule.json
+
+# Agent personal memory files
+agents/*/agent_memory.json
+agents/*/user_memory.json
+agents/*/interaction_logs.json
+
+# DBA Team personal notes and interactions
+agents/ebook_dba_team/personal_notes/
+agents/ebook_dba_team/training_records/
+agents/ebook_dba_team/performance_reviews/
 
 # === BOOK LISTS & DOWNLOADS ===
 # Dynamic book lists for downloads
@@ -138,3 +153,33 @@ APPLE_SHORTCUTS_PROMPT.md
 *QUICK_ACCESS*.html
 *wei_lazy*.md
 *wei_proof*.md
+docs/WEI_PROOF_USAGE_GUIDE.md
+
+# === DOCUMENTATION ORGANIZATION ===
+# Temporary files from documentation reorganization
+debug_log_line.txt
+CONSOLIDATED_LEXI_IMPLEMENTATION.md
+NATURAL_CONVERSATION_TESTS.md
+TEAM_TEST_REPORT.md
+
+# Agent roster with personal information
+LIBRARYOFBABEL_AGENT_ROSTER.csv
+
+# === EBOOK & MEDIA FILES ===
+# Processed ebook files
+*.epub
+*.m4b
+*.mp3
+*.pdf
+*.mobi
+*.azw3
+agents/reddit_bibliophile/*.epub
+data/processed_books/*.epub
+processed_books/*.epub
+
+# Database exports
+audiobook_ebook_tracker.db
+*.db
+*.sqlite
+*.sqlite3
+docs/reports/REDDIT_BIBLIOPHILE_500_BOOKS_LIST_2.md

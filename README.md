@@ -67,6 +67,12 @@ The system enables instant AI-powered research across thousands of books, revolu
 - **Marcus Chen (陈明轩)** (The Spy) - User behavior pattern analysis
 - **Dr. Priya Patel** (Research Specialist) - Mathematical verification & methodology
 
+**📚 NEW: Ebook Focus DBA Team** (Masters of Library Science):
+- **Dr. Sarah Chen (陈雪芳)** (Database Systems Librarian) - PostgreSQL administration & optimization
+- **Dr. Marcus Thompson** (Metadata Quality Assurance Specialist) - Cataloging & metadata standards
+- **Dr. Elena Rodriguez** (Information Architecture Validator) - Search optimization & user experience
+- **Dr. James Park (박진우)** (Digital Collections Technical Manager) - EPUB processing & collection management
+
 **🏗️ Technical Architecture:**
 - **Infinite Generation**: Every possible book using Borges' 25-character alphabet
 - **Deterministic System**: Same coordinates always produce same book
@@ -166,6 +172,8 @@ The system enables instant AI-powered research across thousands of books, revolu
 - **Error Recovery**: Graceful degradation with comprehensive logging
 
 ### 👥 **AI Agent Team System**
+
+#### **Core Operations Team**
 - **Dr. Marcus 'BookNerd' Rodriguez** (Reddit Bibliophile): Expert research assistance with Reddit-style enthusiasm
 - **Alexander 'Alex' Thompson** (Security Architect): Multi-layer protection with real-time threat detection
 - **Linda Zhang (张丽娜)** (HR Manager): Team coordination with Chinese-American work ethic
@@ -174,6 +182,12 @@ The system enables instant AI-powered research across thousands of books, revolu
 - **Marcus Chen (陈明轩)** (The Spy): Surveillance and pattern recognition capabilities
 - **Dr. Priya Patel** (Research Specialist): Data-driven analysis and methodology validation
 - **Dr. Sophia Chen** (Digital Philosopher): Borges theory and infinite possibility exploration
+
+#### **Ebook Focus DBA Team** (Masters of Library Science)
+- **Dr. Sarah Chen (陈雪芳)** (Database Systems Librarian): PostgreSQL database administration and optimization
+- **Dr. Marcus Thompson** (Metadata Quality Assurance Specialist): EPUB metadata extraction and validation
+- **Dr. Elena Rodriguez** (Information Architecture Validator): Search optimization and user experience design
+- **Dr. James Park (박진우)** (Digital Collections Technical Manager): EPUB processing pipeline and collection management
 
 ### 🗃️ Production Database Architecture
 - **PostgreSQL + Vector Extensions**: Optimized for semantic search at scale
