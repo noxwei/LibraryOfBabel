@@ -45,6 +45,11 @@ class HRAgent:
         self.hr_data_dir = "reports/hr_analytics"
         os.makedirs(self.hr_data_dir, exist_ok=True)
         
+        # JSON file paths for fallback
+        self.interactions_file = f"{self.hr_data_dir}/interactions.json"
+        self.performance_file = f"{self.hr_data_dir}/performance_metrics.json"
+        self.workforce_file = f"{self.hr_data_dir}/workforce_status.json"
+        
         # Personal background
         self.name = "Linda Zhang (张丽娜)"
         self.immigration_year = 1999

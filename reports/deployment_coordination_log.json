@@ -1,0 +1,51 @@
+{
+  "timestamp": "2025-07-11T02:39:03.213413",
+  "meeting_type": "deployment_coordination",
+  "participants": [
+    "Linda Zhang (HR)",
+    "Comprehensive QA Agent",
+    "Security QA Agent"
+  ],
+  "target_domain": "api.ashortstayinhell.com",
+  "current_status": {
+    "agents_ready": 6,
+    "system_health": "56.7%",
+    "blockers": [
+      "API service down",
+      "Sensitive data cleanup needed"
+    ]
+  },
+  "action_items": [
+    {
+      "task": "Clean sensitive data from archive",
+      "owner": "Security QA Agent",
+      "priority": "HIGH",
+      "estimate": "15 minutes"
+    },
+    {
+      "task": "Fix production API service startup",
+      "owner": "System Admin",
+      "priority": "CRITICAL",
+      "estimate": "30 minutes"
+    },
+    {
+      "task": "Merge agents to main branch",
+      "owner": "Developer",
+      "priority": "HIGH",
+      "estimate": "10 minutes"
+    },
+    {
+      "task": "Integrate agents into production server",
+      "owner": "Developer",
+      "priority": "HIGH",
+      "estimate": "45 minutes"
+    },
+    {
+      "task": "Deploy to api.ashortstayinhell.com",
+      "owner": "DevOps",
+      "priority": "HIGH",
+      "estimate": "20 minutes"
+    }
+  ],
+  "linda_assessment": "Team ready, process clear, execution critical"
+}
