@@ -48,10 +48,13 @@ This checklist ensures all components are properly configured for production ope
 ```
 
 ### **API Configuration**
+- [ ] **🚨 PORT VERIFICATION** - API MUST use port 5562 (NOT 8080)
+- [ ] **Port Environment Variable** - `PORT=5562` set correctly
+- [ ] **Code Port Check** - `/src/api/production_api.py` line 2422 uses port 5562
 - [ ] **Dependencies Installed** - `pip3 install flask psycopg2-binary requests numpy`
 - [ ] **Security Middleware** - Updated to use Let's Encrypt certificates
-- [ ] **API Server Tested** - Starts successfully with SSL
-- [ ] **External API Access** - `https://api.yourdomain.com:5562/api/secure/info` responds
+- [ ] **API Server Tested** - Starts successfully with SSL on port 5562
+- [ ] **External API Access** - `https://api.ashortstayinhell.com:5562/api/secure/info` responds
 - [ ] **Authentication Working** - API key validation functional
 
 ## Phase 2: Service Automation
