@@ -1,0 +1,99 @@
+{
+  "timestamp": "2025-07-11T02:41:56.295037",
+  "duration_seconds": 0.10456705093383789,
+  "statistics": {
+    "total_tests": 6,
+    "passed": 4,
+    "failed": 1,
+    "warnings": 1,
+    "critical_issues": 0,
+    "high_issues": 1,
+    "total_duration_seconds": 0.10456705093383789
+  },
+  "health_score": 56.67,
+  "health_status": "poor",
+  "test_results": [
+    {
+      "test_name": "database_connectivity",
+      "category": "system",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.034970760345458984,
+      "details": {
+        "book_count": 228,
+        "chunk_count": 6811,
+        "connection_successful": true
+      },
+      "error_message": null,
+      "timestamp": "2025-07-11T02:41:56.225458"
+    },
+    {
+      "test_name": "api_endpoint_info",
+      "category": "system",
+      "status": "failed",
+      "severity": "high",
+      "duration_seconds": 0.0030701160430908203,
+      "details": {
+        "endpoint": "http://localhost:5563/api/v3/info"
+      },
+      "error_message": "HTTPConnectionPool(host='localhost', port=5563): Max retries exceeded with url: /api/v3/info (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1069412b0>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "timestamp": "2025-07-11T02:41:56.228708"
+    },
+    {
+      "test_name": "transmission_connectivity",
+      "category": "system",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.018761873245239258,
+      "details": {
+        "transmission_accessible": true,
+        "output_lines": 12
+      },
+      "error_message": null,
+      "timestamp": "2025-07-11T02:41:56.247500"
+    },
+    {
+      "test_name": "chaos_report_analysis",
+      "category": "performance",
+      "status": "warning",
+      "severity": "low",
+      "duration_seconds": 8.225440979003906e-05,
+      "details": {},
+      "error_message": "Chaos report not found: config/reddit_nerd_chaos_report.json",
+      "timestamp": "2025-07-11T02:41:56.247794"
+    },
+    {
+      "test_name": "unicode_optimization",
+      "category": "database",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.02253890037536621,
+      "details": {
+        "optimization_applied": true,
+        "function_created": "optimize_unicode_search",
+        "index_created": "idx_chunks_content_unicode"
+      },
+      "error_message": null,
+      "timestamp": "2025-07-11T02:41:56.270378"
+    },
+    {
+      "test_name": "sql_injection_protection",
+      "category": "security",
+      "status": "passed",
+      "severity": "medium",
+      "duration_seconds": 0.024522066116333008,
+      "details": {
+        "protection_implemented": true,
+        "validation_function": "validate_search_input",
+        "secure_search_function": "secure_text_search"
+      },
+      "error_message": null,
+      "timestamp": "2025-07-11T02:41:56.295012"
+    }
+  ],
+  "improvements_applied": {
+    "performance": 1,
+    "security": 1,
+    "total_fixes": 0
+  }
+}
