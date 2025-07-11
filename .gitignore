@@ -183,3 +183,5 @@ audiobook_ebook_tracker.db
 *.sqlite
 *.sqlite3
 docs/reports/REDDIT_BIBLIOPHILE_500_BOOKS_LIST_2.md
+PRODUCTION_DEPLOYMENT_SUCCESS.md
+manual_deploy_to_production.py
