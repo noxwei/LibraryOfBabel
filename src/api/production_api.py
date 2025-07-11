@@ -560,7 +560,7 @@ def ollama_ios_chat_legacy():
         # Initialize Ollama agent with Llama3 7B model
         try:
             ollama_agent = OllamaUrlGeneratorAgent(
-                ollama_model="llama3:7b",  # Llama3 7B model
+                ollama_model="llama3.2:3b",  # Llama3.2 3B model
                 api_key=API_KEY,
                 library_api_base=request.host_url.rstrip('/') + '/api/v3'
             )
@@ -1508,7 +1508,7 @@ def lexi_chat():
         # Initialize Ollama agent for Lexi personality
         try:
             lexi_agent = OllamaUrlGeneratorAgent(
-                ollama_model="llama3:7b",
+                ollama_model="llama3.2:3b",
                 api_key=API_KEY,
                 library_api_base=request.host_url.rstrip('/') + '/api/v3'
             )
@@ -1612,13 +1612,13 @@ def lexi_chat():
         
         # Generate Lexi's unified response using consolidated memory system
         unified_context = unified_memory.get_unified_context(user_query, session_id)
-        logger.info(f"🎭 LEXI UNIFIED MEMORY: Context type: {unified_context['type']}, Books: {len(unified_context['book_context'])}, Team members: {len(unified_context['team_context'])}, User memories: {len(unified_context['user_memory'])}")
+        logger.info(f"🎭 LEXI UNIFIED MEMORY: Context type: {unified_context['query_type']}, Books: {len(unified_context['books'])}, Team memories: {len(unified_context.get('team_memory', {}))}, User memories: {len(unified_context['user_memory'])}")
         
         # Create context for unified response generation
         response_context = {
-            'query_type': unified_context['type'],
-            'team_memory': unified_context['team_context'],
-            'books': unified_context['book_context'],
+            'query_type': unified_context['query_type'],
+            'team_memory': unified_context['team_memory'],
+            'books': unified_context['books'],
             'user_memory': unified_context['user_memory'],
             'query': user_query
         }
@@ -1631,9 +1631,10 @@ def lexi_chat():
         )
         
         # Log user interaction for short-term memory
+        response_summary = str(lexi_response)[:100] if lexi_response else "No response"
         user_action_logged = _log_user_action(
             'lexi_chat',
-            f"User query: '{user_query[:100]}...' | Lexi response: '{lexi_response[:100]}...' | Books found: {len(unique_books)}",
+            f"User query: '{user_query[:100]}...' | Lexi response: '{response_summary}...' | Books found: {len(unique_books)}",
             session_id
         )
         
@@ -1695,7 +1696,9 @@ def lexi_chat():
         return jsonify(lexi_response_data)
         
     except Exception as e:
+        import traceback
         logger.error(f"❌ Mascot chat error: {e}")
+        logger.error(f"❌ Full traceback: {traceback.format_exc()}")
         return jsonify({
             'success': False,
             'error': 'Mascot temporarily unavailable',
@@ -2102,7 +2105,7 @@ class UnifiedMemoryHandler:
             cur.execute("""
                 SELECT DISTINCT b.title, c.content, c.chunk_id
                 FROM chunks c
-                JOIN books b ON c.book_id = b.id
+                JOIN books b ON c.book_id = b.book_id
                 WHERE c.content ILIKE %s
                 ORDER BY c.chunk_id
                 LIMIT 5
