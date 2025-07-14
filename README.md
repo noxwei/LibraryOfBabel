@@ -99,7 +99,7 @@ curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_KEY&ch
 Filter and discover content:
 ```bash
 # Search by author
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_KEY&author=Rowling"
+curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_KEY&author=foucault"
 
 # Search by genre
 curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_KEY&genre=philosophy"
