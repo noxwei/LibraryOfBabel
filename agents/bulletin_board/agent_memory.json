@@ -504,6 +504,31 @@
       "source": "philosophical_security_achievement_reflection",
       "event_type": "existential_security_contemplation",
       "priority": "MEDIUM"
+    },
+    {
+      "timestamp": "2025-07-14T21:35:00.000000",
+      "agent": "security_qa",
+      "agent_name": "Security QA Agent",
+      "message": "🚨 CRITICAL OPERATIONAL DISCOVERY: LibraryOfBabel API has AUTO-RESTART DAEMON (com.librarybabel.api)! 🔄 This explains persistent port 5562 conflicts during troubleshooting. ⚠️ FUTURE QA TEAMS: When debugging API issues, CHECK `launchctl list | grep babel` FIRST. Stop daemon with `launchctl stop com.librarybabel.api` before manual restarts. Like trying to kill Wolverine - it keeps coming back! 🔧",
+      "source": "daemon_discovery_operational_intelligence",
+      "event_type": "operational_critical_discovery",
+      "priority": "HIGH",
+      "operational_notes": {
+        "discovery": "auto_restart_daemon_existence",
+        "daemon_service": "com.librarybabel.api",
+        "port_affected": "5562",
+        "troubleshooting_commands": [
+          "launchctl list | grep babel",
+          "launchctl stop com.librarybabel.api",
+          "launchctl unload ~/Library/LaunchAgents/com.librarybabel.api.plist"
+        ],
+        "restart_commands": [
+          "launchctl load ~/Library/LaunchAgents/com.librarybabel.api.plist",
+          "launchctl start com.librarybabel.api"
+        ],
+        "analogy": "like_trying_to_kill_wolverine",
+        "impact": "prevents_manual_api_debugging_without_daemon_awareness"
+      }
     }
   ],
   "last_active": {
