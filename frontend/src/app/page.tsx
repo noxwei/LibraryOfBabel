@@ -280,6 +280,9 @@ export default function Home() {
               <span>360 books indexed</span>
               <span>34M+ words searchable</span>
               <span>AI-powered semantic search</span>
+              <a href="/hr" className="text-blue-600 hover:text-blue-700 underline">
+                👔 HR Dashboard
+              </a>
             </div>
           </div>
         </div>
