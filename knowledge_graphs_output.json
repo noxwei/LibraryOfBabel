@@ -1,0 +1,402 @@
+[
+  {
+    "agent_id": "temp_kg_agent_01",
+    "specialization": "Philosophy & Theory",
+    "books_processed": 80,
+    "graph_metrics": {
+      "concept_nodes": 155,
+      "entity_nodes": 155,
+      "relationship_edges": 240,
+      "graph_density": 0.77,
+      "avg_connections_per_node": 1.5
+    },
+    "top_concepts": [
+      "Central theme in The Long Way Home (A Samantha Church Mystery Book 6)",
+      "Key concept from Betta Ferrendelli's work",
+      "Philosophy & Theory methodology",
+      "Central theme in A Psalm for the Wild-Built",
+      "Key concept from Becky Chambers's work"
+    ],
+    "top_entities": [
+      "Author: Betta Ferrendelli",
+      "Work: The Long Way Home (A Samantha Church Mystery Book 6)",
+      "Domain: Philosophy & Theory",
+      "Author: Becky Chambers",
+      "Work: A Psalm for the Wild-Built"
+    ],
+    "sample_relationships": [
+      "Betta Ferrendelli -> wrote -> The Long Way Home (A Samantha Church Mystery Book 6)",
+      "The Long Way Home (A Samantha Church Mystery Book 6) -> explores -> Central theme in The Long Way Home (A Samantha Church Mystery Book 6)",
+      "Central theme in The Long Way Home (A Samantha Church Mystery Book 6) -> relates_to -> Philosophy & Theory",
+      "Becky Chambers -> wrote -> A Psalm for the Wild-Built",
+      "A Psalm for the Wild-Built -> explores -> Central theme in A Psalm for the Wild-Built",
+      "Central theme in A Psalm for the Wild-Built -> relates_to -> Philosophy & Theory",
+      "Sloane Crosley -> wrote -> Look Alive Out There",
+      "Look Alive Out There -> explores -> Central theme in Look Alive Out There",
+      "Central theme in Look Alive Out There -> relates_to -> Philosophy & Theory",
+      "Manne, Kate; -> wrote -> Down Girl"
+    ],
+    "processing_time_seconds": 50,
+    "timestamp": "2025-07-14T10:46:22.341423"
+  },
+  {
+    "agent_id": "temp_kg_agent_02",
+    "specialization": "Science & Technology",
+    "books_processed": 80,
+    "graph_metrics": {
+      "concept_nodes": 157,
+      "entity_nodes": 157,
+      "relationship_edges": 240,
+      "graph_density": 0.76,
+      "avg_connections_per_node": 1.5
+    },
+    "top_concepts": [
+      "Central theme in The Age of Surveillance Capitalism",
+      "Key concept from Shoshana Zuboff's work",
+      "Science & Technology methodology",
+      "Central theme in Parable of the Sower",
+      "Key concept from Octavia Butler's work"
+    ],
+    "top_entities": [
+      "Author: Shoshana Zuboff",
+      "Work: The Age of Surveillance Capitalism",
+      "Domain: Science & Technology",
+      "Author: Octavia Butler",
+      "Work: Parable of the Sower"
+    ],
+    "sample_relationships": [
+      "Shoshana Zuboff -> wrote -> The Age of Surveillance Capitalism",
+      "The Age of Surveillance Capitalism -> explores -> Central theme in The Age of Surveillance Capitalism",
+      "Central theme in The Age of Surveillance Capitalism -> relates_to -> Science & Technology",
+      "Octavia Butler -> wrote -> Parable of the Sower",
+      "Parable of the Sower -> explores -> Central theme in Parable of the Sower",
+      "Central theme in Parable of the Sower -> relates_to -> Science & Technology",
+      "Arkady Martine -> wrote -> A Memory Called Empire",
+      "A Memory Called Empire -> explores -> Central theme in A Memory Called Empire",
+      "Central theme in A Memory Called Empire -> relates_to -> Science & Technology",
+      "Ibram X. Kendi -> wrote -> How to Be an Antiracist"
+    ],
+    "processing_time_seconds": 93,
+    "timestamp": "2025-07-14T10:46:22.341522"
+  },
+  {
+    "agent_id": "temp_kg_agent_03",
+    "specialization": "Literature & Fiction",
+    "books_processed": 80,
+    "graph_metrics": {
+      "concept_nodes": 159,
+      "entity_nodes": 159,
+      "relationship_edges": 240,
+      "graph_density": 0.75,
+      "avg_connections_per_node": 1.5
+    },
+    "top_concepts": [
+      "Central theme in Schools of Magic: Book 2 of the Chronomancer Series",
+      "Key concept from Mark August's work",
+      "Literature & Fiction methodology",
+      "Central theme in Unbroken Brain: A Revolutionary New Way of Understanding Addiction",
+      "Key concept from Maia Szalavitz's work"
+    ],
+    "top_entities": [
+      "Author: Mark August",
+      "Work: Schools of Magic: Book 2 of the Chronomancer Series",
+      "Domain: Literature & Fiction",
+      "Author: Maia Szalavitz",
+      "Work: Unbroken Brain: A Revolutionary New Way of Understanding Addiction"
+    ],
+    "sample_relationships": [
+      "Mark August -> wrote -> Schools of Magic: Book 2 of the Chronomancer Series",
+      "Schools of Magic: Book 2 of the Chronomancer Series -> explores -> Central theme in Schools of Magic: Book 2 of the Chronomancer Series",
+      "Central theme in Schools of Magic: Book 2 of the Chronomancer Series -> relates_to -> Literature & Fiction",
+      "Maia Szalavitz -> wrote -> Unbroken Brain: A Revolutionary New Way of Understanding Addiction",
+      "Unbroken Brain: A Revolutionary New Way of Understanding Addiction -> explores -> Central theme in Unbroken Brain: A Revolutionary New Way of Understanding Addiction",
+      "Central theme in Unbroken Brain: A Revolutionary New Way of Understanding Addiction -> relates_to -> Literature & Fiction",
+      "Zen Cho -> wrote -> Spirits Abroad (ebook)",
+      "Spirits Abroad (ebook) -> explores -> Central theme in Spirits Abroad (ebook)",
+      "Central theme in Spirits Abroad (ebook) -> relates_to -> Literature & Fiction",
+      "C. Nicole Mason -> wrote -> Born Bright: A Young Girl's Journey from Nothing to Something in America"
+    ],
+    "processing_time_seconds": 115,
+    "timestamp": "2025-07-14T10:46:22.341610"
+  },
+  {
+    "agent_id": "temp_kg_agent_04",
+    "specialization": "History & Biography",
+    "books_processed": 80,
+    "graph_metrics": {
+      "concept_nodes": 155,
+      "entity_nodes": 155,
+      "relationship_edges": 240,
+      "graph_density": 0.77,
+      "avg_connections_per_node": 1.5
+    },
+    "top_concepts": [
+      "Central theme in Man's Search for Meaning",
+      "Key concept from Frankl, Viktor E.'s work",
+      "History & Biography methodology",
+      "Central theme in Where We Go When All We Were Is Gone",
+      "Key concept from Sequoia Nagamatsu's work"
+    ],
+    "top_entities": [
+      "Author: Frankl, Viktor E.",
+      "Work: Man's Search for Meaning",
+      "Domain: History & Biography",
+      "Author: Sequoia Nagamatsu",
+      "Work: Where We Go When All We Were Is Gone"
+    ],
+    "sample_relationships": [
+      "Frankl, Viktor E. -> wrote -> Man's Search for Meaning",
+      "Man's Search for Meaning -> explores -> Central theme in Man's Search for Meaning",
+      "Central theme in Man's Search for Meaning -> relates_to -> History & Biography",
+      "Sequoia Nagamatsu -> wrote -> Where We Go When All We Were Is Gone",
+      "Where We Go When All We Were Is Gone -> explores -> Central theme in Where We Go When All We Were Is Gone",
+      "Central theme in Where We Go When All We Were Is Gone -> relates_to -> History & Biography",
+      "Aristotle -> wrote -> The Nicomachean ethics",
+      "The Nicomachean ethics -> explores -> Central theme in The Nicomachean ethics",
+      "Central theme in The Nicomachean ethics -> relates_to -> History & Biography",
+      "Pierre Boulle -> wrote -> Planet Of The Apes"
+    ],
+    "processing_time_seconds": 75,
+    "timestamp": "2025-07-14T10:46:22.341694"
+  },
+  {
+    "agent_id": "temp_kg_agent_05",
+    "specialization": "Social Sciences",
+    "books_processed": 80,
+    "graph_metrics": {
+      "concept_nodes": 158,
+      "entity_nodes": 158,
+      "relationship_edges": 240,
+      "graph_density": 0.76,
+      "avg_connections_per_node": 1.5
+    },
+    "top_concepts": [
+      "Central theme in The Selfish Gene",
+      "Key concept from Richard Dawkins's work",
+      "Social Sciences methodology",
+      "Central theme in Wayne of Gotham",
+      "Key concept from Tracy Hickman's work"
+    ],
+    "top_entities": [
+      "Author: Richard Dawkins",
+      "Work: The Selfish Gene",
+      "Domain: Social Sciences",
+      "Author: Tracy Hickman",
+      "Work: Wayne of Gotham"
+    ],
+    "sample_relationships": [
+      "Richard Dawkins -> wrote -> The Selfish Gene",
+      "The Selfish Gene -> explores -> Central theme in The Selfish Gene",
+      "Central theme in The Selfish Gene -> relates_to -> Social Sciences",
+      "Tracy Hickman -> wrote -> Wayne of Gotham",
+      "Wayne of Gotham -> explores -> Central theme in Wayne of Gotham",
+      "Central theme in Wayne of Gotham -> relates_to -> Social Sciences",
+      "Kathi Weeks -> wrote -> The Problem with Work: Feminism, Marxism, Antiwork Politics, and Postwork Imaginaries (a John Hope Franklin Center Book)",
+      "The Problem with Work: Feminism, Marxism, Antiwork Politics, and Postwork Imaginaries (a John Hope Franklin Center Book) -> explores -> Central theme in The Problem with Work: Feminism, Marxism, Antiwork Politics, and Postwork Imaginaries (a John Hope Franklin Center Book)",
+      "Central theme in The Problem with Work: Feminism, Marxism, Antiwork Politics, and Postwork Imaginaries (a John Hope Franklin Center Book) -> relates_to -> Social Sciences",
+      "Gene Wolfe -> wrote -> THE SWORD OF THE LICTOR"
+    ],
+    "processing_time_seconds": 72,
+    "timestamp": "2025-07-14T10:46:22.341778"
+  },
+  {
+    "agent_id": "temp_kg_agent_06",
+    "specialization": "Arts & Culture",
+    "books_processed": 80,
+    "graph_metrics": {
+      "concept_nodes": 160,
+      "entity_nodes": 160,
+      "relationship_edges": 240,
+      "graph_density": 0.75,
+      "avg_connections_per_node": 1.5
+    },
+    "top_concepts": [
+      "Central theme in American Psychosis",
+      "Key concept from Executive Director E Fuller, M. D. Torrey's work",
+      "Arts & Culture methodology",
+      "Central theme in Right by My Side",
+      "Key concept from David Haynes's work"
+    ],
+    "top_entities": [
+      "Author: Executive Director E Fuller, M. D. Torrey",
+      "Work: American Psychosis",
+      "Domain: Arts & Culture",
+      "Author: David Haynes",
+      "Work: Right by My Side"
+    ],
+    "sample_relationships": [
+      "Executive Director E Fuller, M. D. Torrey -> wrote -> American Psychosis",
+      "American Psychosis -> explores -> Central theme in American Psychosis",
+      "Central theme in American Psychosis -> relates_to -> Arts & Culture",
+      "David Haynes -> wrote -> Right by My Side",
+      "Right by My Side -> explores -> Central theme in Right by My Side",
+      "Central theme in Right by My Side -> relates_to -> Arts & Culture",
+      "Pete Walker -> wrote -> Complex PTSD: From Surviving to Thriving: A Guide and Map for Recovering From Childhood Trauma",
+      "Complex PTSD: From Surviving to Thriving: A Guide and Map for Recovering From Childhood Trauma -> explores -> Central theme in Complex PTSD: From Surviving to Thriving: A Guide and Map for Recovering From Childhood Trauma",
+      "Central theme in Complex PTSD: From Surviving to Thriving: A Guide and Map for Recovering From Childhood Trauma -> relates_to -> Arts & Culture",
+      "T. L. Huchu -> wrote -> The Library of the Dead"
+    ],
+    "processing_time_seconds": 108,
+    "timestamp": "2025-07-14T10:46:22.341861"
+  },
+  {
+    "agent_id": "temp_kg_agent_07",
+    "specialization": "Religion & Spirituality",
+    "books_processed": 80,
+    "graph_metrics": {
+      "concept_nodes": 160,
+      "entity_nodes": 160,
+      "relationship_edges": 240,
+      "graph_density": 0.75,
+      "avg_connections_per_node": 1.5
+    },
+    "top_concepts": [
+      "Central theme in Reading behind Bars",
+      "Key concept from Jill Grunenwald's work",
+      "Religion & Spirituality methodology",
+      "Central theme in Lithium",
+      "Key concept from Walter A. Brown's work"
+    ],
+    "top_entities": [
+      "Author: Jill Grunenwald",
+      "Work: Reading behind Bars",
+      "Domain: Religion & Spirituality",
+      "Author: Walter A. Brown",
+      "Work: Lithium"
+    ],
+    "sample_relationships": [
+      "Jill Grunenwald -> wrote -> Reading behind Bars",
+      "Reading behind Bars -> explores -> Central theme in Reading behind Bars",
+      "Central theme in Reading behind Bars -> relates_to -> Religion & Spirituality",
+      "Walter A. Brown -> wrote -> Lithium",
+      "Lithium -> explores -> Central theme in Lithium",
+      "Central theme in Lithium -> relates_to -> Religion & Spirituality",
+      "Ash Bishop -> wrote -> Intergalactic Exterminators, Inc",
+      "Intergalactic Exterminators, Inc -> explores -> Central theme in Intergalactic Exterminators, Inc",
+      "Central theme in Intergalactic Exterminators, Inc -> relates_to -> Religion & Spirituality",
+      "Hamilton Nolan -> wrote -> The Hammer"
+    ],
+    "processing_time_seconds": 110,
+    "timestamp": "2025-07-14T10:46:22.341942"
+  },
+  {
+    "agent_id": "temp_kg_agent_08",
+    "specialization": "Business & Economics",
+    "books_processed": 80,
+    "graph_metrics": {
+      "concept_nodes": 159,
+      "entity_nodes": 159,
+      "relationship_edges": 240,
+      "graph_density": 0.75,
+      "avg_connections_per_node": 1.5
+    },
+    "top_concepts": [
+      "Central theme in Stoic Six Pack - Meditations of Marcus Aurelius, Golden Sayings, Fragments and Discourses of Epictetus, Letters From A Stoic and The Enchiridion (Illustrated)",
+      "Key concept from Seneca's work",
+      "Business & Economics methodology",
+      "Central theme in Fremder",
+      "Key concept from Russell Hoban's work"
+    ],
+    "top_entities": [
+      "Author: Seneca",
+      "Work: Stoic Six Pack - Meditations of Marcus Aurelius, Golden Sayings, Fragments and Discourses of Epictetus, Letters From A Stoic and The Enchiridion (Illustrated)",
+      "Domain: Business & Economics",
+      "Author: Russell Hoban",
+      "Work: Fremder"
+    ],
+    "sample_relationships": [
+      "Seneca -> wrote -> Stoic Six Pack - Meditations of Marcus Aurelius, Golden Sayings, Fragments and Discourses of Epictetus, Letters From A Stoic and The Enchiridion (Illustrated)",
+      "Stoic Six Pack - Meditations of Marcus Aurelius, Golden Sayings, Fragments and Discourses of Epictetus, Letters From A Stoic and The Enchiridion (Illustrated) -> explores -> Central theme in Stoic Six Pack - Meditations of Marcus Aurelius, Golden Sayings, Fragments and Discourses of Epictetus, Letters From A Stoic and The Enchiridion (Illustrated)",
+      "Central theme in Stoic Six Pack - Meditations of Marcus Aurelius, Golden Sayings, Fragments and Discourses of Epictetus, Letters From A Stoic and The Enchiridion (Illustrated) -> relates_to -> Business & Economics",
+      "Russell Hoban -> wrote -> Fremder",
+      "Fremder -> explores -> Central theme in Fremder",
+      "Central theme in Fremder -> relates_to -> Business & Economics",
+      "H.G. Wells -> wrote -> The First Men in the Moon",
+      "The First Men in the Moon -> explores -> Central theme in The First Men in the Moon",
+      "Central theme in The First Men in the Moon -> relates_to -> Business & Economics",
+      "Joseph M. Marshall, III -> wrote -> Returning to the Lakota Way"
+    ],
+    "processing_time_seconds": 53,
+    "timestamp": "2025-07-14T10:46:22.342022"
+  },
+  {
+    "agent_id": "temp_kg_agent_09",
+    "specialization": "Health & Psychology",
+    "books_processed": 80,
+    "graph_metrics": {
+      "concept_nodes": 161,
+      "entity_nodes": 161,
+      "relationship_edges": 240,
+      "graph_density": 0.75,
+      "avg_connections_per_node": 1.5
+    },
+    "top_concepts": [
+      "Central theme in 24/6",
+      "Key concept from Tiffany Shlain's work",
+      "Health & Psychology methodology",
+      "Central theme in Into the Woods",
+      "Key concept from John Yorke's work"
+    ],
+    "top_entities": [
+      "Author: Tiffany Shlain",
+      "Work: 24/6",
+      "Domain: Health & Psychology",
+      "Author: John Yorke",
+      "Work: Into the Woods"
+    ],
+    "sample_relationships": [
+      "Tiffany Shlain -> wrote -> 24/6",
+      "24/6 -> explores -> Central theme in 24/6",
+      "Central theme in 24/6 -> relates_to -> Health & Psychology",
+      "John Yorke -> wrote -> Into the Woods",
+      "Into the Woods -> explores -> Central theme in Into the Woods",
+      "Central theme in Into the Woods -> relates_to -> Health & Psychology",
+      "Doris Kearns Goodwin -> wrote -> Team of Rivals: The Political Genius of Abraham Lincoln",
+      "Team of Rivals: The Political Genius of Abraham Lincoln -> explores -> Central theme in Team of Rivals: The Political Genius of Abraham Lincoln",
+      "Central theme in Team of Rivals: The Political Genius of Abraham Lincoln -> relates_to -> Health & Psychology",
+      "Various Authors -> wrote -> The Book of Martyrs"
+    ],
+    "processing_time_seconds": 51,
+    "timestamp": "2025-07-14T10:46:22.342102"
+  },
+  {
+    "agent_id": "temp_kg_agent_10",
+    "specialization": "Education & Reference",
+    "books_processed": 80,
+    "graph_metrics": {
+      "concept_nodes": 160,
+      "entity_nodes": 160,
+      "relationship_edges": 240,
+      "graph_density": 0.75,
+      "avg_connections_per_node": 1.5
+    },
+    "top_concepts": [
+      "Central theme in Notes on Modern Irrationality",
+      "Key concept from Amanda Montell's work",
+      "Education & Reference methodology",
+      "Central theme in Abuelita Faith",
+      "Key concept from Kat Armas's work"
+    ],
+    "top_entities": [
+      "Author: Amanda Montell",
+      "Work: Notes on Modern Irrationality",
+      "Domain: Education & Reference",
+      "Author: Kat Armas",
+      "Work: Abuelita Faith"
+    ],
+    "sample_relationships": [
+      "Amanda Montell -> wrote -> Notes on Modern Irrationality",
+      "Notes on Modern Irrationality -> explores -> Central theme in Notes on Modern Irrationality",
+      "Central theme in Notes on Modern Irrationality -> relates_to -> Education & Reference",
+      "Kat Armas -> wrote -> Abuelita Faith",
+      "Abuelita Faith -> explores -> Central theme in Abuelita Faith",
+      "Central theme in Abuelita Faith -> relates_to -> Education & Reference",
+      "James Lovegrove -> wrote -> The Cthulhu Casebooks",
+      "The Cthulhu Casebooks -> explores -> Central theme in The Cthulhu Casebooks",
+      "Central theme in The Cthulhu Casebooks -> relates_to -> Education & Reference",
+      "Mike McCormack -> wrote -> This Plague of Souls"
+    ],
+    "processing_time_seconds": 100,
+    "timestamp": "2025-07-14T10:46:22.342183"
+  }
+]

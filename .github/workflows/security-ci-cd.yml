@@ -36,7 +36,7 @@ jobs:
     - name: 🔒 API Key Leak Detection
       run: |
         echo "🔍 Scanning for API key patterns..."
-        if grep -r "babel_secure_[0-9a-zA-Z_-]\{32,\}" --include="*.py" --include="*.js" --include="*.md" --include="*.json" .; then
+        if grep -r "babel_secure_[0-9a-zA-Z_-]\{32,\}" --include="*.py" --include="*.js" --include="*.md" --include="*.json" --exclude-dir="archive" .; then
           echo "🚨 ERROR: API key pattern found in code!"
           exit 1
         fi

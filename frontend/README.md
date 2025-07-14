@@ -146,7 +146,7 @@ curl -k -X GET "https://localhost:5563/api/v3/health"
 
 # Test search endpoint
 curl -k -X GET "https://localhost:5563/api/v3/search?q=AI%20consciousness" \
-  -H "X-API-Key: babel_secure_3f99c2d1d294fbebdfc6b10cce93652d"
+  -H "X-API-Key: YOUR_API_KEY_HERE"
 
 # Check frontend logs
 npm run dev # See console output

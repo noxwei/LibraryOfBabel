@@ -15,7 +15,7 @@ sys.path.insert(0, src_dir)
 app = Flask(__name__)
 
 # Simple API key check
-API_KEY = "babel_secure_8a52a0ad3a1fe3bf3ade37d04deef0054d8f58035a0e9d4760a9a08548d8cebf"
+API_KEY = os.getenv('API_KEY', 'YOUR_API_KEY_HERE')  # Set via environment variable
 
 def check_api_key():
     """Check API key from headers"""
