@@ -20,7 +20,22 @@
       "Bash(mv:*)",
       "Bash(mkdir:*)",
       "Bash(gh secret:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(if find . -name \".env*\" -not -path \"./node_modules/*\" -not -name \"*.example\" -not -name \"*.template\" -not -name \"*.sample\")",
+      "Bash(then echo \"🚨 ERROR: Real environment files found in repository!\")",
+      "Bash(exit 1)",
+      "Bash(fi)",
+      "Bash(git rm:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run watch:*)",
+      "Bash(gh run view:*)",
+      "Bash(kill:*)",
+      "Bash(export API_KEY=\"babel_secure_LKi-NkGfNRI3-plfVA3ud8vG8v-SzbTSbhl34LW5QzE\")",
+      "Bash(API_KEY=babel_secure_LKi-NkGfNRI3-plfVA3ud8vG8v-SzbTSbhl34LW5QzE python3 src/api/secure_paginated_api.py)",
+      "Bash(sudo fuser:*)",
+      "Bash(launchctl:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }
