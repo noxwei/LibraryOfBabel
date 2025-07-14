@@ -43,7 +43,7 @@ npm run start-dev
 
 4. **Open Your Browser**
 - **Frontend**: http://localhost:3000 (Beautiful mystical interface)
-- **Backend**: http://localhost:5570 (API for advanced users)
+- **Backend**: http://localhost:5562 (Secure paginated API - 838 books)
 
 ### **Classroom Network Setup**
 
@@ -60,7 +60,7 @@ The system will automatically detect your local IP (e.g., 10.0.0.13)
 
 3. **Student Access**
 - **Hell Theme**: http://YOUR_IP:5571 (Red/black dramatic theme)
-- **Quest Theme**: http://YOUR_IP:5572 (Gold/blue scholarly theme)
+- **Production API**: https://api.ashortstayinhell.com:5562 (838 books, authenticated)
 
 ### **Educational Features**
 - ✅ **Safe Content**: All generated books are educational and appropriate
@@ -230,15 +230,13 @@ cd frontend && npm run build
 3. **Testing Endpoints**
 ```bash
 # Health check
-curl http://localhost:5570/api/health
+curl http://localhost:5562/health
 
 # Search test
-curl -X POST http://localhost:5570/api/search \
-  -H "Content-Type: application/json" \
-  -d '{"query": "infinity paradox", "maxResults": 3}'
+curl "http://localhost:5562/books?api_key=YOUR_API_KEY&search=infinity&page_size=3"
 
 # Network scan (for local testing)
-curl http://localhost:5571/api/network/scan
+curl "http://localhost:5562/search?api_key=YOUR_API_KEY&q=paradox"
 ```
 
 ### **Development Workflow**
@@ -270,7 +268,7 @@ curl http://localhost:5571/api/network/scan
 #### **Port Already in Use**
 ```bash
 # Kill processes on specific ports
-lsof -ti:5570 | xargs kill -9
+lsof -ti:5562 | xargs kill -9
 lsof -ti:3000 | xargs kill -9
 ```
 
@@ -307,7 +305,7 @@ DEBUG=* npm start
 ### **Educational Troubleshooting**
 
 #### **Students Can't Access on Network**
-1. **Check Firewall**: Ensure ports 5571-5572 are open
+1. **Check Firewall**: Ensure port 5562 is open for API access
 2. **Verify IP**: Use `ipconfig` (Windows) or `ifconfig` (Mac/Linux)
 3. **Test Connection**: `ping YOUR_IP` from student device
 4. **Alternative**: Use localhost and share screen
