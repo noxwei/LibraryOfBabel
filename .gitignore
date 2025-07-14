@@ -186,3 +186,81 @@ docs/reports/REDDIT_BIBLIOPHILE_500_BOOKS_LIST_2.md
 PRODUCTION_DEPLOYMENT_SUCCESS.md
 manual_deploy_to_production.py
 .claude/settings.local.json
+
+# 🔒 Security QA Agent - Sensitive Data Protection
+# Database credentials and connection strings
+*.env
+.env*
+database.conf
+db_config.json
+connection_strings.txt
+
+# Agent workspace and sensitive reports
+agents/*/workspace/
+agents/*/reports/
+agents/*/logs/
+**/workspace/
+**/sensitive_reports/
+
+# API keys and tokens
+api_keys.txt
+tokens.json
+credentials.json
+secrets.json
+
+# Python cache and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.coverage
+.pytest_cache/
+*.egg-info/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary processing files
+temp/
+tmp/
+*.tmp
+*.log
+*.bak
+
+# Large data files that shouldn't be in git
+*.epub
+raw_downloads/
+large_datasets/
+processed_data/
+vector_embeddings/
+
+# Node.js (if any frontend components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test reports and coverage
+test_reports/
+coverage/
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
