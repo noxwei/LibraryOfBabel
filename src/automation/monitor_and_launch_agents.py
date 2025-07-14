@@ -91,14 +91,26 @@ def main():
     
     # Check initial status
     status = check_embedding_completion()
-    
+
     if status.get('is_complete'):
         logger.info("✅ Embeddings already complete! Launching agents immediately...")
         launch_agent_demo()
         return
-    
-    logger.info(f"📊 Initial status: {status.get('embedded', 0)}/{status.get('total', 0)} "
-               f"chunks embedded ({status.get('completion_pct', 0):.1f}%)")
+
+    logger.info(
+        f"📊 Initial status: {status.get('embedded', 0)}/{status.get('total', 0)} "
+        f"chunks embedded ({status.get('completion_pct', 0):.1f}%)"
+    )
+    logger.info("🚀 Starting embedding generation process...")
+    try:
+        subprocess.run([
+            'python3', '../vector_embeddings.py', '--generate'
+        ], check=True)
+    except Exception as e:
+        logger.error(f"Embedding generation process failed: {e}")
+
+    # Refresh status after attempting generation
+    status = check_embedding_completion()
     
     # Monitor until complete
     check_interval = 300  # Check every 5 minutes
