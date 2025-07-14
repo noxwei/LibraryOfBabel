@@ -43,11 +43,17 @@ The system enables instant AI-powered research across thousands of books, revolu
 - **[QA Testing Guide](docs/guides/QA_TESTING_GUIDE.md)** - Comprehensive testing procedures
 
 ### 🎯 **Quick Start for Wei**
-1. **Check if working**: `curl -s https://api.ashortstayinhell.com:5563/api/v3/health`
-2. **Search books**: `curl -k "https://api.ashortstayinhell.com:5563/api/v3/search?q=consciousness&api_key=YOUR_KEY"`
-3. **If broken**: `cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel" && bash scripts/health-check.sh`
+1. **Check if working**: `curl -s https://api.ashortstayinhell.com:5562/api/v3/health`
+2. **Search books**: `curl -k "https://api.ashortstayinhell.com:5562/api/v3/search?q=consciousness&api_key=YOUR_KEY"`
+3. **Chat with Lexi**:
+   ```bash
+   curl -k -H "Content-Type: application/json" \
+        -d '{"query": "hello"}' \
+        https://api.ashortstayinhell.com:5562/api/v3/lexi
+   ```
+4. **If broken**: `cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel" && bash scripts/health-check.sh`
 
-**That's it. Three commands. Write them down.**
+**That's it. Four commands. Write them down.**
 
 ## Current Status: NEXT PHASE - Borges' Library of Babel Implementation! 🎉
 
@@ -115,7 +121,7 @@ The system enables instant AI-powered research across thousands of books, revolu
 - 🧪 **Comprehensive Testing**: Full test suite with Reddit Bibliophile analysis
 
 ### ✅ **Vector Search System Complete**
-- 🧠 **Vector Embeddings**: 3,839 chunks embedded (100% completion)
+- 🧠 **Vector Embeddings**: embedding_array fully populated
 - 🔍 **Semantic Search**: Operational with 768-dimensional embeddings
 - ⚡ **Performance**: Sub-100ms semantic search response times
 - 🤖 **AI Integration**: nomic-embed-text model integration complete
@@ -138,6 +144,7 @@ The system enables instant AI-powered research across thousands of books, revolu
 - 📚 **Priority Downloads**: Process completed books first via Babel's Archive
 - 🔄 **Auto-Processing**: EPUBs automatically flow into LibraryOfBabel pipeline
 - 🧠 **Knowledge Enhancement**: AI agents gain access to completed reading collection
+- 🛠️ **Automatic Embedding Generation**: Missing vectors are created on demand
 - 🔍 **Enhanced Search**: Query across personally validated high-value content
 
 ## Features
@@ -151,7 +158,7 @@ The system enables instant AI-powered research across thousands of books, revolu
 - **Performance**: Sub-second natural language processing with comprehensive results
 
 ### 🧠 Vector Search & Semantic Discovery
-- **768-Dimensional Embeddings**: 3,839 chunks embedded with nomic-embed-text
+- **768-Dimensional Embeddings**: All chunks embedded with nomic-embed-text
 - **Semantic Search**: Cross-domain concept discovery beyond keyword matching
 - **Cosine Similarity**: Advanced relevance scoring for research queries
 - **Knowledge Discovery**: Find connections between philosophy, technology, politics
@@ -314,12 +321,13 @@ LibraryOfBabel/
 - **Programming**: Python 3.8+ for processing scripts
 - **API**: Flask for REST endpoints
 - **Vector Search**: Framework ready for embeddings
+- **Graph Analysis**: `networkx` and `matplotlib` for visualization and monitoring
 
 ## Production Deployment
 
 ### ✅ **System Complete**
 The LibraryOfBabel system is **production-ready** with all core features operational:
-- ✅ Vector embeddings complete (3,839 chunks)
+- ✅ Vector embeddings fully populated (`embedding_array` column)
 - ✅ Semantic search API operational
 - ✅ Let's Encrypt SSL certificates
 - ✅ Custom domain configuration

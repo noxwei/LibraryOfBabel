@@ -7,7 +7,7 @@ Simplified production-ready API for immediate deployment
 Consolidates core functionality without complex dependencies
 """
 
-from flask import Flask, request, jsonify, g
+from flask import Flask, request, jsonify, g, Response
 import psycopg2
 import psycopg2.extras
 import logging
@@ -1691,22 +1691,26 @@ def lexi_chat():
         }
         
         logger.info(f"[LEXI DEBUG] Final response for query {user_query}: {repr(lexi_response)}")
-        logger.info(f"🎭 LEXI: Query processed in {response_time:.3f}s - {len(unique_books)} books, {total_books_found} passages")
-        
-        return jsonify(lexi_response_data)
+        logger.info(
+            f"🎭 LEXI: Query processed in {response_time:.3f}s - {len(unique_books)} books, {total_books_found} passages"
+        )
+
+        response_json = json.dumps(lexi_response_data, ensure_ascii=False)
+        return Response(response_json, mimetype="application/json")
         
     except Exception as e:
         import traceback
         logger.error(f"❌ Mascot chat error: {e}")
         logger.error(f"❌ Full traceback: {traceback.format_exc()}")
-        return jsonify({
+        error_payload = {
             'success': False,
             'error': 'Mascot temporarily unavailable',
             'mascot': 'lexi',
             'message': 'oops! something went wrong on my end. try again? 🤖',
             'fallback_message': 'LibraryOfBabel search is still available at /api/v3/search',
             'timestamp': datetime.now().isoformat()
-        }), 500
+        }
+        return Response(json.dumps(error_payload, ensure_ascii=False), status=500, mimetype='application/json')
 
 def _generate_lexi_response(query, search_results, unique_books, total_passages, conversation_context=None, agent_memory_context=None, memory_context=None):
     """Generate Lexi's official personality response - THE LibraryOfBabel mascot with conversation memory and team awareness"""
