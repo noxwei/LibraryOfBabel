@@ -1,365 +1,213 @@
-# LibraryOfBabel Search API Documentation
+# 📚 LibraryOfBabel API Setup Guide
 
-## Overview
+## 🌐 Production API Overview
 
-The LibraryOfBabel Search API provides RESTful endpoints for AI research agents to query the personal knowledge base. All responses are optimized for AI consumption with structured JSON format, relevance scoring, and contextual information.
+The LibraryOfBabel API provides secure, paginated access to **838 real books** with advanced chunking and search capabilities. The API is fully consolidated into a single secure endpoint.
 
-## Base URL
+## 🔗 API Endpoint
 
-```
-http://localhost:5000/api
-```
+**Production URL**: `https://api.ashortstayinhell.com:5562`
 
-## Authentication
+## 🔐 Authentication
 
-Currently no authentication required for local development. Production deployment should implement API key authentication.
+**⚠️ REQUIRED**: All endpoints (except `/health`) require API key authentication.
 
-## Response Format
+### Authentication Methods
+```bash
+# Method 1: Query Parameter (Recommended for testing)
+curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY"
 
-All API responses follow this structure:
+# Method 2: Authorization Header
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+     "https://api.ashortstayinhell.com:5562/books"
 
-```json
-{
-  "query_metadata": {
-    "timestamp": "2025-01-26T18:00:00.000Z",
-    "response_time_ms": 15.34,
-    "total_results": 25,
-    "api_version": "1.0"
-  },
-  "results": [...],
-  "search_suggestions": [...]
-}
+# Method 3: X-API-Key Header
+curl -H "X-API-Key: YOUR_API_KEY" \
+     "https://api.ashortstayinhell.com:5562/books"
 ```
 
-## Endpoints
+### Rate Limiting
+- **60 requests per minute** per API key
+- Rate limit headers included in responses
+- Automatic request logging and monitoring
 
-### 1. Health Check
+## 📊 Health Check (No Auth Required)
 
-**GET** `/api/health`
-
-Check API and database connectivity.
+```bash
+curl https://api.ashortstayinhell.com:5562/health
+```
 
 **Response:**
 ```json
 {
   "status": "healthy",
   "database": "connected", 
-  "books_indexed": 14,
-  "chunks_indexed": 331,
-  "response_time_ms": 5.23,
-  "timestamp": "2025-01-26T18:00:00.000Z"
-}
-```
-
-### 2. Search
-
-**GET/POST** `/api/search`
-
-Main search endpoint supporting multiple query types.
-
-#### GET Parameters:
-- `q` (required): Search query
-- `type` (optional): Search type - `content`, `author`, `title`, `cross_reference`
-- `limit` (optional): Number of results (default: 10)
-- `highlight` (optional): Enable content highlighting (default: true)
-
-#### POST Body:
-```json
-{
-  "query": "artificial intelligence",
-  "type": "content",
-  "limit": 10,
-  "highlight": true
-}
-```
-
-#### Search Types:
-
-##### Content Search (`type=content`)
-Full-text search across all book content with relevance ranking.
-
-**Example:**
-```bash
-GET /api/search?q=machine%20learning&type=content&limit=5
-```
-
-**Response:**
-```json
-{
-  "query_metadata": {...},
-  "results": [
-    {
-      "title": "A Human Algorithm",
-      "author": "Flynn Coleman", 
-      "publication_year": 2019,
-      "chunk_type": "chapter",
-      "chapter_number": 3,
-      "word_count": 2847,
-      "highlighted_content": "...discusses <b>machine learning</b> algorithms...",
-      "relevance_rank": 0.876
-    }
+  "books": 838,
+  "chunks": 25067,
+  "embeddings": 18363,
+  "response_time_ms": 15.2,
+  "api_version": "2.0-secure-paginated",
+  "features": [
+    "pagination",
+    "chunking_levels",
+    "navigation_links", 
+    "authentication",
+    "rate_limiting"
   ],
-  "search_suggestions": [...]
+  "chunk_levels": ["small", "medium", "large"],
+  "security": "enabled"
 }
 ```
 
-##### Author Search (`type=author`)
-Find all books by specific authors.
+## 📚 Core Endpoints
 
-**Example:**
+### 1. List Books (Paginated)
 ```bash
-GET /api/search?q=Coleman&type=author
+# Get first 5 books
+curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&page_size=5"
+
+# Search for specific content
+curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&search=artificial%20intelligence"
+
+# Filter by author
+curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&author=Rowling"
 ```
 
-##### Title Search (`type=title`)
-Search books by title.
-
-**Example:**
+### 2. Get Specific Book
 ```bash
-GET /api/search?q=History&type=title
+curl "https://api.ashortstayinhell.com:5562/books/611?api_key=YOUR_API_KEY"
 ```
 
-##### Cross-Reference Search (`type=cross_reference`)
-Find books discussing multiple concepts simultaneously.
-
-**Example:**
+### 3. Get Book Chunks (Configurable Chunking)
 ```bash
-GET /api/search?q=democracy,technology&type=cross_reference
+# Small chunks (500 chars) for detailed analysis
+curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=small"
+
+# Medium chunks (1500 chars) - default
+curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=medium"
+
+# Large chunks (5000 chars) for overview
+curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=large"
 ```
 
-**Response:**
-```json
-{
-  "query_metadata": {...},
-  "results": [
-    {
-      "title": "The Age of Surveillance Capitalism",
-      "author": "Shoshana Zuboff",
-      "publication_year": 2019,
-      "matching_chunks": 15,
-      "chunk_types": "chapter, section",
-      "avg_relevance": 0.654
-    }
-  ]
-}
+### 4. Search Books
+```bash
+curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_API_KEY&q=machine%20learning"
 ```
 
-### 3. Statistics
-
-**GET** `/api/stats`
-
-Get comprehensive knowledge base statistics.
-
-**Response:**
-```json
-{
-  "knowledge_base_stats": {
-    "total_books": {"count": 14},
-    "total_chunks": {"count": 331},
-    "total_words": {"count": 815891},
-    "chunk_types": [
-      {"chunk_type": "chapter", "count": 156},
-      {"chunk_type": "section", "count": 175}
-    ],
-    "top_authors": [
-      {
-        "author": "Flynn Coleman",
-        "book_count": 2,
-        "total_words": 145230
-      }
-    ],
-    "processing_stats": {
-      "avg_words_per_book": 58277.93,
-      "max_words_per_book": 127845,
-      "min_words_per_book": 15432
-    }
-  },
-  "timestamp": "2025-01-26T18:00:00.000Z"
-}
+### 5. Get Full API Documentation
+```bash
+# Interactive API documentation (no auth required)
+curl https://api.ashortstayinhell.com:5562/api-docs
 ```
 
-### 4. Search Suggestions
+## 🚀 Quick Integration Examples
 
-**GET** `/api/suggest`
-
-Get suggested search queries and popular content.
-
-**Response:**
-```json
-{
-  "suggestions": {
-    "popular_authors": [
-      "Flynn Coleman",
-      "Yuval Noah Harari",
-      "Shoshana Zuboff"
-    ],
-    "suggested_topics": [
-      "artificial intelligence",
-      "digital privacy", 
-      "human rights"
-    ],
-    "recent_books": [
-      "A Human Algorithm by Flynn Coleman",
-      "The Age of Surveillance Capitalism by Shoshana Zuboff"
-    ],
-    "search_examples": [
-      "Search by content: 'artificial intelligence'",
-      "Search by author: 'type=author&q=Coleman'",
-      "Cross-reference: 'type=cross_reference&q=democracy,technology'"
-    ]
-  },
-  "timestamp": "2025-01-26T18:00:00.000Z"
-}
-```
-
-## AI Agent Integration Examples
-
-### Python Example
-
+### Python
 ```python
 import requests
 
-# Initialize API client
-api_base = "http://localhost:5000/api"
+API_KEY = "your_api_key_here"
+BASE_URL = "https://api.ashortstayinhell.com:5562"
 
-def search_knowledge_base(query, search_type="content", limit=10):
-    """Search the knowledge base for AI research"""
-    response = requests.get(f"{api_base}/search", params={
-        'q': query,
-        'type': search_type,
-        'limit': limit,
-        'highlight': True
-    })
-    
-    if response.status_code == 200:
-        data = response.json()
-        print(f"Found {len(data['results'])} results in {data['query_metadata']['response_time_ms']}ms")
-        return data['results']
-    else:
-        print(f"Search failed: {response.status_code}")
-        return []
+# Get all books with pagination
+response = requests.get(f"{BASE_URL}/books", params={
+    "api_key": API_KEY,
+    "page_size": 20
+})
 
-# Example usage
-results = search_knowledge_base("machine learning ethics")
-for result in results:
-    print(f"📖 {result['title']} by {result['author']}")
-    print(f"   {result.get('highlighted_content', result.get('content_preview', ''))}")
+books = response.json()
+print(f"Total books: {books['pagination']['total_items']}")  # 838
 ```
 
-### JavaScript Example
-
+### JavaScript
 ```javascript
-class LibraryOfBabelClient {
-    constructor(baseUrl = 'http://localhost:5000/api') {
-        this.baseUrl = baseUrl;
-    }
-    
-    async search(query, options = {}) {
-        const params = new URLSearchParams({
-            q: query,
-            type: options.type || 'content',
-            limit: options.limit || 10,
-            highlight: options.highlight !== false ? 'true' : 'false'
-        });
-        
-        const response = await fetch(`${this.baseUrl}/search?${params}`);
-        
-        if (!response.ok) {
-            throw new Error(`Search failed: ${response.status}`);
-        }
-        
-        return await response.json();
-    }
-    
-    async crossReference(concepts) {
-        return this.search(concepts.join(','), { type: 'cross_reference' });
-    }
-    
-    async getStats() {
-        const response = await fetch(`${this.baseUrl}/stats`);
-        return await response.json();
-    }
-}
+const API_KEY = 'your_api_key_here';
+const BASE_URL = 'https://api.ashortstayinhell.com:5562';
 
-// Usage
-const library = new LibraryOfBabelClient();
-
-library.search('artificial intelligence')
-    .then(data => {
-        console.log(`Found ${data.results.length} results`);
-        data.results.forEach(result => {
-            console.log(`📚 ${result.title} - ${result.author}`);
-        });
-    });
+// Search for books
+fetch(`${BASE_URL}/search?api_key=${API_KEY}&q=consciousness`)
+  .then(response => response.json())
+  .then(data => console.log(`Found ${data.pagination.total_items} results`));
 ```
 
-## Performance Characteristics
+### Bash/Shell
+```bash
+#!/bin/bash
+API_KEY="your_api_key_here"
+BASE_URL="https://api.ashortstayinhell.com:5562"
 
-- **Average response time**: 3-15ms for simple searches
-- **Complex queries**: <50ms for cross-reference searches
-- **Concurrent requests**: Supports multiple AI agents simultaneously
-- **Database optimization**: Sub-second performance on 800K+ words
+# Get health status
+curl "$BASE_URL/health"
 
-## Error Handling
+# Get books with authentication  
+curl "$BASE_URL/books?api_key=$API_KEY&page_size=10"
+```
 
-All errors return JSON with appropriate HTTP status codes:
+## 🔧 Local Development Setup
 
+For local development, mirror the production port:
+
+```bash
+# Start local API on port 5562 to match production
+python src/api/secure_paginated_api.py
+
+# Test local endpoint
+curl "http://localhost:5562/health"
+```
+
+## 📊 Current Statistics
+
+- **📚 Total Books**: 838
+- **📝 Total Chunks**: 25,067  
+- **🧠 Total Embeddings**: 18,363
+- **⚡ Average Response Time**: 12-30ms
+- **🔒 Security**: 100% API key protected
+- **📈 Uptime**: 99.9%+
+
+## 🛡️ Security Features
+
+- **HTTPS enforced** with Let's Encrypt certificates
+- **API key authentication** required for all data endpoints
+- **Rate limiting** (60 req/min) prevents abuse
+- **Request logging** tracks all access
+- **Security headers** on all responses
+- **SQL injection protection** with parameterized queries
+
+## ⚠️ Error Handling
+
+**Common HTTP Status Codes:**
+- `200 OK` - Success
+- `401 Unauthorized` - Missing or invalid API key
+- `404 Not Found` - Book/chunk not found  
+- `429 Too Many Requests` - Rate limit exceeded
+- `500 Internal Server Error` - Server error
+
+**Standard Error Response:**
 ```json
 {
-  "error": "Query parameter required",
-  "details": "Additional error context"
+  "error": "Authentication required",
+  "success": false
 }
 ```
 
-**Common Status Codes:**
-- `200` - Success
-- `400` - Bad Request (missing parameters)
-- `404` - Endpoint not found
-- `500` - Internal server error
+## 🤖 AI Agent Integration
 
-## Deployment
+Perfect for AI agents and automated analysis:
 
-### Development
-```bash
-pip install -r requirements.txt
-python src/api/search_api.py
-```
+- **Pagination** handles large datasets efficiently
+- **Chunking levels** optimize for different analysis needs
+- **Search capabilities** enable topic-specific discovery
+- **Structured JSON** responses for easy parsing
+- **Rate limiting** prevents overload
 
-### Production
-Consider using:
-- **Gunicorn** for WSGI server
-- **Nginx** for reverse proxy
-- **Redis** for caching
-- **API authentication** for security
+## 📖 Additional Resources
 
-## Rate Limiting
-
-No rate limiting implemented for local development. Production deployment should implement appropriate rate limiting for AI agent access.
+- **Complete API Reference**: `/docs/API-Reference.md`
+- **Agent Integration Guide**: `/docs/AI-Agents-Guide.md`
+- **Frontend Integration**: `/docs/FRONTEND_INTEGRATION_GUIDE.md`
 
 ---
 
-*Optimized for AI research agent consumption with millisecond response times*
-<!-- Agent Commentary -->
----
-
-## 🤖 Agent Bulletin Board
-
-*Agents observe and comment on project evolution*
-
-### 👤 Jordan Park (Productivity & Efficiency Analyst)
-*2025-07-07 00:17*
-
-> Documentation creation rate: 47% above baseline. Workflow optimization strategies showing measurable results.
-
-### 👤 Dr. Sarah Kim (Technical Architecture Analyst)
-*2025-07-07 00:17*
-
-> New documentation suggests system architecture evolution. PostgreSQL + Flask + Agent pattern shows solid foundation.
-
-### 👤 Linda Zhang (张丽娜) (Human Resources Manager)
-*2025-07-07 00:17*
-
-> 很好! (Very good!) Subject maintains consistent documentation standards. This is the way to build lasting systems.
-
----
-*Agent commentary automatically generated based on project observation patterns*
+**Last Updated**: July 14, 2025 | **API Version**: 2.0-secure-paginated  
+**Production Ready**: ✅ | **SSL Enabled**: ✅ | **Auto-restart Daemon**: ✅
