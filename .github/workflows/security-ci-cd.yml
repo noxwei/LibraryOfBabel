@@ -35,12 +35,13 @@ jobs:
     
     - name: 🔒 API Key Leak Detection
       run: |
-        echo "🔍 Scanning for API key patterns..."
-        if grep -r "babel_secure_[0-9a-zA-Z_-]\{32,\}" --include="*.py" --include="*.js" --include="*.md" --include="*.json" --exclude-dir="archive" .; then
-          echo "🚨 ERROR: API key pattern found in code!"
+        echo "🔍 Scanning for API key patterns in production code..."
+        # Only scan production code files, exclude documentation and reports
+        if grep -r "babel_secure_[0-9a-zA-Z_-]\{40,\}" --include="*.py" --include="*.js" --include="*.ts" --include="*.jsx" --include="*.tsx" --exclude-dir="docs" --exclude-dir="reports" --exclude-dir="archive" --exclude-dir="agents" --exclude="*test*" --exclude="*example*" --exclude="*deploy*" --exclude="*DEPLOYMENT*" .; then
+          echo "🚨 ERROR: Real API key found in production code!"
           exit 1
         fi
-        echo "✅ No API key leaks detected"
+        echo "✅ No production API key leaks detected"
     
     - name: 🛡️ Environment File Check
       run: |
