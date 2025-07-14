@@ -89,9 +89,19 @@ reports/security_report_*.json
 ssl/
 certificates/
 
-# Logs (but not agent architecture)
+# Logs (but not agent architecture) - INCLUDES API KEYS
 *.log
 logs/
+**/logs/
+qa_logs/
+reports/
+
+# API logs that may contain sensitive keys
+*api*.log
+*production*.log
+*secure*.log
+*deployment*.log
+*security*.log
 
 # OS & IDE
 .DS_Store
