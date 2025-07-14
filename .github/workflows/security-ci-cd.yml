@@ -46,11 +46,15 @@ jobs:
     - name: 🛡️ Environment File Check
       run: |
         echo "🔍 Checking for committed environment files..."
-        if find . -name ".env*" -not -path "./node_modules/*" -not -name ".env.example"; then
-          echo "🚨 ERROR: Environment files found in repository!"
+        # Only check files that are actually tracked by git (not just local files)
+        if git ls-files | grep -E "\.env($|\..*)" | grep -v -E "\.(example|template|sample)$"; then
+          echo "🚨 ERROR: Real environment files found in git repository!"
+          echo "💡 Tip: Use .env.example, .env.template, or .env.sample for examples"
+          echo "Found tracked environment files:"
+          git ls-files | grep -E "\.env($|\..*)" | grep -v -E "\.(example|template|sample)$"
           exit 1
         fi
-        echo "✅ No environment files committed"
+        echo "✅ No real environment files committed to git (local .env files are OK)"
 
   # 🧪 Code Quality & Testing
   code-quality:
