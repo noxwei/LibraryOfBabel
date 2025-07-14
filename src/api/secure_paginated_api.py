@@ -82,7 +82,7 @@ logging.basicConfig(
     level=logging.INFO, 
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('../../logs/production_secure_paginated_api.log'),
+        logging.FileHandler('/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/production_secure_paginated_api.log'),
         logging.StreamHandler()
     ]
 )
