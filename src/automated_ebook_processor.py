@@ -32,6 +32,8 @@ sys.path.append('src')
 from epub_processor import EPUBProcessor
 from batch_processor import BatchProcessor
 from database_ingestion import DatabaseIngestor
+from deduplication_layer import DeduplicationLayer  # DBA Team deduplication system
+from ollama_vector_embedder import OllamaVectorEmbedder  # Vector embedding integration
 # from frictionless_ebook_harvester import FrictionlessEbookHarvester  # Removed MAM dependency
 
 class AutomatedEbookProcessor:
@@ -59,6 +61,12 @@ class AutomatedEbookProcessor:
             'user': os.getenv('DB_USER', 'weixiangzhang'),
             'port': 5432
         }
+        
+        # DBA Team deduplication system
+        self.deduplication_layer = DeduplicationLayer(self.db_config)
+        
+        # Vector embedding system (Lexi + Dr. Elena integration)
+        self.vector_embedder = OllamaVectorEmbedder(self.db_config)
         
         # Statistics
         self.stats = {
@@ -138,14 +146,35 @@ class AutomatedEbookProcessor:
         return ebooks
     
     def check_already_processed(self, ebook_path: Path) -> bool:
-        """Check if this ebook has already been processed"""
+        """Check if this ebook has already been processed (improved by DBA team)"""
         # Check if file exists in processed directory
         processed_file = self.processed_dir / ebook_path.name
         if processed_file.exists():
             return True
         
-        # Could also check database for existing book by file path
-        # For now, use simple file-based checking
+        # Check database for existing book by file path (Dr. Sarah's enhancement)
+        try:
+            import psycopg2
+            conn = psycopg2.connect(**self.db_config)
+            cursor = conn.cursor()
+            
+            # Check if book already exists in database by file path
+            cursor.execute("""
+                SELECT book_id FROM books 
+                WHERE file_path = %s OR file_path LIKE %s
+            """, (str(ebook_path), f"%{ebook_path.name}%"))
+            
+            result = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            
+            if result:
+                self.logger.debug(f"    📋 Book already in database: ID {result[0]}")
+                return True
+                
+        except Exception as e:
+            self.logger.debug(f"    ⚠️ Database check failed: {e}")
+        
         return False
     
     def process_single_ebook(self, ebook_info: Dict) -> bool:
@@ -190,7 +219,28 @@ class AutomatedEbookProcessor:
                 self.stats['failed'] += 1
                 return False
             
-            # Ingest into PostgreSQL database
+            # DBA Team deduplication check
+            self.logger.info(f"    🔍 DBA Team: Checking for duplicates...")
+            is_safe, duplicates = self.deduplication_layer.is_safe_to_ingest(metadata, chapters)
+            
+            if not is_safe:
+                self.logger.warning(f"    🚫 DUPLICATE DETECTED - Skipping ingestion")
+                for dup in duplicates:
+                    if dup.confidence >= 0.75:
+                        self.logger.warning(f"       📚 {dup.match_type}: {dup.confidence:.2f} - {dup.match_details}")
+                
+                # Log the duplicate prevention
+                self.deduplication_layer.log_duplicate_prevention(metadata, duplicates, "BLOCKED_DUPLICATE")
+                
+                # Move to processed directory (don't try again)
+                processed_path = self.processed_dir / ebook_path.name
+                shutil.move(str(ebook_path), str(processed_path))
+                self.stats['skipped_format'] += 1  # Track as skipped
+                return False
+            
+            self.logger.info(f"    ✅ DBA Team: No duplicates found - proceeding with ingestion")
+            
+            # Ingest into PostgreSQL database with MD5 hash
             success = self._ingest_into_database(metadata, chapters)
             
             if success:
@@ -250,20 +300,23 @@ class AutomatedEbookProcessor:
             return None
     
     def _ingest_into_database(self, metadata, chapters) -> bool:
-        """Ingest processed book into PostgreSQL database"""
+        """Ingest processed book into PostgreSQL database with MD5 hash"""
         try:
             import psycopg2
+            
+            # Generate MD5 hash for this book (Dr. Sarah Chen's requirement)
+            content_md5 = self.deduplication_layer.generate_content_md5(chapters)
             
             # Direct database connection
             conn = psycopg2.connect(**self.db_config)
             cursor = conn.cursor()
             
-            # Insert book metadata
+            # Insert book metadata with MD5 hash
             cursor.execute("""
                 INSERT INTO books (
                     title, author, publisher, publication_date, language,
-                    isbn, description, word_count, file_path, processed_date
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                    isbn, description, word_count, file_path, processed_date, md5_hash
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s)
                 RETURNING book_id
             """, (
                 metadata.title,
@@ -274,7 +327,8 @@ class AutomatedEbookProcessor:
                 metadata.isbn,
                 metadata.description,
                 metadata.total_words,
-                metadata.file_path
+                metadata.file_path,
+                content_md5
             ))
             
             book_id = cursor.fetchone()[0]
@@ -306,6 +360,16 @@ class AutomatedEbookProcessor:
             conn.close()
             
             self.logger.info(f"    ✅ Database: {chunks_inserted} chunks inserted for book ID {book_id}")
+            
+            # Generate vector embeddings (Lexi + DBA team integration)
+            self.logger.info(f"    🧠 Generating vector embeddings...")
+            embedding_success = self.vector_embedder.process_book_with_embeddings(book_id, chapters)
+            
+            if embedding_success:
+                self.logger.info(f"    ✅ Vector embeddings generated and stored")
+            else:
+                self.logger.warning(f"    ⚠️ Vector embedding generation failed (book still processed)")
+            
             return True
             
         except Exception as e:
