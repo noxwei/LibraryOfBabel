@@ -29,9 +29,9 @@ The system enables instant AI-powered research across thousands of books, revolu
 
 ## 📖 Usage Guides
 
-### 🎯 **For Tired Wei (Primary User)**
-- **[WEI-PROOF Usage Guide](docs/WEI_PROOF_USAGE_GUIDE.md)** - The ultimate "I'm tired and can't think" manual
-- **[Apple Shortcuts + Siri](docs/APPLE_SHORTCUTS_PROMPT.md)** - Voice-activated search with Apple Intelligence
+### 🎯 **For Quick Start Users** 🚀
+- **[Simple Usage Guide](docs/SIMPLE_USAGE_GUIDE.md)** - The ultimate "I just want it to work" manual 😴
+- **[Apple Shortcuts + Siri](docs/APPLE_SHORTCUTS_PROMPT.md)** - Voice-activated search with Apple Intelligence 📱
 
 ### 🛠️ **For Developers & Advanced Users**
 - **[API Reference](docs/API-Reference.md)** - Complete API documentation
@@ -42,18 +42,18 @@ The system enables instant AI-powered research across thousands of books, revolu
 - **[HTTPS Domain Restoration Report](docs/HTTPS_DOMAIN_RESTORATION_REPORT.md)** - Complete system recovery documentation
 - **[QA Testing Guide](docs/guides/QA_TESTING_GUIDE.md)** - Comprehensive testing procedures
 
-### 🎯 **Quick Start for Wei**
-1. **Check if working**: `curl -s https://api.ashortstayinhell.com:5562/api/v3/health`
-2. **Search books**: `curl -k "https://api.ashortstayinhell.com:5562/api/v3/search?q=consciousness&api_key=YOUR_KEY"`
+### 🎯 **Quick Start Commands** ⚡
+1. **Check if working**: `curl -s https://your-api-domain.com:5562/api/v3/health` ✅
+2. **Search books**: `curl -k "https://your-api-domain.com:5562/api/v3/search?q=consciousness&api_key=YOUR_KEY"` 🔍
 3. **Chat with Lexi**:
    ```bash
    curl -k -H "Content-Type: application/json" \
         -d '{"query": "hello"}' \
-        https://api.ashortstayinhell.com:5562/api/v3/lexi
+        https://your-api-domain.com:5562/api/v3/lexi
    ```
-4. **If broken**: `cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel" && bash scripts/health-check.sh`
+4. **If broken**: `cd "/path/to/LibraryOfBabel" && bash scripts/health-check.sh` 🔧
 
-**That's it. Four commands. Write them down.**
+**That's it. Four commands. Bookmark this page!** 📌
 
 ## Current Status: NEXT PHASE - Borges' Library of Babel Implementation! 🎉
 
@@ -217,7 +217,7 @@ The system enables instant AI-powered research across thousands of books, revolu
 ### 🚀 **Production API Access** (Let's Encrypt SSL + Custom Domain)
 The LibraryOfBabel API is production-ready with browser-trusted certificates:
 
-**🌐 Production Endpoint:** `https://api.yourdomain.com:5562`
+**🌐 Production Endpoint:** `https://your-api-domain.com:5562`
 - ✅ **Green lock icon** - No security warnings
 - ✅ **Universal compatibility** - Works on all devices and browsers  
 - ✅ **Mobile ready** - Perfect for iOS Shortcuts and mobile apps
@@ -244,29 +244,29 @@ cd src && python3 secure_book_api.py
 
 # Method 1: Bearer Token (Recommended)
 curl -H "Authorization: Bearer YOUR_API_KEY" \
-     "https://api.yourdomain.com:5562/api/secure/books/search-across?q=power"
+     "https://your-api-domain.com:5562/api/secure/books/search-across?q=power"
 
 # Method 2: API Key Header  
 curl -H "X-API-Key: YOUR_API_KEY" \
-     "https://api.yourdomain.com:5562/api/secure/books/search-across?q=consciousness"
+     "https://your-api-domain.com:5562/api/secure/books/search-across?q=consciousness"
 
 # Method 3: URL Parameter (iOS Shortcuts compatible)
-curl "https://api.yourdomain.com:5562/api/secure/books/search-across?q=philosophy&api_key=YOUR_API_KEY"
+curl "https://your-api-domain.com:5562/api/secure/books/search-across?q=philosophy&api_key=YOUR_API_KEY"
 ```
 
 ### 🧠 **Semantic Search Examples**
 ```bash
 # Cross-domain concept discovery
 curl -H "Authorization: Bearer YOUR_API_KEY" \
-     "https://api.yourdomain.com:5562/api/secure/books/search-across?q=digital+surveillance"
+     "https://your-api-domain.com:5562/api/secure/books/search-across?q=digital+surveillance"
 
 # Philosophy + technology intersection
 curl -H "Authorization: Bearer YOUR_API_KEY" \
-     "https://api.yourdomain.com:5562/api/secure/books/search-across?q=artificial+intelligence+ethics"
+     "https://your-api-domain.com:5562/api/secure/books/search-across?q=artificial+intelligence+ethics"
 
 # Knowledge discovery across disciplines
 curl -H "Authorization: Bearer YOUR_API_KEY" \
-     "https://api.yourdomain.com:5562/api/secure/books/search-across?q=posthuman+consciousness"
+     "https://your-api-domain.com:5562/api/secure/books/search-across?q=posthuman+consciousness"
 ```
 
 ## Core Architecture
