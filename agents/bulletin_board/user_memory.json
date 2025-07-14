@@ -435,6 +435,46 @@
         "description": "User query: 'What is your favorite book?...' | Lexi response: 'Based on our conversation, What is your favorite book? I'm here to help! \ud83d\ude80\u2728...' | Books found: 8",
         "session_id": "favorite_book_test_fixed"
       }
+    ],
+    "lexi_session_1752219110": [
+      {
+        "timestamp": "2025-07-11T03:31:57.095758",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Hiii...' | Lexi response: 'Based on our conversation, Hiii I found some relevant books: A Psalm for the Wild-Built, A Thousand ...' | Books found: 8",
+        "session_id": "lexi_session_1752219110"
+      }
+    ],
+    "lexi_session_1752219138": [
+      {
+        "timestamp": "2025-07-11T03:32:22.801482",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Hiiiiii...' | Lexi response: 'Based on our conversation, Hiiiiii I found some relevant books: A Psalm for the Wild-Built, A Thousa...' | Books found: 10",
+        "session_id": "lexi_session_1752219138"
+      }
+    ],
+    "lexi_session_1752219173": [
+      {
+        "timestamp": "2025-07-11T03:32:59.801362",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Hellooooo...' | Lexi response: 'Based on our conversation, Hellooooo I found some relevant books: The Calculating Stars: A Lady Astr...' | Books found: 20",
+        "session_id": "lexi_session_1752219173"
+      }
+    ],
+    "lexi_session_1752219211": [
+      {
+        "timestamp": "2025-07-11T03:33:38.652487",
+        "action_type": "lexi_chat",
+        "description": "User query: 'What do you recommend for philosophy books?...' | Lexi response: 'Based on our conversation, I'd love to recommend some books! I have 363 books in my library covering...' | Books found: 13",
+        "session_id": "lexi_session_1752219211"
+      }
+    ],
+    "lexi_session_1752219294": [
+      {
+        "timestamp": "2025-07-11T03:34:59.364653",
+        "action_type": "lexi_chat",
+        "description": "User query: 'Which book?...' | Lexi response: 'Based on our conversation, Which book? I'm here to help! \ud83d\ude80\u2728...' | Books found: 16",
+        "session_id": "lexi_session_1752219294"
+      }
     ]
   }
 }
