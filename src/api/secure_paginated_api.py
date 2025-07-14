@@ -716,7 +716,7 @@ def api_documentation():
 if __name__ == '__main__':
     # Set environment variable for production if not already set
     if not os.getenv('API_KEY'):
-        os.environ['API_KEY'] = 'babel_secure_YOUR_KEY_HERE_SET_VIA_ENVIRONMENT'
+        os.environ['API_KEY'] = 'babel_secure_PLACEHOLDER_SET_REAL_KEY_VIA_ENV'
     
     logger.info("🚀 Starting LibraryOfBabel Secure Paginated API v2.0")
     logger.info(f"🔐 Security: API Key Authentication + Rate Limiting")
