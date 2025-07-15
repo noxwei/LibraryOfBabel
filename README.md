@@ -255,6 +255,7 @@ LibraryOfBabel Unified System/
 ## 📖 **Documentation**
 
 - **[Unified API Reference](docs/API-Reference-Unified.md)** - Complete endpoint documentation
+- **[Story Generation API](docs/STORY_GENERATION_API.md)** - 🆕 Advanced AI-powered narrative creation
 - **[Endpoint Summary](docs/ENDPOINT_SUMMARY.md)** - Quick reference guide
 - **[Centralized Config Guide](docs/CENTRALIZED_CONFIG_GUIDE.md)** - Configuration management
 - **[Security Guide](docs/Security-Guide.md)** - Security best practices
@@ -344,6 +345,9 @@ The LibraryOfBabel Unified API is production-ready and serving **1,006 books** w
 - ✅ **Centralized Configuration**: Secure, automated configuration management
 - ✅ **QA Security Agent**: Enhanced security monitoring and protection
 - ✅ **Collection Growth**: Expanded from 838 to 1,006 books (+20% growth!)
+- 🆕 **Story Generation Suite**: Advanced AI-powered narrative creation system
+- 🆕 **Lexi's Template Engine**: Seed-based reproducible story generation
+- 🆕 **RAG Integration**: Ollama-powered creative writing assistance
 
 **🔗 Ready to explore?** Start with the [Unified API Reference](docs/API-Reference-Unified.md)
 
