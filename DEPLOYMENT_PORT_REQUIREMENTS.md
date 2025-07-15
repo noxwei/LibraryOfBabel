@@ -6,7 +6,7 @@
 
 ### Background
 - User has specified: "the port should be 55 something something"
-- Production domain: `api.ashortstayinhell.com:5562` 
+- Production domain: `api.example.com:5562` 
 - This is a CRITICAL requirement that must be enforced in ALL deployments
 
 ### CI/CD Integration Required

@@ -33,7 +33,7 @@ scripts/
 ## 🔑 Current API Configuration
 
 **API Key**: `babel_secure_3f99c2d1d294fbebdfc6b10cce93652d`  
-**Base URL**: `https://api.ashortstayinhell.com:5562`  
+**Base URL**: `https://api.example.com:5562`  
 **Version**: Unified (consolidates former v2 + v3)
 
 ---
@@ -149,7 +149,7 @@ The `config/api_settings.json` file contains:
 ```json
 {
   "api": {
-    "base_url": "https://api.ashortstayinhell.com:5562",
+    "base_url": "https://api.example.com:5562",
     "api_key": "babel_secure_3f99c2d1d294fbebdfc6b10cce93652d",
     "rate_limit": 60,
     "timeout": 30
@@ -230,7 +230,7 @@ python3 config/api_config.py --daemon-config
 ```python
 # Each script had hardcoded values
 API_KEY = "babel_secure_8a52a0ad3a1fe3bf..."  # Wrong key!
-BASE_URL = "https://api.ashortstayinhell.com:5562"
+BASE_URL = "https://api.example.com:5562"
 ```
 
 ### New Way (Centralized Configuration)

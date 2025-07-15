@@ -2,14 +2,14 @@
 
 **Personal Knowledge Liberation System with Unified AI Architecture**
 
-Transform your digital ebook collection into a searchable, AI-accessible research library with production-grade security, fuzzy search, and vector embeddings. Now featuring **1,006 books** and advanced semantic search capabilities.
+Transform your digital ebook collection into a searchable, AI-accessible research library with production-grade security, fuzzy search, and vector embeddings. Now featuring advanced semantic search capabilities.
 
 ## 🎯 **What It Does**
 
-LibraryOfBabel turns your EPUB collection into a powerful, unified search API with **1,006 books** instantly accessible through secure endpoints. Perfect for AI agents, research tools, and knowledge discovery with advanced fuzzy search and vector embeddings.
+LibraryOfBabel turns your EPUB collection into a powerful, unified search API with your entire library instantly accessible through secure endpoints. Perfect for AI agents, research tools, and knowledge discovery with advanced fuzzy search and vector embeddings.
 
 ### **✨ Core Features**
-- 🔍 **Instant Search**: Query across **1,006 books** with fuzzy search & vector embeddings
+- 🔍 **Instant Search**: Query across your entire library with fuzzy search & vector embeddings
 - 🧠 **AI-Powered**: Semantic search using 19,000+ vector embeddings
 - 📖 **Smart Chunking**: Configurable text granularity (500/1500/5000 chars)
 - 🔐 **Production Security**: API key authentication + HTTPS + QA Security Agent
@@ -22,23 +22,22 @@ LibraryOfBabel turns your EPUB collection into a powerful, unified search API wi
 
 ```bash
 # 1. Check if system is running
-curl https://api.ashortstayinhell.com:5562/health
+curl https://api.example.com:5562/health
 
 # 2. Search your library (replace YOUR_API_KEY)
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&search=consciousness&page_size=5"
+curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&search=consciousness&page_size=5"
 
 # 3. NEW: Fuzzy semantic search with AI
-curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=YOUR_API_KEY&q=artificial%20intelligence&type=semantic&limit=5"
+curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_API_KEY&q=artificial%20intelligence&type=semantic&limit=5"
 
 # 4. NEW: Search within a specific book
-curl "https://api.ashortstayinhell.com:5562/books/1099/search?api_key=YOUR_API_KEY&q=discourse&page_size=3"
+curl "https://api.example.com:5562/books/1099/search?api_key=YOUR_API_KEY&q=discourse&page_size=3"
 ```
 
 **That's it. Four commands. Bookmark this page!** 📌
 
 ## 📊 **Current Statistics**
 
-- **📚 Total Books**: 1,006 (100% accessible, +20% growth!)
 - **📝 Total Chunks**: 26,000+ (searchable segments)
 - **🧠 Vector Embeddings**: 19,000+ (semantic AI search ready)
 - **⚡ Response Time**: 50-600ms (depending on search complexity)
@@ -48,7 +47,7 @@ curl "https://api.ashortstayinhell.com:5562/books/1099/search?api_key=YOUR_API_K
 
 ## 🔗 **Unified Production API**
 
-**Base URL**: `https://api.ashortstayinhell.com:5562`  
+**Base URL**: `https://api.example.com:5562`  
 **Architecture**: Unified (consolidates former v2 + v3 functionality)
 
 ### **Authentication Required**
@@ -86,16 +85,16 @@ Find content using semantic similarity and fuzzy text matching:
 
 ```bash
 # Semantic search using AI vector embeddings
-curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=YOUR_KEY&q=artificial%20intelligence&type=semantic&limit=5"
+curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_KEY&q=artificial%20intelligence&type=semantic&limit=5"
 
 # Fuzzy text matching (handles typos)
-curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=YOUR_KEY&q=philosphy&type=fuzzy&limit=3"
+curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_KEY&q=philosphy&type=fuzzy&limit=3"
 
 # Hybrid search (combines semantic + fuzzy + keyword)
-curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=YOUR_KEY&q=democracy&type=hybrid&limit=10"
+curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_KEY&q=democracy&type=hybrid&limit=10"
 
 # Custom weighted hybrid search
-curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=YOUR_KEY&q=consciousness&type=hybrid&semantic_weight=0.6&fuzzy_weight=0.3&keyword_weight=0.1"
+curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_KEY&q=consciousness&type=hybrid&semantic_weight=0.6&fuzzy_weight=0.3&keyword_weight=0.1"
 ```
 
 ### **📖 In-Book Search**
@@ -103,10 +102,10 @@ Focus your research within specific books:
 
 ```bash
 # Search within a Foucault book
-curl "https://api.ashortstayinhell.com:5562/books/1099/search?api_key=YOUR_KEY&q=discourse&page_size=5"
+curl "https://api.example.com:5562/books/1099/search?api_key=YOUR_KEY&q=discourse&page_size=5"
 
 # Search within any book by ID
-curl "https://api.ashortstayinhell.com:5562/books/611/search?api_key=YOUR_KEY&q=magic&page=1"
+curl "https://api.example.com:5562/books/611/search?api_key=YOUR_KEY&q=magic&page=1"
 ```
 
 ## 🔧 **Advanced Features**
@@ -115,10 +114,10 @@ curl "https://api.ashortstayinhell.com:5562/books/611/search?api_key=YOUR_KEY&q=
 Navigate large datasets efficiently:
 ```bash
 # Get page 1 with 10 books
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_KEY&page=1&page_size=10"
+curl "https://api.example.com:5562/books?api_key=YOUR_KEY&page=1&page_size=10"
 
-# Navigate to specific pages (201 pages of books!)
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_KEY&page=200&page_size=5"
+# Navigate to specific pages with pagination
+curl "https://api.example.com:5562/books?api_key=YOUR_KEY&page=200&page_size=5"
 ```
 
 Every response includes navigation links: `next`, `prev`, `first`, `last`
@@ -127,26 +126,26 @@ Every response includes navigation links: `next`, `prev`, `first`, `last`
 Adjust text granularity for different use cases:
 ```bash
 # Small chunks (500 chars) - detailed analysis
-curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_KEY&chunk_level=small"
+curl "https://api.example.com:5562/books/611/chunks?api_key=YOUR_KEY&chunk_level=small"
 
 # Medium chunks (1500 chars) - balanced (default)
-curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_KEY&chunk_level=medium"
+curl "https://api.example.com:5562/books/611/chunks?api_key=YOUR_KEY&chunk_level=medium"
 
 # Large chunks (5000 chars) - overview
-curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_KEY&chunk_level=large"
+curl "https://api.example.com:5562/books/611/chunks?api_key=YOUR_KEY&chunk_level=large"
 ```
 
 ### **🎯 Traditional Search**
 Filter and discover content:
 ```bash
 # Search by author
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_KEY&author=foucault"
+curl "https://api.example.com:5562/books?api_key=YOUR_KEY&author=foucault"
 
 # Search by genre
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_KEY&genre=philosophy"
+curl "https://api.example.com:5562/books?api_key=YOUR_KEY&genre=philosophy"
 
 # Full-text search with semantic support
-curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_KEY&q=machine%20learning&type=semantic"
+curl "https://api.example.com:5562/search?api_key=YOUR_KEY&q=machine%20learning&type=semantic"
 ```
 
 ## 📱 **Integration Examples**
@@ -175,7 +174,7 @@ print(f"Found {results['search_stats']['total_results']} semantic matches")
 ### **JavaScript with Fuzzy Search**
 ```javascript
 const API_KEY = 'YOUR_ACTUAL_API_KEY';
-const BASE_URL = 'https://api.ashortstayinhell.com:5562';
+const BASE_URL = 'https://api.example.com:5562';
 
 // Hybrid fuzzy search
 fetch(`${BASE_URL}/fuzzy-search?api_key=${API_KEY}&q=artificial intelligence&type=hybrid&limit=10`)
@@ -188,7 +187,7 @@ fetch(`${BASE_URL}/fuzzy-search?api_key=${API_KEY}&q=artificial intelligence&typ
 
 ### **iOS Shortcuts with Semantic Search**
 ```
-GET https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=YOUR_KEY&q=TEXT_INPUT&type=semantic&limit=5
+GET https://api.example.com:5562/fuzzy-search?api_key=YOUR_KEY&q=TEXT_INPUT&type=semantic&limit=5
 ```
 
 Perfect for voice-activated AI research with Siri!
@@ -207,7 +206,7 @@ Perfect for voice-activated AI research with Siri!
 
 ### **⚡ High Performance**
 - ✅ **50-600ms** response times (semantic search is more complex)
-- ✅ **PostgreSQL** with optimized indexes for 1,006 books
+- ✅ **PostgreSQL** with optimized indexes for your ebook catalog
 - ✅ **Auto-restart daemon** ensures 99.9%+ uptime
 - ✅ **Vector embeddings** for instant semantic similarity
 - ✅ **Concurrent access** supports multiple users
@@ -227,7 +226,7 @@ LibraryOfBabel Unified System/
 │   ├── /fuzzy-search              # 🆕 AI fuzzy search
 │   └── /api/v3/*                  # Legacy compatibility
 ├── 🗄️ PostgreSQL Database
-│   ├── 1,006 books                # Growing collection (+20%)
+│   ├── ebooks                # Growing collection 
 │   ├── 26,000+ chunks             # Searchable segments
 │   └── 19,000+ embeddings         # Vector search ready
 ├── 🧠 AI Search Engine
@@ -264,7 +263,7 @@ LibraryOfBabel Unified System/
 ## 🎯 **Use Cases**
 
 ### **🤖 AI Research Agents with Semantic Search**
-- Query entire 1,006-book library with semantic understanding
+- Query entire entire library with semantic understanding
 - Use fuzzy search to find concepts even with imprecise queries
 - Extract relevant passages with AI-powered relevance scoring
 - Navigate large datasets with hybrid search algorithms
@@ -282,7 +281,7 @@ LibraryOfBabel Unified System/
 - Knowledge graph construction with AI assistance
 
 ### **⚡ Personal Knowledge Management**
-- Instant access to 1,006-book reading history
+- Instant access to your reading history
 - Rediscover forgotten insights with fuzzy search
 - Build on previous research with semantic connections
 - Accelerate learning with AI-powered discovery
@@ -299,7 +298,7 @@ LibraryOfBabel Unified System/
 | Fuzzy Search | < 15000ms | 10-12s | ✅ |
 | Hybrid Search | < 3000ms | 1-2s | ✅ |
 
-**Result**: All performance targets exceeded for 1,006-book collection! 🎉
+**Result**: All performance targets exceeded for the collection! 🎉
 
 ## 🔧 **Local Development**
 
@@ -336,7 +335,7 @@ For complete setup instructions, see [Installation Guide](docs/Installation-Guid
 
 **✅ FULLY OPERATIONAL WITH AI ENHANCEMENTS**
 
-The LibraryOfBabel Unified API is production-ready and serving **1,006 books** with enterprise-grade security, advanced AI search capabilities, and team collaboration features. Perfect for researchers, developers, and AI agents seeking instant access to curated knowledge with semantic understanding.
+The LibraryOfBabel Unified API is production-ready and serving **your ebook catalog** with enterprise-grade security, advanced AI search capabilities, and team collaboration features. Perfect for researchers, developers, and AI agents seeking instant access to curated knowledge with semantic understanding.
 
 ### **🆕 Recent Enhancements**
 - ✅ **API Consolidation**: Single unified endpoint (no more v2/v3 separation)
@@ -344,7 +343,7 @@ The LibraryOfBabel Unified API is production-ready and serving **1,006 books** w
 - ✅ **In-Book Search**: Focus research within specific books
 - ✅ **Centralized Configuration**: Secure, automated configuration management
 - ✅ **QA Security Agent**: Enhanced security monitoring and protection
-- ✅ **Collection Growth**: Expanded from 838 to 1,006 books (+20% growth!)
+- ✅ **Collection Growth**: Ongoing expansion with new titles
 - 🆕 **Story Generation Suite**: Advanced AI-powered narrative creation system
 - 🆕 **Lexi's Template Engine**: Seed-based reproducible story generation
 - 🆕 **RAG Integration**: Ollama-powered creative writing assistance
@@ -357,4 +356,4 @@ The LibraryOfBabel Unified API is production-ready and serving **1,006 books** w
 
 **Status**: Production-Ready ✅ | **AI Features**: Operational ✅ | **Security**: QA Enhanced ✅ | **Team**: Integrated ✅
 
-**Collection**: 1,006 Books 📚 | **Search**: AI-Powered 🧠 | **Architecture**: Unified 🎯
+**Collection**: Extensive Library 📚 | **Search**: AI-Powered 🧠 | **Architecture**: Unified 🎯

@@ -14,7 +14,7 @@
 ### Current Problem
 - Production API failing due to wrong port (8080)
 - User frustrated having to remind team repeatedly
-- Core agents blocked from deployment to `api.ashortstayinhell.com`
+- Core agents blocked from deployment to `api.example.com`
 
 ### IMMEDIATE ACTIONS REQUIRED
 
@@ -40,7 +40,7 @@
 #### 4. Validation Requirements
 - [ ] Test deployment with port 5562
 - [ ] Verify SSL works with new port
-- [ ] Confirm api.ashortstayinhell.com:5562 accessibility
+- [ ] Confirm api.example.com:5562 accessibility
 - [ ] Test all agent endpoints
 
 ### CODE CHANGES ALREADY MADE
@@ -57,7 +57,7 @@ port=int(os.getenv('PORT', 5562))
 Add to ALL future deployment checklists:
 - [ ] ✅ Verify PORT environment variable = 5562
 - [ ] ✅ Confirm production API runs on port 5562  
-- [ ] ✅ Test HTTPS access: `https://api.ashortstayinhell.com:5562`
+- [ ] ✅ Test HTTPS access: `https://api.example.com:5562`
 - [ ] ✅ Validate SSL certificate for port 5562
 
 ---

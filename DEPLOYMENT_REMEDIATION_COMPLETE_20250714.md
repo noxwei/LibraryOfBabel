@@ -16,7 +16,7 @@
    - Prevents API keys from being committed to repository
 
 2. **✅ Secure Paginated API Deployed**
-   - Production API running at api.ashortstayinhell.com:5562
+   - Production API running at api.example.com:5562
    - All 838 books accessible with authentication
    - Pagination working correctly (168 pages, 5 books per page)
    - Rate limiting active (60 requests/minute)
@@ -79,7 +79,7 @@
 ### **✅ Authentication Testing**
 ```bash
 # Without API key - CORRECTLY BLOCKED
-curl "https://api.ashortstayinhell.com:5562/books"
+curl "https://api.example.com:5562/books"
 # Response: {"error": "API key required", "success": false}
 
 # With API key - WORKS LOCALLY  
@@ -106,10 +106,10 @@ Based on today's deployment issue, here are **targeted improvements** to the alr
 - name: 🔗 Production Endpoint Validation
   run: |
     # Test actual production endpoints after deployment
-    curl -f "https://api.ashortstayinhell.com:5562/health" || exit 1
+    curl -f "https://api.example.com:5562/health" || exit 1
     
     # Test authenticated endpoint
-    response=$(curl -s "https://api.ashortstayinhell.com:5562/books?api_key=$API_KEY&page=1&page_size=1")
+    response=$(curl -s "https://api.example.com:5562/books?api_key=$API_KEY&page=1&page_size=1")
     if [[ $(echo $response | jq '.pagination.total_items') -lt 800 ]]; then
       echo "ERROR: Not all books accessible"
       exit 1
@@ -121,10 +121,10 @@ Based on today's deployment issue, here are **targeted improvements** to the alr
 - name: 🔒 SSL Configuration Validation  
   run: |
     # Verify HTTPS is working
-    curl -I "https://api.ashortstayinhell.com:5562/health" | grep "HTTP/1.1 200"
+    curl -I "https://api.example.com:5562/health" | grep "HTTP/1.1 200"
     
     # Check certificate validity
-    echo | openssl s_client -connect api.ashortstayinhell.com:5562 2>/dev/null | openssl x509 -noout -dates
+    echo | openssl s_client -connect api.example.com:5562 2>/dev/null | openssl x509 -noout -dates
 ```
 
 ### **Priority 3: Automated Rollback**
@@ -144,8 +144,8 @@ Based on today's deployment issue, here are **targeted improvements** to the alr
 ### **Step 1: Fix SSL Configuration (15 minutes)**
 ```python
 # Add to secure_paginated_api.py
-ssl_context = ('ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem',
-               'ssl/letsencrypt-config/live/api.ashortstayinhell.com/privkey.pem')
+ssl_context = ('ssl/letsencrypt-config/live/api.example.com/fullchain.pem',
+               'ssl/letsencrypt-config/live/api.example.com/privkey.pem')
 
 app.run(host='0.0.0.0', port=5562, ssl_context=ssl_context)
 ```

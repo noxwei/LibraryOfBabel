@@ -219,8 +219,8 @@ Query: "yo what books discuss AI consciousness and ethics?"
 Input: "yo what books discuss AI consciousness and ethics?"
 Response Time: 0.007s
 Generated URLs:
-- primary_semantic: https://api.ashortstayinhell.com/api/v3/search?q=what+discuss+consciousness+ethics&limit=10&type=semantic
-- topic_based: https://api.ashortstayinhell.com/api/v3/search?q=what+OR+discuss&limit=8&type=topic
+- primary_semantic: https://api.example.com/api/v3/search?q=what+discuss+consciousness+ethics&limit=10&type=semantic
+- topic_based: https://api.example.com/api/v3/search?q=what+OR+discuss&limit=8&type=topic
 
 Truncated JSON Output:
 {
@@ -235,7 +235,7 @@ Truncated JSON Output:
   "search_urls": [
     {
       "strategy": "primary_semantic",
-      "url": "https://api.ashortstayinhell.com/api/v3/search?q=what+discuss+consciousness+ethics&limit=10&type=semantic",
+      "url": "https://api.example.com/api/v3/search?q=what+discuss+consciousness+ethics&limit=10&type=semantic",
       "description": "Semantic search for: what discuss consciousness ethics"
     }
   ]
@@ -247,8 +247,8 @@ Truncated JSON Output:
 Input: "books that bridge quantum physics and philosophy"
 Response Time: 0.002s
 Generated URLs:
-- primary_semantic: https://api.ashortstayinhell.com/api/v3/search?q=that+bridge+quantum+physics+philosophy&limit=10&type=semantic
-- topic_based: https://api.ashortstayinhell.com/api/v3/search?q=that+OR+bridge&limit=8&type=topic
+- primary_semantic: https://api.example.com/api/v3/search?q=that+bridge+quantum+physics+philosophy&limit=10&type=semantic
+- topic_based: https://api.example.com/api/v3/search?q=that+OR+bridge&limit=8&type=topic
 
 Truncated JSON Output:
 {
@@ -273,8 +273,8 @@ Truncated JSON Output:
 Input: "find me some Octavia Butler social justice analysis"
 Response Time: 0.002s
 Generated URLs:
-- primary_semantic: https://api.ashortstayinhell.com/api/v3/search?q=some+octavia+butler+social+justice&limit=10&type=semantic
-- topic_based: https://api.ashortstayinhell.com/api/v3/search?q=some+OR+octavia&limit=8&type=topic
+- primary_semantic: https://api.example.com/api/v3/search?q=some+octavia+butler+social+justice&limit=10&type=semantic
+- topic_based: https://api.example.com/api/v3/search?q=some+OR+octavia&limit=8&type=topic
 
 Truncated JSON Output:
 {
@@ -297,8 +297,8 @@ Truncated JSON Output:
 Input: "CAPS LOCK QUERY ABOUT CONSCIOUSNESS"
 Response Time: 0.002s
 Generated URLs:
-- primary_semantic: https://api.ashortstayinhell.com/api/v3/search?q=caps+lock+query+consciousness&limit=10&type=semantic
-- topic_based: https://api.ashortstayinhell.com/api/v3/search?q=caps+OR+lock&limit=8&type=topic
+- primary_semantic: https://api.example.com/api/v3/search?q=caps+lock+query+consciousness&limit=10&type=semantic
+- topic_based: https://api.example.com/api/v3/search?q=caps+OR+lock&limit=8&type=topic
 
 System handled CAPS gracefully with proper keyword extraction and URL generation.
 ```

@@ -9,7 +9,7 @@ Since port 80 isn't forwarded, let's use DNS verification instead.
 3. **Use DNS verification** instead:
 
 ```bash
-certbot certonly --manual --preferred-challenges dns -d api.ashortstayinhell.com --email admin@ashortstayinhell.com --agree-tos --no-eff-email --config-dir "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config" --work-dir "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-work" --logs-dir "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-logs"
+certbot certonly --manual --preferred-challenges dns -d api.example.com --email admin@example.com --agree-tos --no-eff-email --config-dir "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config" --work-dir "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-work" --logs-dir "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-logs"
 ```
 
 This will ask you to add a TXT record to your DNS instead of serving a file on port 80.

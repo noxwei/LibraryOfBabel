@@ -6,7 +6,7 @@ The LibraryOfBabel API provides secure, paginated access to **838 real books** w
 
 ## 🔗 API Endpoint
 
-**Production URL**: `https://api.ashortstayinhell.com:5562`
+**Production URL**: `https://api.example.com:5562`
 
 ## 🔐 Authentication
 
@@ -15,15 +15,15 @@ The LibraryOfBabel API provides secure, paginated access to **838 real books** w
 ### Authentication Methods
 ```bash
 # Method 1: Query Parameter (Recommended for testing)
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY"
+curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY"
 
 # Method 2: Authorization Header
 curl -H "Authorization: Bearer YOUR_API_KEY" \
-     "https://api.ashortstayinhell.com:5562/books"
+     "https://api.example.com:5562/books"
 
 # Method 3: X-API-Key Header
 curl -H "X-API-Key: YOUR_API_KEY" \
-     "https://api.ashortstayinhell.com:5562/books"
+     "https://api.example.com:5562/books"
 ```
 
 ### Rate Limiting
@@ -34,7 +34,7 @@ curl -H "X-API-Key: YOUR_API_KEY" \
 ## 📊 Health Check (No Auth Required)
 
 ```bash
-curl https://api.ashortstayinhell.com:5562/health
+curl https://api.example.com:5562/health
 ```
 
 **Response:**
@@ -64,41 +64,41 @@ curl https://api.ashortstayinhell.com:5562/health
 ### 1. List Books (Paginated)
 ```bash
 # Get first 5 books
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&page_size=5"
+curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page_size=5"
 
 # Search for specific content
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&search=artificial%20intelligence"
+curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&search=artificial%20intelligence"
 
 # Filter by author
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&author=Rowling"
+curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&author=Rowling"
 ```
 
 ### 2. Get Specific Book
 ```bash
-curl "https://api.ashortstayinhell.com:5562/books/611?api_key=YOUR_API_KEY"
+curl "https://api.example.com:5562/books/611?api_key=YOUR_API_KEY"
 ```
 
 ### 3. Get Book Chunks (Configurable Chunking)
 ```bash
 # Small chunks (500 chars) for detailed analysis
-curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=small"
+curl "https://api.example.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=small"
 
 # Medium chunks (1500 chars) - default
-curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=medium"
+curl "https://api.example.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=medium"
 
 # Large chunks (5000 chars) for overview
-curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=large"
+curl "https://api.example.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=large"
 ```
 
 ### 4. Search Books
 ```bash
-curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_API_KEY&q=machine%20learning"
+curl "https://api.example.com:5562/search?api_key=YOUR_API_KEY&q=machine%20learning"
 ```
 
 ### 5. Get Full API Documentation
 ```bash
 # Interactive API documentation (no auth required)
-curl https://api.ashortstayinhell.com:5562/api-docs
+curl https://api.example.com:5562/api-docs
 ```
 
 ## 🚀 Quick Integration Examples
@@ -108,7 +108,7 @@ curl https://api.ashortstayinhell.com:5562/api-docs
 import requests
 
 API_KEY = "your_api_key_here"
-BASE_URL = "https://api.ashortstayinhell.com:5562"
+BASE_URL = "https://api.example.com:5562"
 
 # Get all books with pagination
 response = requests.get(f"{BASE_URL}/books", params={
@@ -123,7 +123,7 @@ print(f"Total books: {books['pagination']['total_items']}")  # 838
 ### JavaScript
 ```javascript
 const API_KEY = 'your_api_key_here';
-const BASE_URL = 'https://api.ashortstayinhell.com:5562';
+const BASE_URL = 'https://api.example.com:5562';
 
 // Search for books
 fetch(`${BASE_URL}/search?api_key=${API_KEY}&q=consciousness`)
@@ -135,7 +135,7 @@ fetch(`${BASE_URL}/search?api_key=${API_KEY}&q=consciousness`)
 ```bash
 #!/bin/bash
 API_KEY="your_api_key_here"
-BASE_URL="https://api.ashortstayinhell.com:5562"
+BASE_URL="https://api.example.com:5562"
 
 # Get health status
 curl "$BASE_URL/health"
