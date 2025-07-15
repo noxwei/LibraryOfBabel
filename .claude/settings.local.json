@@ -52,7 +52,11 @@
       "Bash(npx playwright test:*)",
       "Bash(timeout 60 npx playwright test:*)",
       "Bash(sudo launchctl:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(git branch:*)",
+      "Bash(git for-each-ref:*)",
+      "Bash(git stash:*)",
+      "Bash(echo \"\" echo \"🤔 STRATEGIC ANALYSIS OF SURVIVORS:\" echo \"\" echo \"ollama-integration (July 8) - Check if this was merged...\" git log --oneline main..ollama-integration)"
     ],
     "deny": []
   }
