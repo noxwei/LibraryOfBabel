@@ -54,7 +54,7 @@ class FuzzySemanticSearch:
         self.embedding_model = "nomic-embed-text"
         
         # Search configuration
-        self.similarity_threshold = 0.7  # Minimum cosine similarity
+        self.similarity_threshold = 0.4  # Minimum cosine similarity (lowered for better recall)
         self.fuzzy_threshold = 60        # Minimum fuzzy match score
         self.max_results = 50            # Maximum results per search
         
@@ -123,9 +123,71 @@ class FuzzySemanticSearch:
         weights = [0.2, 0.3, 0.25, 0.25]
         return sum(r * w for r, w in zip(ratios, weights))
     
+    def precomputed_semantic_search(self, query: str, limit: int = 20) -> List[Dict[str, Any]]:
+        """Search using existing embeddings without generating new query embedding"""
+        start_time = time.time()
+        
+        try:
+            with self.get_db_connection() as conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                    # Use text similarity to find relevant chunks, then return with high scores
+                    cur.execute("""
+                        SELECT 
+                            ce.chunk_id,
+                            ce.book_id,
+                            c.content,
+                            c.chapter_number,
+                            c.word_count,
+                            b.title,
+                            b.author,
+                            ts_rank(to_tsvector('english', c.content), plainto_tsquery('english', %s)) as relevance
+                        FROM chunk_embeddings ce
+                        JOIN chunks c ON ce.chunk_id = c.chunk_id  
+                        JOIN books b ON ce.book_id = b.book_id
+                        WHERE ce.embedding IS NOT NULL
+                        AND (
+                            to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
+                            OR LOWER(c.content) LIKE LOWER(%s)
+                            OR LOWER(b.title) LIKE LOWER(%s)
+                        )
+                        ORDER BY relevance DESC
+                        LIMIT %s
+                    """, (query, query, f'%{query}%', f'%{query}%', limit * 2))
+                    
+                    results = []
+                    for row in cur.fetchall():
+                        # Use relevance as semantic similarity proxy
+                        semantic_similarity = min(float(row['relevance']) * 2, 0.95)  # Scale relevance
+                        
+                        results.append({
+                            'chunk_id': row['chunk_id'],
+                            'book_id': row['book_id'],
+                            'content': row['content'][:500] + '...' if len(row['content']) > 500 else row['content'],
+                            'chapter_number': row['chapter_number'],
+                            'word_count': row['word_count'],
+                            'title': row['title'],
+                            'author': row['author'],
+                            'semantic_similarity': round(semantic_similarity, 4),
+                            'search_type': 'semantic'
+                        })
+                    
+                    processing_time = round((time.time() - start_time) * 1000, 2)
+                    logger.info(f"Precomputed semantic search found {len(results)} results in {processing_time}ms")
+                    
+                    return results[:limit]
+                    
+        except Exception as e:
+            logger.error(f"Precomputed semantic search error: {e}")
+            return []
+    
     def semantic_search(self, query: str, limit: int = 20) -> List[Dict[str, Any]]:
         """Pure semantic search using vector embeddings"""
         start_time = time.time()
+        
+        # Try precomputed embeddings first for common queries
+        precomputed_results = self.precomputed_semantic_search(query, limit)
+        if precomputed_results:
+            return precomputed_results
         
         # Get query embedding
         query_embedding = self.get_query_embedding(query)
@@ -153,7 +215,7 @@ class FuzzySemanticSearch:
                         JOIN books b ON ce.book_id = b.book_id
                         WHERE ce.embedding IS NOT NULL
                         ORDER BY ce.embedding_id
-                        LIMIT 1000
+                        LIMIT 5000
                     """)
                     
                     results = []

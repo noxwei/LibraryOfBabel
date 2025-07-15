@@ -18,9 +18,14 @@ import urllib3
 # Suppress SSL warnings for testing
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Configuration
-API_KEY = "babel_secure_8a52a0ad3a1fe3bf3ade37d04deef0054d8f58035a0e9d4760a9a08548d8cebf"
-V2_BASE = "https://api.ashortstayinhell.com:5562"
+# Configuration - Use centralized config
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from config.api_config import get_api_key, get_base_url
+
+API_KEY = get_api_key()
+V2_BASE = get_base_url()
 
 class FinalAPIQATest:
     def __init__(self):
