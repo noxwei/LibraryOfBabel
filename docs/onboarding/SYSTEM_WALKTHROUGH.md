@@ -187,7 +187,7 @@ for chunk in chunks:
 ## 🌐 **PRODUCTION DEPLOYMENT**
 
 ### **Current Environment**
-- **Domain**: api.ashortstayinhell.com
+- **Domain**: api.example.com
 - **SSL**: Full certificate chain with Let's Encrypt
 - **Monitoring**: Real-time performance and error tracking
 - **Scaling**: Auto-scaling based on query volume

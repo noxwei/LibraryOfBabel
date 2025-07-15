@@ -1,5 +1,5 @@
 # 🔒 HTTPS Domain Restoration Report
-## Emergency Response: api.ashortstayinhell.com Recovery
+## Emergency Response: api.example.com Recovery
 
 **Date:** July 9, 2025  
 **Issue:** Production API domain down  
@@ -10,7 +10,7 @@
 
 ## 🚨 Problem Summary
 
-- **Initial State:** `api.ashortstayinhell.com` was not accessible via HTTPS
+- **Initial State:** `api.example.com` was not accessible via HTTPS
 - **Root Cause:** API service not properly configured for external access
 - **Previous Working State:** July 7, 2025 - External IP 73.161.54.75 was successfully accessing the API
 
@@ -20,12 +20,12 @@
 
 ### 1. Service Configuration
 - **Production API:** Running on port 5563 with SSL certificates
-- **SSL Certificates:** Valid Let's Encrypt certificates for api.ashortstayinhell.com
+- **SSL Certificates:** Valid Let's Encrypt certificates for api.example.com
 - **LaunchDaemon:** Configured for automatic startup with proper API key
 
 ### 2. HTTPS Access Confirmed
 ```bash
-curl -k -v https://api.ashortstayinhell.com:5563/api/v3/health
+curl -k -v https://api.example.com:5563/api/v3/health
 # Result: ✅ SUCCESS - 200 OK with valid SSL handshake
 ```
 
@@ -66,8 +66,8 @@ curl -k -v https://api.ashortstayinhell.com:5563/api/v3/health
 
 | Method | URL | Status | Notes |
 |--------|-----|--------|-------|
-| **HTTPS (Primary)** | `https://api.ashortstayinhell.com:5563` | ✅ WORKING | Valid SSL, external access |
-| **HTTP Proxy** | `http://api.ashortstayinhell.com:8080` | ✅ WORKING | Fallback access |
+| **HTTPS (Primary)** | `https://api.example.com:5563` | ✅ WORKING | Valid SSL, external access |
+| **HTTP Proxy** | `http://api.example.com:8080` | ✅ WORKING | Fallback access |
 | **Local HTTPS** | `https://localhost:5563` | ✅ WORKING | Local development |
 
 ---
@@ -75,7 +75,7 @@ curl -k -v https://api.ashortstayinhell.com:5563/api/v3/health
 ## 🔐 Security Configuration
 
 ### SSL Certificate Status
-- **Domain:** api.ashortstayinhell.com
+- **Domain:** api.example.com
 - **Issuer:** Let's Encrypt (E6)
 - **Valid From:** July 6, 2025
 - **Valid Until:** October 4, 2025
@@ -180,7 +180,7 @@ curl -k -v https://api.ashortstayinhell.com:5563/api/v3/health
 - **Manual:** `bash scripts/health-check.sh`
 
 ### For SSL Issues
-- **Certificate Path:** `ssl/letsencrypt-config/live/api.ashortstayinhell.com/`
+- **Certificate Path:** `ssl/letsencrypt-config/live/api.example.com/`
 - **Renewal:** Automatic via certbot
 - **Manual Renewal:** `bash ssl/renew-certificates.sh`
 
@@ -188,7 +188,7 @@ curl -k -v https://api.ashortstayinhell.com:5563/api/v3/health
 
 ## 🎉 Conclusion
 
-**Mission Accomplished!** The `api.ashortstayinhell.com` domain is now fully operational with:
+**Mission Accomplished!** The `api.example.com` domain is now fully operational with:
 
 - ✅ **HTTPS access on port 5563** (primary)
 - ✅ **HTTP proxy on port 8080** (fallback)

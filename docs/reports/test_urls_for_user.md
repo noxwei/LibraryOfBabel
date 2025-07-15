@@ -6,44 +6,44 @@ Based on your observed behavioral patterns, here are direct search URLs you can 
 
 ### 1. **AI Consciousness + Philosophy**
 ```
-https://api.ashortstayinhell.com/api/v3/search?q=AI+consciousness+philosophy&limit=10&search_type=semantic
+https://api.example.com/api/v3/search?q=AI+consciousness+philosophy&limit=10&search_type=semantic
 ```
 
 ### 2. **Octavia Butler Social Justice**
 ```
-https://api.ashortstayinhell.com/api/v3/search?q=Octavia+Butler+social+justice&limit=10&search_type=author&author=Butler
+https://api.example.com/api/v3/search?q=Octavia+Butler+social+justice&limit=10&search_type=author&author=Butler
 ```
 
 ### 3. **Digital Surveillance Theory**
 ```
-https://api.ashortstayinhell.com/api/v3/search?q=digital+surveillance+theory&limit=10&search_type=semantic
+https://api.example.com/api/v3/search?q=digital+surveillance+theory&limit=10&search_type=semantic
 ```
 
 ### 4. **Climate Change Policy**
 ```
-https://api.ashortstayinhell.com/api/v3/search?q=climate+change+policy&limit=10&search_type=topic
+https://api.example.com/api/v3/search?q=climate+change+policy&limit=10&search_type=topic
 ```
 
 ### 5. **Critical Race Theory Technology**
 ```
-https://api.ashortstayinhell.com/api/v3/search?q=critical+race+theory+technology&limit=10&search_type=semantic
+https://api.example.com/api/v3/search?q=critical+race+theory+technology&limit=10&search_type=semantic
 ```
 
 ### 6. **Post-structuralist Analysis**
 ```
-https://api.ashortstayinhell.com/api/v3/search?q=post-structuralist+analysis&limit=10&search_type=concept
+https://api.example.com/api/v3/search?q=post-structuralist+analysis&limit=10&search_type=concept
 ```
 
 ## 🤖 Ollama Integration Test URLs (API Key Required)
 
 ### Health Check (No Auth)
 ```
-https://api.ashortstayinhell.com/api/v3/health
+https://api.example.com/api/v3/health
 ```
 
 ### Ollama Query Endpoint (Requires API Key)
 ```
-POST https://api.ashortstayinhell.com/api/v3/ollama/query
+POST https://api.example.com/api/v3/ollama/query
 Content-Type: application/json
 X-API-Key: YOUR_API_KEY_HERE
 
@@ -54,7 +54,7 @@ X-API-Key: YOUR_API_KEY_HERE
 
 ### Ollama Health Check (Requires API Key)
 ```
-GET https://api.ashortstayinhell.com/api/v3/ollama/health
+GET https://api.example.com/api/v3/ollama/health
 X-API-Key: YOUR_API_KEY_HERE
 ```
 
@@ -62,17 +62,17 @@ X-API-Key: YOUR_API_KEY_HERE
 
 ### 1. Test Basic API Health
 ```bash
-curl -X GET "https://api.ashortstayinhell.com/api/v3/health"
+curl -X GET "https://api.example.com/api/v3/health"
 ```
 
 ### 2. Test Direct Search
 ```bash
-curl -X GET "https://api.ashortstayinhell.com/api/v3/search?q=AI+consciousness&limit=5"
+curl -X GET "https://api.example.com/api/v3/search?q=AI+consciousness&limit=5"
 ```
 
 ### 3. Test Ollama Integration (with API key)
 ```bash
-curl -X POST "https://api.ashortstayinhell.com/api/v3/ollama/query" \
+curl -X POST "https://api.example.com/api/v3/ollama/query" \
   -H "Content-Type: application/json" \
   -H "X-API-Key: YOUR_API_KEY_HERE" \
   -d '{"query": "Find books about digital surveillance through critical theory"}'
@@ -112,7 +112,7 @@ curl -X POST "https://api.ashortstayinhell.com/api/v3/ollama/query" \
     },
     "search_urls": [
       {
-        "url": "https://api.ashortstayinhell.com/api/v3/search?q=AI+consciousness...",
+        "url": "https://api.example.com/api/v3/search?q=AI+consciousness...",
         "strategy": "semantic",
         "description": "Primary semantic search"
       }
@@ -146,10 +146,10 @@ curl -X POST "https://api.ashortstayinhell.com/api/v3/ollama/query" \
 
 Just paste these URLs directly into your browser:
 
-1. **API Health**: https://api.ashortstayinhell.com/api/v3/health
-2. **AI Search**: https://api.ashortstayinhell.com/api/v3/search?q=artificial+intelligence&limit=5
-3. **Philosophy Search**: https://api.ashortstayinhell.com/api/v3/search?q=philosophy+consciousness&limit=5
-4. **Butler Search**: https://api.ashortstayinhell.com/api/v3/search?q=Octavia+Butler&search_type=author&limit=5
+1. **API Health**: https://api.example.com/api/v3/health
+2. **AI Search**: https://api.example.com/api/v3/search?q=artificial+intelligence&limit=5
+3. **Philosophy Search**: https://api.example.com/api/v3/search?q=philosophy+consciousness&limit=5
+4. **Butler Search**: https://api.example.com/api/v3/search?q=Octavia+Butler&search_type=author&limit=5
 
 ## 🔒 API Key Information
 

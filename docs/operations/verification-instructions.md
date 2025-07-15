@@ -12,7 +12,7 @@ The certbot process is waiting for you to serve the verification file.
    ```
 3. **Test the verification URL:**
    ```bash
-   curl http://api.ashortstayinhell.com/.well-known/acme-challenge/DKfA2xFbltVDZ_lEKzJiBXSsPnna-_gzdY107XiI25M
+   curl http://api.example.com/.well-known/acme-challenge/DKfA2xFbltVDZ_lEKzJiBXSsPnna-_gzdY107XiI25M
    ```
 4. **Go back to the certbot terminal and press Enter**
 
