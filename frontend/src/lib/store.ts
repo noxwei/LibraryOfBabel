@@ -1,30 +1,30 @@
-import { create } from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
-import { libraryAPI, type BookSearchResult } from './api'
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+import { libraryAPI, type BookSearchResult } from "./api";
 
 interface SearchState {
   // Current search
-  query: string
-  isLoading: boolean
-  results: BookSearchResult[]
-  totalResults: number
-  searchTime: number
-  searchType: 'semantic' | 'topic' | 'keyword' | null
-  error: string | null
+  query: string;
+  isLoading: boolean;
+  results: BookSearchResult[];
+  totalResults: number;
+  searchTime: number;
+  searchType: "semantic" | "topic" | "keyword" | null;
+  error: string | null;
 
   // Search history
-  recentSearches: string[]
-  
+  recentSearches: string[];
+
   // UI state
-  selectedBook: BookSearchResult | null
-  
+  selectedBook: BookSearchResult | null;
+
   // Actions
-  setQuery: (query: string) => void
-  performSearch: (query: string) => Promise<void>
-  clearResults: () => void
-  setSelectedBook: (book: BookSearchResult | null) => void
-  addToRecentSearches: (query: string) => void
-  clearError: () => void
+  setQuery: (query: string) => void;
+  performSearch: (query: string) => Promise<void>;
+  clearResults: () => void;
+  setSelectedBook: (book: BookSearchResult | null) => void;
+  addToRecentSearches: (query: string) => void;
+  clearError: () => void;
 }
 
 export const useSearchStore = create<SearchState>()(
@@ -32,7 +32,7 @@ export const useSearchStore = create<SearchState>()(
     persist(
       (set, get) => ({
         // Initial state
-        query: '',
+        query: "",
         isLoading: false,
         results: [],
         totalResults: 0,
@@ -44,25 +44,25 @@ export const useSearchStore = create<SearchState>()(
 
         // Actions
         setQuery: (query: string) => {
-          set({ query, error: null })
+          set({ query, error: null });
         },
 
         performSearch: async (query: string) => {
-          if (!query.trim()) return
+          if (!query.trim()) return;
 
-          set({ 
-            isLoading: true, 
+          set({
+            isLoading: true,
             error: null,
-            query: query.trim()
-          })
+            query: query.trim(),
+          });
 
           try {
-            const startTime = Date.now()
-            
+            const startTime = Date.now();
+
             // Perform semantic search as primary strategy
-            const response = await libraryAPI.searchBooks(query.trim(), 20)
-            
-            const searchTime = Date.now() - startTime
+            const response = await libraryAPI.searchBooks(query.trim(), 20);
+
+            const searchTime = Date.now() - startTime;
 
             set({
               results: response.results,
@@ -70,22 +70,21 @@ export const useSearchStore = create<SearchState>()(
               searchTime: searchTime,
               searchType: response.search_type,
               isLoading: false,
-              error: null
-            })
+              error: null,
+            });
 
             // Add to recent searches
-            get().addToRecentSearches(query.trim())
-
+            get().addToRecentSearches(query.trim());
           } catch (error) {
-            console.error('Search error:', error)
+            console.error("Search error:", error);
             set({
               isLoading: false,
-              error: error instanceof Error ? error.message : 'Search failed',
+              error: error instanceof Error ? error.message : "Search failed",
               results: [],
               totalResults: 0,
               searchTime: 0,
-              searchType: null
-            })
+              searchType: null,
+            });
           }
         },
 
@@ -96,67 +95,68 @@ export const useSearchStore = create<SearchState>()(
             searchTime: 0,
             searchType: null,
             error: null,
-            selectedBook: null
-          })
+            selectedBook: null,
+          });
         },
 
         setSelectedBook: (book: BookSearchResult | null) => {
-          set({ selectedBook: book })
+          set({ selectedBook: book });
         },
 
         addToRecentSearches: (query: string) => {
-          const current = get().recentSearches
-          const updated = [
-            query,
-            ...current.filter(q => q !== query)
-          ].slice(0, 10) // Keep only last 10 searches
-          
-          set({ recentSearches: updated })
+          const current = get().recentSearches;
+          const updated = [query, ...current.filter((q) => q !== query)].slice(
+            0,
+            10,
+          ); // Keep only last 10 searches
+
+          set({ recentSearches: updated });
         },
 
         clearError: () => {
-          set({ error: null })
-        }
+          set({ error: null });
+        },
       }),
       {
-        name: 'library-babel-search',
+        name: "library-babel-search",
         partialize: (state) => ({
-          recentSearches: state.recentSearches
-        })
-      }
+          recentSearches: state.recentSearches,
+        }),
+      },
     ),
-    { name: 'library-babel-search' }
-  )
-)
+    { name: "library-babel-search" },
+  ),
+);
 
 // Additional stores for different features
 
 interface UIState {
-  theme: 'light' | 'dark' | 'system'
-  sidebarOpen: boolean
-  viewMode: 'grid' | 'list'
-  
-  setTheme: (theme: 'light' | 'dark' | 'system') => void
-  toggleSidebar: () => void
-  setViewMode: (mode: 'grid' | 'list') => void
+  theme: "light" | "dark" | "system";
+  sidebarOpen: boolean;
+  viewMode: "grid" | "list";
+
+  setTheme: (theme: "light" | "dark" | "system") => void;
+  toggleSidebar: () => void;
+  setViewMode: (mode: "grid" | "list") => void;
 }
 
 export const useUIStore = create<UIState>()(
   devtools(
     persist(
       (set) => ({
-        theme: 'system',
+        theme: "system",
         sidebarOpen: false,
-        viewMode: 'list',
+        viewMode: "list",
 
         setTheme: (theme) => set({ theme }),
-        toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-        setViewMode: (viewMode) => set({ viewMode })
+        toggleSidebar: () =>
+          set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+        setViewMode: (viewMode) => set({ viewMode }),
       }),
       {
-        name: 'library-babel-ui'
-      }
+        name: "library-babel-ui",
+      },
     ),
-    { name: 'library-babel-ui' }
-  )
-)
+    { name: "library-babel-ui" },
+  ),
+);
