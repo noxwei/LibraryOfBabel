@@ -50,7 +50,8 @@
       "Bash(echo)",
       "Bash(npx playwright test:*)",
       "Bash(timeout 60 npx playwright test:*)",
-      "Bash(sudo launchctl:*)"
+      "Bash(sudo launchctl:*)",
+      "Bash(git pull:*)"
     ],
     "deny": []
   }
