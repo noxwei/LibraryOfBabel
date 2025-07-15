@@ -1,6 +1,21 @@
-# 📚 LibraryOfBabel API Reference v2.0
+# 📚 LibraryOfBabel API Reference - UNIFIED
 
-Complete documentation for the LibraryOfBabel Secure Paginated API. This API provides authenticated access to 838 real books with advanced pagination, chunking, and search capabilities.
+**🎉 IMPORTANT UPDATE: API has been consolidated!**
+
+This API has been **unified** - there is no longer a separation between v2 and v3 endpoints. All functionality is now available through a single, consolidated API.
+
+**👉 For complete updated documentation, see: [API-Reference-Unified.md](API-Reference-Unified.md)**
+
+## 🚨 Migration Notice
+
+- **Single endpoint**: All functionality now on port 5562
+- **No more v2/v3**: Unified API with backwards compatibility
+- **New features**: Fuzzy search, vector embeddings, in-book search
+- **Legacy support**: V3 format endpoints available for backwards compatibility
+
+---
+
+This API provides authenticated access to 838 real books with advanced pagination, chunking, search capabilities, and new fuzzy search with vector embeddings.
 
 ## 🌐 Production Endpoint
 
