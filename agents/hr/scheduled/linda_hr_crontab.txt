@@ -1,0 +1,7 @@
+# Linda's HR System Cron Jobs
+# Install with: crontab linda_hr_crontab.txt
+
+0 8 * * * /Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/hr/scheduled/hr_task_runner.py daily_performance
+0 9 * * 1 /Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/hr/scheduled/hr_task_runner.py weekly_performance
+0 14 * * 3 /Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/hr/scheduled/hr_task_runner.py cross_training
+0 15 * * 5 /Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/hr/scheduled/hr_task_runner.py mentorship

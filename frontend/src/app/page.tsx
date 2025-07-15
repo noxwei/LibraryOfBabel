@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 interface SearchResult {
   id: string; // Now a string combining book_id-chunk_id
@@ -13,7 +13,7 @@ interface SearchResult {
 }
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -24,17 +24,17 @@ export default function Home() {
 
     setIsSearching(true);
     setShowResults(true);
-    
+
     try {
       // Simulate API call for now - replace with actual API endpoint
-      const response = await fetch('/api/search', {
-        method: 'POST',
+      const response = await fetch("/api/search", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ query: searchQuery }),
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setSearchResults(data.results || []);
@@ -42,28 +42,28 @@ export default function Home() {
         // Mock results for demonstration
         const mockResults = [
           {
-            id: '1-mock-chunk-1',
+            id: "1-mock-chunk-1",
             bookId: 1,
-            chunkId: 'mock-chunk-1',
-            title: 'The Left Hand of Darkness',
-            author: 'Ursula K. Le Guin',
-            excerpt: 'A fascinating exploration of gender and society...',
-            relevance: 0.95
+            chunkId: "mock-chunk-1",
+            title: "The Left Hand of Darkness",
+            author: "Ursula K. Le Guin",
+            excerpt: "A fascinating exploration of gender and society...",
+            relevance: 0.95,
           },
           {
-            id: '2-mock-chunk-2',
+            id: "2-mock-chunk-2",
             bookId: 2,
-            chunkId: 'mock-chunk-2',
-            title: 'Neuromancer',
-            author: 'William Gibson',
-            excerpt: 'The matrix has its roots in primitive arcade games...',
-            relevance: 0.87
-          }
+            chunkId: "mock-chunk-2",
+            title: "Neuromancer",
+            author: "William Gibson",
+            excerpt: "The matrix has its roots in primitive arcade games...",
+            relevance: 0.87,
+          },
         ];
         setSearchResults(mockResults);
       }
     } catch (error) {
-      console.error('Search failed:', error);
+      console.error("Search failed:", error);
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -74,7 +74,7 @@ export default function Home() {
     setSearchQuery(example);
     // Auto-submit the search
     setTimeout(() => {
-      const form = document.querySelector('form');
+      const form = document.querySelector("form");
       if (form) {
         form.requestSubmit();
       }
@@ -90,7 +90,7 @@ export default function Home() {
       "posthuman consciousness",
       "cybernetic organisms",
       "philosophy of mind",
-      "artificial life"
+      "artificial life",
     ];
     const randomExample = examples[Math.floor(Math.random() * examples.length)];
     handleExampleSearch(randomExample);
@@ -134,13 +134,38 @@ export default function Home() {
                     disabled={isSearching || !searchQuery.trim()}
                   >
                     {isSearching ? (
-                      <svg className="h-5 w-5 sm:h-6 sm:w-6 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="h-5 w-5 sm:h-6 sm:w-6 animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                     ) : (
-                      <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      <svg
+                        className="h-5 w-5 sm:h-6 sm:w-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
                       </svg>
                     )}
                   </button>
@@ -149,14 +174,14 @@ export default function Home() {
 
               {/* Mobile-Optimized Action Buttons */}
               <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
-                <button 
+                <button
                   type="submit"
                   className="action-button font-medium w-full sm:w-auto"
                   disabled={isSearching || !searchQuery.trim()}
                 >
-                  {isSearching ? 'Searching...' : 'Search Library'}
+                  {isSearching ? "Searching..." : "Search Library"}
                 </button>
-                <button 
+                <button
                   type="button"
                   onClick={handleIAmFeelingCurious}
                   className="action-button font-medium w-full sm:w-auto"
@@ -175,7 +200,7 @@ export default function Home() {
                     "Octavia Butler",
                     "quantum physics",
                     "digital surveillance",
-                    "posthuman consciousness"
+                    "posthuman consciousness",
                   ].map((example) => (
                     <button
                       key={example}
@@ -200,14 +225,21 @@ export default function Home() {
                       Search Results for &quot;{searchQuery}&quot;
                     </h2>
                     <p className="text-sm text-gray-600 mt-1">
-                      {searchResults.length} results found from 360 books (34M+ words)
+                      {searchResults.length} results found from 360 books (34M+
+                      words)
                     </p>
                   </div>
-                  
-                  <div data-testid="search-results" className="divide-y divide-gray-200">
+
+                  <div
+                    data-testid="search-results"
+                    className="divide-y divide-gray-200"
+                  >
                     {searchResults.length > 0 ? (
                       searchResults.map((result: SearchResult) => (
-                        <div key={result.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                        <div
+                          key={result.id}
+                          className="px-6 py-4 hover:bg-gray-50 transition-colors"
+                        >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <h3 className="text-lg font-medium text-blue-600 hover:text-blue-700">
@@ -230,12 +262,16 @@ export default function Home() {
                       ))
                     ) : (
                       <div className="px-6 py-8 text-center">
-                        <p className="text-gray-500">No results found for your search.</p>
+                        <p className="text-gray-500">
+                          No results found for your search.
+                        </p>
                         <p className="text-sm text-gray-400 mt-2">
-                          Try different keywords or check the popular searches above.
+                          Try different keywords or check the popular searches
+                          above.
                         </p>
                         <p className="text-xs text-gray-400 mt-1">
-                          Searching across 360 books with 34,236,988 words indexed.
+                          Searching across 360 books with 34,236,988 words
+                          indexed.
                         </p>
                       </div>
                     )}
@@ -245,7 +281,9 @@ export default function Home() {
             )}
 
             {/* Mobile-Optimized Stats Display */}
-            <div className={`text-center px-4 ${showResults ? 'mt-8 sm:mt-12' : 'mt-12 sm:mt-16'}`}>
+            <div
+              className={`text-center px-4 ${showResults ? "mt-8 sm:mt-12" : "mt-12 sm:mt-16"}`}
+            >
               <div className="mobile-stats">
                 <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-8">
                   <span className="inline-flex items-center">
@@ -266,24 +304,34 @@ export default function Home() {
           </div>
         </div>
       </main>
-      
+
       {/* Mobile-Optimized Footer */}
       <footer className="mobile-footer">
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-secondary">
             <div className="text-center sm:text-left">
-              <span className="font-semibold text-primary">Library Of Babel</span> 
+              <span className="font-semibold text-primary">
+                Library Of Babel
+              </span>
               <span className="mx-2 hidden sm:inline">•</span>
-              <span className="block sm:inline">Personal Knowledge Liberation System</span>
+              <span className="block sm:inline">
+                Personal Knowledge Liberation System
+              </span>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-8 text-xs sm:text-sm">
               <span>360 books indexed</span>
               <span>34M+ words searchable</span>
               <span>AI-powered semantic search</span>
+              <a
+                href="/hr"
+                className="text-blue-600 hover:text-blue-700 underline"
+              >
+                👔 HR Dashboard
+              </a>
             </div>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

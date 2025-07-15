@@ -197,7 +197,39 @@ PRODUCTION_DEPLOYMENT_SUCCESS.md
 manual_deploy_to_production.py
 .claude/settings.local.json
 
-# 🔒 Security QA Agent - Sensitive Data Protection
+# 🔒 SECURITY QA AGENT - COMPREHENSIVE PROTECTION
+# =================================================
+
+# === CENTRALIZED CONFIGURATION SECURITY ===
+# Centralized API configuration (contains API keys)
+config/api_settings.json
+config/*_backup_*.json
+config/api_settings_backup_*.json
+**/api_settings*.json
+
+# Configuration backups with sensitive data
+config_backup_*/
+*_config_backup.json
+
+# === QA SECURITY AGENT WORKSPACE ===
+# QA Security Agent sensitive reports and data
+agents/qa_security/
+agents/security_qa/
+agents/qa/security_reports/
+agents/qa/vulnerability_scans/
+agents/qa/penetration_tests/
+agents/qa/security_logs/
+qa_security_agent/
+security_qa_workspace/
+
+# QA test reports with API keys or sensitive data
+agents/qa/reports/*security*.json
+agents/qa/reports/*vulnerability*.json
+agents/qa/reports/*penetration*.json
+agents/qa/reports/*api_key*.json
+**/qa_security_*.json
+
+# === API SECURITY & AUTHENTICATION ===
 # Database credentials and connection strings
 *.env
 .env*
@@ -205,18 +237,111 @@ database.conf
 db_config.json
 connection_strings.txt
 
-# Agent workspace and sensitive reports
-agents/*/workspace/
-agents/*/reports/
-agents/*/logs/
-**/workspace/
-**/sensitive_reports/
-
-# API keys and tokens
+# API keys and authentication tokens
 api_keys.txt
 tokens.json
 credentials.json
 secrets.json
+*_api_key.txt
+*_token.json
+*API_KEY*
+*SECRET_KEY*
+
+# OAuth and authentication files
+oauth_config.json
+auth_tokens.json
+session_keys.json
+jwt_secrets.json
+
+# === QA TESTING SECURITY ===
+# QA test files that may contain sensitive data
+qa_test_*.log
+qa_security_*.log
+security_test_*.json
+penetration_test_*.json
+vulnerability_scan_*.json
+
+# QA automation secrets
+qa_automation_secrets.json
+test_credentials.json
+qa_api_keys.json
+
+# === AGENT WORKSPACE & SECURITY REPORTS ===
+# Agent workspace and sensitive reports
+agents/*/workspace/
+agents/*/reports/
+agents/*/logs/
+agents/*/security/
+agents/*/vulnerabilities/
+**/workspace/
+**/sensitive_reports/
+**/security_workspace/
+
+# Security scanning results
+*security_scan*
+*vulnerability_report*
+*penetration_test*
+*security_audit*
+
+# === QA SECURITY AGENT SPECIFIC ===
+# QA Security Agent operational files
+agents/qa/security_agent_workspace/
+agents/qa/security_assessments/
+agents/qa/threat_analysis/
+agents/qa/security_monitoring/
+agents/qa/incident_response/
+
+# Security testing databases and dumps
+*security_test*.db
+*security_scan*.sql
+*vulnerability_data*.json
+*security_assessment*.json
+
+# QA Security metrics and analytics
+security_metrics_*.json
+qa_security_dashboard_*.json
+security_compliance_*.json
+threat_intelligence_*.json
+
+# Sensitive QA configuration files
+qa_security_config.json
+security_qa_settings.json
+qa_agent_credentials.json
+security_testing_config.json
+
+# === INCIDENT RESPONSE & FORENSICS ===
+# Security incident data (potentially sensitive)
+incident_reports/
+forensics_data/
+security_incidents/
+*incident_*.json
+*forensics_*.log
+*security_event_*.json
+
+# === COMPLIANCE & AUDIT ===
+# Compliance reports (may contain sensitive findings)
+compliance_reports/
+audit_logs/
+*compliance_*.json
+*audit_report_*.json
+*security_compliance_*.pdf
+
+# === THREAT INTELLIGENCE ===
+# Threat intelligence feeds and indicators
+threat_intel/
+indicators_of_compromise/
+*threat_*.json
+*ioc_*.json
+*malware_*.json
+
+# === SECURITY TESTING TOOLS ===
+# Security testing tool outputs
+nmap_scans/
+burp_suite_reports/
+owasp_zap_reports/
+*_scan_results.xml
+*_security_report.html
+*_vulnerability_scan.json
 
 # Python cache and temporary files
 __pycache__/
@@ -276,3 +401,6 @@ dist/
 *.egg-info/
 test_api_debug.py
 agents/bulletin_board/agent_memory.json
+.claude/settings.local.json
+.claude/settings.local.json
+.claude/settings.local.json

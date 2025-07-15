@@ -3,14 +3,14 @@
  * Connects Next.js frontend to PostgreSQL backend with 360 books
  */
 
-import { Pool } from 'pg';
+import { Pool } from "pg";
 
 // Database configuration
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'knowledge_base',
-  user: process.env.DB_USER || 'weixiangzhang',
-  port: parseInt(process.env.DB_PORT || '5432'),
+  host: process.env.DB_HOST || "localhost",
+  database: process.env.DB_NAME || "knowledge_base",
+  user: process.env.DB_USER || "weixiangzhang",
+  port: parseInt(process.env.DB_PORT || "5432"),
   password: process.env.DB_PASSWORD,
   // Connection pool settings
   max: 20,
@@ -22,8 +22,8 @@ const dbConfig = {
 const pool = new Pool(dbConfig);
 
 // Handle pool errors
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
   process.exit(-1);
 });
 
@@ -58,12 +58,15 @@ export interface SearchResponse {
 /**
  * Execute full-text search across the 360-book database
  */
-export async function searchDatabase(query: string, limit: number = 8): Promise<SearchResponse> {
+export async function searchDatabase(
+  query: string,
+  limit: number = 8,
+): Promise<SearchResponse> {
   const startTime = Date.now();
-  
+
   try {
     const client = await pool.connect();
-    
+
     try {
       // Full-text search with relevance ranking
       const searchQuery = `
@@ -86,9 +89,9 @@ export async function searchDatabase(query: string, limit: number = 8): Promise<
         ORDER BY relevance DESC, b.word_count DESC
         LIMIT $2
       `;
-      
+
       const result = await client.query(searchQuery, [query, limit]);
-      
+
       // Get library statistics
       const statsQuery = `
         SELECT 
@@ -96,23 +99,26 @@ export async function searchDatabase(query: string, limit: number = 8): Promise<
           (SELECT SUM(word_count) FROM books) as total_words,
           (SELECT COUNT(*) FROM chunks) as total_chunks
       `;
-      
+
       const statsResult = await client.query(statsQuery);
       const stats = statsResult.rows[0];
-      
+
       const searchTime = `${Date.now() - startTime}ms`;
-      
+
       // Generate suggestions if no results
-      const suggestions = result.rows.length === 0 ? [
-        "Try searching for specific authors like 'Octavia Butler' or 'Harari'",
-        "Search for topics like 'consciousness', 'quantum physics', or 'surveillance'",
-        "Use broader terms like 'AI', 'technology', or 'philosophy'",
-        "Try book titles like 'Parable of the Sower' or 'Sapiens'"
-      ] : [];
-      
+      const suggestions =
+        result.rows.length === 0
+          ? [
+              "Try searching for specific authors like 'Octavia Butler' or 'Harari'",
+              "Search for topics like 'consciousness', 'quantum physics', or 'surveillance'",
+              "Use broader terms like 'AI', 'technology', or 'philosophy'",
+              "Try book titles like 'Parable of the Sower' or 'Sapiens'",
+            ]
+          : [];
+
       return {
         query,
-        results: result.rows.map(row => ({
+        results: result.rows.map((row) => ({
           book_id: row.book_id,
           title: row.title,
           author: row.author,
@@ -124,25 +130,23 @@ export async function searchDatabase(query: string, limit: number = 8): Promise<
           content: row.content,
           chapter_number: row.chapter_number,
           section_number: row.section_number,
-          relevance: parseFloat(row.relevance) || 0
+          relevance: parseFloat(row.relevance) || 0,
         })),
         totalResults: result.rows.length,
         searchTime,
         libraryStats: {
           totalBooks: parseInt(stats.total_books) || 0,
           totalWords: parseInt(stats.total_words) || 0,
-          totalChunks: parseInt(stats.total_chunks) || 0
+          totalChunks: parseInt(stats.total_chunks) || 0,
         },
-        suggestions
+        suggestions,
       };
-      
     } finally {
       client.release();
     }
-    
   } catch (error) {
-    console.error('Database search error:', error);
-    throw new Error('Database search failed');
+    console.error("Database search error:", error);
+    throw new Error("Database search failed");
   }
 }
 
@@ -152,7 +156,7 @@ export async function searchDatabase(query: string, limit: number = 8): Promise<
 export async function getRandomBooks(limit: number = 5): Promise<BookResult[]> {
   try {
     const client = await pool.connect();
-    
+
     try {
       const randomQuery = `
         SELECT 
@@ -174,10 +178,10 @@ export async function getRandomBooks(limit: number = 5): Promise<BookResult[]> {
         ORDER BY RANDOM()
         LIMIT $1
       `;
-      
+
       const result = await client.query(randomQuery, [limit]);
-      
-      return result.rows.map(row => ({
+
+      return result.rows.map((row) => ({
         book_id: row.book_id,
         title: row.title,
         author: row.author,
@@ -189,31 +193,29 @@ export async function getRandomBooks(limit: number = 5): Promise<BookResult[]> {
         content: row.content,
         chapter_number: row.chapter_number,
         section_number: row.section_number,
-        relevance: parseFloat(row.relevance) || 0
+        relevance: parseFloat(row.relevance) || 0,
       }));
-      
     } finally {
       client.release();
     }
-    
   } catch (error) {
-    console.error('Random books error:', error);
-    throw new Error('Failed to get random books');
+    console.error("Random books error:", error);
+    throw new Error("Failed to get random books");
   }
 }
 
 /**
  * Test database connection and return health status
  */
-export async function testConnection(): Promise<{ 
-  connected: boolean; 
-  totalBooks: number; 
-  totalChunks: number; 
+export async function testConnection(): Promise<{
+  connected: boolean;
+  totalBooks: number;
+  totalChunks: number;
   totalWords: number;
 }> {
   try {
     const client = await pool.connect();
-    
+
     try {
       const result = await client.query(`
         SELECT 
@@ -221,27 +223,25 @@ export async function testConnection(): Promise<{
           (SELECT COUNT(*) FROM chunks) as total_chunks,
           (SELECT SUM(word_count) FROM books) as total_words
       `);
-      
+
       const stats = result.rows[0];
-      
+
       return {
         connected: true,
         totalBooks: parseInt(stats.total_books) || 0,
         totalChunks: parseInt(stats.total_chunks) || 0,
-        totalWords: parseInt(stats.total_words) || 0
+        totalWords: parseInt(stats.total_words) || 0,
       };
-      
     } finally {
       client.release();
     }
-    
   } catch (error) {
-    console.error('Database connection test failed:', error);
+    console.error("Database connection test failed:", error);
     return {
       connected: false,
       totalBooks: 0,
       totalChunks: 0,
-      totalWords: 0
+      totalWords: 0,
     };
   }
 }
