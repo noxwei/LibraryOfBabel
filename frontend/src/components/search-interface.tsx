@@ -1,31 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useState } from "react";
+import { Search, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface SearchInterfaceProps {
-  onSearch?: (query: string) => void
-  isLoading?: boolean
-  hasResults?: boolean
-  currentQuery?: string
+  onSearch?: (query: string) => void;
+  isLoading?: boolean;
+  hasResults?: boolean;
+  currentQuery?: string;
 }
 
-export function SearchInterface({ 
-  onSearch, 
-  isLoading = false, 
+export function SearchInterface({
+  onSearch,
+  isLoading = false,
   hasResults = false,
-  currentQuery = ""
+  currentQuery = "",
 }: SearchInterfaceProps) {
-  const [query, setQuery] = useState(currentQuery)
+  const [query, setQuery] = useState(currentQuery);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (query.trim() && onSearch) {
-      onSearch(query.trim())
+      onSearch(query.trim());
     }
-  }
+  };
 
   // Google-style: Large centered search when no results, compact header when results
   if (hasResults) {
@@ -37,7 +37,7 @@ export function SearchInterface({
             <h1 className="text-xl font-bold text-foreground">
               LibraryOfBabel
             </h1>
-            
+
             {/* Compact Search */}
             <form onSubmit={handleSubmit} className="flex-1 max-w-2xl">
               <div className="relative">
@@ -59,7 +59,10 @@ export function SearchInterface({
                   disabled={isLoading || !query.trim()}
                 >
                   {isLoading ? (
-                    <Loader2 data-testid="search-loading" className="h-4 w-4 animate-spin" />
+                    <Loader2
+                      data-testid="search-loading"
+                      className="h-4 w-4 animate-spin"
+                    />
                   ) : (
                     <Search className="h-4 w-4" />
                   )}
@@ -74,7 +77,7 @@ export function SearchInterface({
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   // Google-style: Large centered search for homepage
@@ -113,7 +116,10 @@ export function SearchInterface({
             disabled={isLoading || !query.trim()}
           >
             {isLoading ? (
-              <Loader2 data-testid="search-loading" className="h-4 w-4 animate-spin" />
+              <Loader2
+                data-testid="search-loading"
+                className="h-4 w-4 animate-spin"
+              />
             ) : (
               <Search className="h-4 w-4" />
             )}
@@ -122,17 +128,17 @@ export function SearchInterface({
 
         {/* Google-style Buttons */}
         <div className="flex justify-center gap-4">
-          <Button 
+          <Button
             type="submit"
-            variant="outline" 
+            variant="outline"
             size="lg"
             disabled={isLoading || !query.trim()}
             className="px-6"
           >
             Search Library
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="lg"
             onClick={() => setQuery("AI consciousness and ethics")}
             disabled={isLoading}
@@ -144,14 +150,16 @@ export function SearchInterface({
 
         {/* Search Examples */}
         <div className="text-center">
-          <p className="text-sm text-muted-foreground mb-3">Popular searches:</p>
+          <p className="text-sm text-muted-foreground mb-3">
+            Popular searches:
+          </p>
           <div className="flex flex-wrap justify-center gap-2">
             {[
               "AI consciousness and ethics",
               "Octavia Butler social justice",
               "quantum physics philosophy",
               "digital surveillance state",
-              "posthuman consciousness"
+              "posthuman consciousness",
             ].map((example) => (
               <Button
                 key={example}
@@ -193,5 +201,5 @@ export function SearchInterface({
         </div>
       </div>
     </div>
-  )
+  );
 }

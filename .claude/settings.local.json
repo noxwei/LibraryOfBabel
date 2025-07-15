@@ -36,7 +36,23 @@
       "Bash(sudo fuser:*)",
       "Bash(launchctl:*)",
       "Bash(ls:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(./agents/hr/startup/start_linda_hr.sh:*)",
+      "Bash(./agents/hr/startup/stop_linda_hr.sh:*)",
+      "Bash(crontab:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm run qa:maya:*)",
+      "Bash(npm run qa:full:*)",
+      "Bash(npm run lint)",
+      "Bash(npm install:*)",
+      "Bash(npm run format:*)",
+      "Bash(npm test)",
+      "Bash(npm run dev:*)",
+      "Bash(echo)",
+      "Bash(npx playwright test:*)",
+      "Bash(timeout 60 npx playwright test:*)",
+      "Bash(sudo launchctl:*)",
+      "Bash(git pull:*)"
     ],
     "deny": []
   }

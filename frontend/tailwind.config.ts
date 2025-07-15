@@ -1,12 +1,12 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   darkMode: ["class"],
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   prefix: "",
   theme: {
@@ -20,20 +20,28 @@ const config: Config = {
     extend: {
       // Alex Chen's 留白 (liúbái) Design System
       fontFamily: {
-        'sans': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        sans: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
+          "sans-serif",
+        ],
       },
       fontSize: {
-        '7xl': ['4.5rem', { lineHeight: '1', letterSpacing: '-0.02em' }],
-        '8xl': ['6rem', { lineHeight: '1', letterSpacing: '-0.02em' }],
+        "7xl": ["4.5rem", { lineHeight: "1", letterSpacing: "-0.02em" }],
+        "8xl": ["6rem", { lineHeight: "1", letterSpacing: "-0.02em" }],
       },
       fontWeight: {
-        'extralight': '200',
-        'light': '300',
+        extralight: "200",
+        light: "300",
       },
       spacing: {
-        '18': '4.5rem',
-        '20': '5rem',
-        '24': '6rem',
+        "18": "4.5rem",
+        "20": "5rem",
+        "24": "6rem",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -92,6 +100,6 @@ const config: Config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};
 
-export default config
+export default config;

@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { Book, Clock, User, Hash, ExternalLink } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import type { BookSearchResult } from "@/lib/api"
+import { Book, Clock, User, Hash, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { BookSearchResult } from "@/lib/api";
 
 interface SearchResultsProps {
-  results: BookSearchResult[]
-  totalResults: number
-  searchTime: number
-  searchType: string | null
-  query: string
-  isLoading?: boolean
+  results: BookSearchResult[];
+  totalResults: number;
+  searchTime: number;
+  searchType: string | null;
+  query: string;
+  isLoading?: boolean;
 }
 
-export function SearchResults({ 
-  results, 
-  totalResults, 
-  searchTime, 
-  searchType, 
+export function SearchResults({
+  results,
+  totalResults,
+  searchTime,
+  searchType,
   query,
-  isLoading = false 
+  isLoading = false,
 }: SearchResultsProps) {
   if (isLoading) {
     return (
@@ -35,7 +35,7 @@ export function SearchResults({
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (results.length === 0 && !isLoading) {
@@ -52,10 +52,10 @@ export function SearchResults({
             <div className="flex flex-wrap justify-center gap-2">
               {[
                 "consciousness",
-                "philosophy", 
+                "philosophy",
                 "technology",
                 "ethics",
-                "society"
+                "society",
               ].map((suggestion) => (
                 <Button
                   key={suggestion}
@@ -70,11 +70,14 @@ export function SearchResults({
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div data-testid="search-results" className="w-full max-w-4xl mx-auto px-6 mt-12 fade-in">
+    <div
+      data-testid="search-results"
+      className="w-full max-w-4xl mx-auto px-6 mt-12 fade-in"
+    >
       {/* Results Header - 留白 style with breathing room */}
       <div className="border-b border-gray-200 pb-6 mb-10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
@@ -99,7 +102,10 @@ export function SearchResults({
             </div>
           </div>
           <div className="text-sm text-secondary">
-            Searching: <span className="font-medium text-primary">&quot;{query}&quot;</span>
+            Searching:{" "}
+            <span className="font-medium text-primary">
+              &quot;{query}&quot;
+            </span>
           </div>
         </div>
       </div>
@@ -115,7 +121,7 @@ export function SearchResults({
             {/* Book Header with improved hierarchy */}
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
-                <h3 
+                <h3
                   data-testid="book-title"
                   className="text-xl font-medium text-primary hover:text-blue-600 cursor-pointer transition-colors duration-150"
                 >
@@ -138,7 +144,7 @@ export function SearchResults({
                   )}
                 </div>
               </div>
-              
+
               {result.relevance_score && (
                 <div className="text-xs text-tertiary bg-gray-50 px-3 py-1 rounded-full">
                   {(result.relevance_score * 100).toFixed(1)}% match
@@ -147,7 +153,7 @@ export function SearchResults({
             </div>
 
             {/* Content Preview with better readability */}
-            <div 
+            <div
               data-testid="book-content"
               className="text-primary leading-relaxed mb-6 text-base"
             >
@@ -163,12 +169,16 @@ export function SearchResults({
                   <Book className="h-4 w-4 mr-2" />
                   View Book
                 </Button>
-                <Button variant="ghost" size="sm" className="text-secondary hover:text-primary">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-secondary hover:text-primary"
+                >
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Read Chapter
                 </Button>
               </div>
-              
+
               <div className="text-xs text-tertiary">
                 {result.word_count && `${result.word_count} words`}
               </div>
@@ -180,7 +190,11 @@ export function SearchResults({
       {/* Load More with improved spacing */}
       {results.length < totalResults && (
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg" className="action-button px-8 py-3">
+          <Button
+            variant="outline"
+            size="lg"
+            className="action-button px-8 py-3"
+          >
             Load More Results
           </Button>
           <p className="text-sm text-tertiary mt-4">
@@ -189,23 +203,26 @@ export function SearchResults({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // Helper function to highlight search terms in content
 function highlightSearchTerms(content: string, query: string): React.ReactNode {
-  if (!query || query.length < 2) return content
+  if (!query || query.length < 2) return content;
 
-  const terms = query.toLowerCase().split(' ').filter(term => term.length > 2)
-  let highlightedContent = content
+  const terms = query
+    .toLowerCase()
+    .split(" ")
+    .filter((term) => term.length > 2);
+  let highlightedContent = content;
 
-  terms.forEach(term => {
-    const regex = new RegExp(`(${term})`, 'gi')
+  terms.forEach((term) => {
+    const regex = new RegExp(`(${term})`, "gi");
     highlightedContent = highlightedContent.replace(
-      regex, 
-      '<mark class="bg-yellow-200 dark:bg-yellow-900 px-1 rounded">$1</mark>'
-    )
-  })
+      regex,
+      '<mark class="bg-yellow-200 dark:bg-yellow-900 px-1 rounded">$1</mark>',
+    );
+  });
 
-  return <div dangerouslySetInnerHTML={{ __html: highlightedContent }} />
+  return <div dangerouslySetInnerHTML={{ __html: highlightedContent }} />;
 }

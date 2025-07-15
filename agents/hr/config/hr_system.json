@@ -1,0 +1,31 @@
+{
+  "hr_system": {
+    "version": "1.0.0",
+    "manager": "Linda Zhang (\u5f20\u4e3d\u5a1c)",
+    "philosophy": "\u7cfb\u7edf\u5316\u7ba1\u7406 (Systematic Management)",
+    "enabled_features": [
+      "performance_reviews",
+      "cross_training",
+      "mentorship",
+      "automatic_monitoring",
+      "alert_system"
+    ]
+  },
+  "thresholds": {
+    "performance_alert": 0.6,
+    "mentor_qualification": 0.85,
+    "cross_training_urgency": 3,
+    "inactivity_alert_hours": 24
+  },
+  "scheduling": {
+    "daily_monitoring": "08:00",
+    "weekly_reports": "monday_09:00",
+    "emergency_check_minutes": 30
+  },
+  "automation": {
+    "auto_alerts": true,
+    "auto_mentorship": true,
+    "auto_reports": true,
+    "auto_cross_training": true
+  }
+}
