@@ -137,6 +137,13 @@
 ### Phase 6: Post-Deployment Monitoring 📊
 
 #### QA Agent Validation
+- [ ] **MANDATORY: Automated Test Execution**
+  - [ ] Alex Chen (Frontend Design) and Maya Rodriguez (Frontend QA) MUST automatically execute relevant Playwright test suite
+  - [ ] Include Pass/Fail count summary in completion report
+  - [ ] Document key test failures with resolution steps
+  - [ ] **CRITICAL: A feature is NOT considered 'complete' until it has passed its automated QA tests**
+  - [ ] **COMPLETION REQUIREMENT**: When reporting on the completion of any frontend feature or UI implementation, Alex Chen (Frontend Design) and Maya Rodriguez (Frontend QA) MUST automatically execute the relevant Playwright test suite and include a summary of the test results (Pass/Fail count, key failures) in the completion report
+
 - [ ] **Linda's Frontend QA Agent Check**
   - [ ] Feature registered in QA system
   - [ ] Performance metrics baseline established

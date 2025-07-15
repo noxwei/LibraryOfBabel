@@ -35,7 +35,21 @@
       "Bash(API_KEY=babel_secure_LKi-NkGfNRI3-plfVA3ud8vG8v-SzbTSbhl34LW5QzE python3 src/api/secure_paginated_api.py)",
       "Bash(sudo fuser:*)",
       "Bash(launchctl:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(./agents/hr/startup/start_linda_hr.sh:*)",
+      "Bash(./agents/hr/startup/stop_linda_hr.sh:*)",
+      "Bash(crontab:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm run qa:maya:*)",
+      "Bash(npm run qa:full:*)",
+      "Bash(npm run lint)",
+      "Bash(npm install:*)",
+      "Bash(npm run format:*)",
+      "Bash(npm test)",
+      "Bash(npm run dev:*)",
+      "Bash(echo)",
+      "Bash(npx playwright test:*)",
+      "Bash(timeout 60 npx playwright test:*)"
     ],
     "deny": []
   }
