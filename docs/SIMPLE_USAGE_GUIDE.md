@@ -7,7 +7,7 @@
 
 ## 🎭 **BREAKING: LEXI CHAT IS NOW WORKING!** 
 **THE official LibraryOfBabel mascot is LIVE and chatting at:**
-**https://api.ashortstayinhell.com:5562/api/v3/lexi** ✅
+**https://api.example.com:5562/api/v3/lexi** ✅
 
 ---
 
@@ -16,7 +16,7 @@
 ### ⚡ Quick Health Check - PRODUCTION READY!
 ```bash
 # Test LIVE production server (VALIDATED ✅)
-curl -k -s https://api.ashortstayinhell.com:5562/api/v3/health
+curl -k -s https://api.example.com:5562/api/v3/health
 
 # Expected result:
 {"components":{"api":"healthy","database":"healthy"},"status":"healthy","timestamp":"2025-07-11T03:13:29.050827"}
@@ -32,7 +32,7 @@ curl -k -s https://api.ashortstayinhell.com:5562/api/v3/health
 ### 🌐 **Current Working Servers**
 ```bash
 # Production server - LIVE AND VALIDATED ✅
-https://api.ashortstayinhell.com:5562
+https://api.example.com:5562
 
 # Local production server (when running locally)
 https://localhost:5562
@@ -338,7 +338,7 @@ print('=== ALL SYSTEMS GO! ===')
 curl -k -X POST -H "Authorization: Bearer YOUR_API_KEY_HERE" \
   -H "Content-Type: application/json" \
   -d '{"query": "What philosophy books do you recommend?"}' \
-  "https://api.ashortstayinhell.com:5562/api/v3/lexi"
+  "https://api.example.com:5562/api/v3/lexi"
 
 # Returns full response with book recommendations from 363 books!
 ```
@@ -347,7 +347,7 @@ curl -k -X POST -H "Authorization: Bearer YOUR_API_KEY_HERE" \
 ```bash
 # Lexi health dashboard - THE OFFICIAL MASCOT
 curl -k -s -H "Authorization: Bearer YOUR_API_KEY_HERE" \
-  "https://api.ashortstayinhell.com:5562/api/v3/lexi/health" | \
+  "https://api.example.com:5562/api/v3/lexi/health" | \
   python3 -m json.tool
 ```
 
@@ -460,7 +460,7 @@ python3 test_api_endpoints.py &
 ### 🔗 **URLs**
 - Test Server: `http://localhost:9002`
 - Production: `https://localhost:9001` 
-- External: `https://api.ashortstayinhell.com:8080`
+- External: `https://api.example.com:8080`
 
 ### 🔑 **API Key**
 ```
@@ -501,10 +501,10 @@ YOUR_API_KEY_HERE
 
 ---
 
-**🚀 FINAL NOTE: This system is now LIVE IN PRODUCTION with Lexi (THE official mascot) fully operational! 363 books, 34M+ words, Ollama-powered chat, and bulletproof API. Production-ready and battle-tested. Chat with Lexi at https://api.ashortstayinhell.com:5562/api/v3/lexi**
+**🚀 FINAL NOTE: This system is now LIVE IN PRODUCTION with Lexi (THE official mascot) fully operational! 363 books, 34M+ words, Ollama-powered chat, and bulletproof API. Production-ready and battle-tested. Chat with Lexi at https://api.example.com:5562/api/v3/lexi**
 
 *Made with ❤️ by the LibraryOfBabel AI Agent Team*  
 *Lexi (THE official mascot - WORKING!), Linda Zhang, Backend Team, and Wei*
 
 **Last Updated: July 11, 2025 - Production endpoints validated ✅**
-**Production URL: https://api.ashortstayinhell.com:5562**
+**Production URL: https://api.example.com:5562**

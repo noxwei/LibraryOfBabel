@@ -19,7 +19,7 @@ This API provides authenticated access to 838 real books with advanced paginatio
 
 ## 🌐 Production Endpoint
 
-**Base URL**: `https://api.ashortstayinhell.com:5562`
+**Base URL**: `https://api.example.com:5562`
 
 ## 🔐 Authentication
 
@@ -55,7 +55,7 @@ This API provides authenticated access to 838 real books with advanced paginatio
 
 **Example Request:**
 ```bash
-curl https://api.ashortstayinhell.com:5562/health
+curl https://api.example.com:5562/health
 ```
 
 **Response:**
@@ -115,8 +115,8 @@ curl "https://api.ashorystayinhell.com:5562/books?api_key=YOUR_API_KEY&page=1&pa
       "processed_date": "Sun, 06 Jul 2025 00:49:50 GMT",
       "has_hash": true,
       "links": {
-        "self": "https://api.ashortstayinhell.com:5562/books/611",
-        "chunks": "https://api.ashortstayinhell.com:5562/books/611/chunks"
+        "self": "https://api.example.com:5562/books/611",
+        "chunks": "https://api.example.com:5562/books/611/chunks"
       }
     }
   ],
@@ -129,9 +129,9 @@ curl "https://api.ashorystayinhell.com:5562/books?api_key=YOUR_API_KEY&page=1&pa
     "has_prev": false
   },
   "navigation": {
-    "next": "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&page=2&page_size=5",
-    "first": "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&page=1&page_size=5",
-    "last": "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&page=168&page_size=5"
+    "next": "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=2&page_size=5",
+    "first": "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=1&page_size=5",
+    "last": "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=168&page_size=5"
   },
   "meta": {
     "timestamp": "2025-07-14T13:35:25.089000",
@@ -145,7 +145,7 @@ curl "https://api.ashorystayinhell.com:5562/books?api_key=YOUR_API_KEY&page=1&pa
 
 **Example Request:**
 ```bash
-curl "https://api.ashortstayinhell.com:5562/books/611?api_key=YOUR_API_KEY"
+curl "https://api.example.com:5562/books/611?api_key=YOUR_API_KEY"
 ```
 
 **Response:**
@@ -167,8 +167,8 @@ curl "https://api.ashortstayinhell.com:5562/books/611?api_key=YOUR_API_KEY"
   "chunks_available": 45,
   "embeddings_available": 42,
   "links": {
-    "chunks": "https://api.ashortstayinhell.com:5562/books/611/chunks",
-    "search_in_book": "https://api.ashortstayinhell.com:5562/search?q=&book_id=611"
+    "chunks": "https://api.example.com:5562/books/611/chunks",
+    "search_in_book": "https://api.example.com:5562/search?q=&book_id=611"
   },
   "meta": {
     "query_time_ms": 12.34
@@ -189,7 +189,7 @@ curl "https://api.ashortstayinhell.com:5562/books/611?api_key=YOUR_API_KEY"
 
 **Example Request:**
 ```bash
-curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=small&page=1"
+curl "https://api.example.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=small&page=1"
 ```
 
 **Response:**
@@ -213,7 +213,7 @@ curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_API_KE
       "total_sub_chunks": 6,
       "chunk_level": "small",
       "links": {
-        "full_content": "https://api.ashortstayinhell.com:5562/chunks/1234?chunk_level=small"
+        "full_content": "https://api.example.com:5562/chunks/1234?chunk_level=small"
       }
     }
   ],
@@ -241,7 +241,7 @@ curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_API_KE
 
 **Example Request:**
 ```bash
-curl "https://api.ashortstayinhell.com:5562/chunks/1234?api_key=YOUR_API_KEY&chunk_level=medium"
+curl "https://api.example.com:5562/chunks/1234?api_key=YOUR_API_KEY&chunk_level=medium"
 ```
 
 **Response:**
@@ -264,7 +264,7 @@ curl "https://api.ashortstayinhell.com:5562/chunks/1234?api_key=YOUR_API_KEY&chu
   ],
   "total_sub_chunks": 2,
   "links": {
-    "book": "https://api.ashortstayinhell.com:5562/books/611"
+    "book": "https://api.example.com:5562/books/611"
   },
   "meta": {
     "query_time_ms": 8.92
@@ -287,7 +287,7 @@ curl "https://api.ashortstayinhell.com:5562/chunks/1234?api_key=YOUR_API_KEY&chu
 
 **Example Request:**
 ```bash
-curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_API_KEY&q=magic&page=1"
+curl "https://api.example.com:5562/search?api_key=YOUR_API_KEY&q=magic&page=1"
 ```
 
 **Response:**
@@ -301,8 +301,8 @@ curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_API_KEY&q=magic&
       "description": "The first book in the Harry Potter series about a young wizard...",
       "word_count": 77325,
       "links": {
-        "book": "https://api.ashortstayinhell.com:5562/books/611",
-        "chunks": "https://api.ashortstayinhell.com:5562/books/611/chunks"
+        "book": "https://api.example.com:5562/books/611",
+        "chunks": "https://api.example.com:5562/books/611/chunks"
       }
     }
   ],
@@ -315,7 +315,7 @@ curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_API_KEY&q=magic&
     "has_prev": false
   },
   "navigation": {
-    "next": "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_API_KEY&q=magic&page=2"
+    "next": "https://api.example.com:5562/search?api_key=YOUR_API_KEY&q=magic&page=2"
   },
   "meta": {
     "timestamp": "2025-07-14T13:35:25.089000",
@@ -334,7 +334,7 @@ curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_API_KEY&q=magic&
 
 **Example Request:**
 ```bash
-curl https://api.ashortstayinhell.com:5562/api-docs
+curl https://api.example.com:5562/api-docs
 ```
 
 **Response:**
@@ -342,7 +342,7 @@ curl https://api.ashortstayinhell.com:5562/api-docs
 {
   "title": "LibraryOfBabel Secure Paginated API v2.0",
   "description": "Enhanced API with pagination, chunking levels, navigation links, and authentication",
-  "base_url": "https://api.ashortstayinhell.com:5562",
+  "base_url": "https://api.example.com:5562",
   "authentication": {
     "required": true,
     "methods": [
@@ -367,7 +367,7 @@ curl https://api.ashortstayinhell.com:5562/api-docs
       "method": "GET",
       "description": "Health check and system info",
       "authentication": false,
-      "example": "https://api.ashortstayinhell.com:5562/health"
+      "example": "https://api.example.com:5562/health"
     },
     "/books": {
       "method": "GET", 
@@ -380,7 +380,7 @@ curl https://api.ashortstayinhell.com:5562/api-docs
         "author": "Filter by author",
         "genre": "Filter by genre"
       },
-      "example": "https://api.ashortstayinhell.com:5562/books?page=1&page_size=10&search=magic&api_key=YOUR_API_KEY"
+      "example": "https://api.example.com:5562/books?page=1&page_size=10&search=magic&api_key=YOUR_API_KEY"
     }
   },
   "chunking_levels": {
@@ -405,7 +405,7 @@ curl https://api.ashortstayinhell.com:5562/api-docs
 ## 🛡️ Security Features
 
 ### HTTPS/SSL
-- **Let's Encrypt certificates** for api.ashortstayinhell.com
+- **Let's Encrypt certificates** for api.example.com
 - **HTTPS enforced** for all connections
 - **Security headers** on all responses:
   - `X-Content-Type-Options: nosniff`
@@ -443,25 +443,25 @@ curl https://api.ashortstayinhell.com:5562/api-docs
 ### Basic Book Listing
 ```bash
 # Get first 5 books
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&page_size=5"
+curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page_size=5"
 ```
 
 ### Search for Specific Content
 ```bash
 # Search for books about artificial intelligence
-curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_API_KEY&q=artificial%20intelligence"
+curl "https://api.example.com:5562/search?api_key=YOUR_API_KEY&q=artificial%20intelligence"
 ```
 
 ### Navigate to Last Page
 ```bash
 # Jump to the last page to see newest books
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_API_KEY&page=168&page_size=5"
+curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=168&page_size=5"
 ```
 
 ### Get Book Chunks with Small Chunking
 ```bash
 # Get small chunks for detailed analysis
-curl "https://api.ashortstayinhell.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=small"
+curl "https://api.example.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_level=small"
 ```
 
 ---

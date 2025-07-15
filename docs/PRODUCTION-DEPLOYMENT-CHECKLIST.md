@@ -54,7 +54,7 @@ This checklist ensures all components are properly configured for production ope
 - [ ] **Dependencies Installed** - `pip3 install flask psycopg2-binary requests numpy`
 - [ ] **Security Middleware** - Updated to use Let's Encrypt certificates
 - [ ] **API Server Tested** - Starts successfully with SSL on port 5562
-- [ ] **External API Access** - `https://api.ashortstayinhell.com:5562/api/secure/info` responds
+- [ ] **External API Access** - `https://api.example.com:5562/api/secure/info` responds
 - [ ] **Authentication Working** - API key validation functional
 
 ## Phase 2: Service Automation

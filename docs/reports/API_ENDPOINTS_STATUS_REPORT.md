@@ -4,7 +4,7 @@
 ## 🚀 **API SERVER STATUS: OPERATIONAL** ✅
 
 ### **Server Configuration:**
-- **Host**: api.ashortstayinhell.com
+- **Host**: api.example.com
 - **Port**: 5562 (Production HTTPS)
 - **Protocol**: HTTPS with Let's Encrypt certificates
 - **API Version**: 2.0-secure-paginated
@@ -117,7 +117,7 @@
 ## 🚀 **DEPLOYMENT STATUS**
 
 ### **Production Environment:**
-- **URL**: https://api.ashortstayinhell.com:5562
+- **URL**: https://api.example.com:5562
 - **Status**: ✅ Live and operational
 - **Uptime**: 99.9%+
 - **Auto-restart Daemon**: ✅ Active (com.librarybabel.api)

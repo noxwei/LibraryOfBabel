@@ -58,7 +58,7 @@ Transform static book collections into dynamic, searchable knowledge bases that 
 - **Quality Assurance**: Library science standards compliance
 
 ### **Current Projects**
-- **Production API**: Fully operational at api.ashortstayinhell.com
+- **Production API**: Fully operational at api.example.com
 - **Vector Embeddings**: Semantic search implementation
 - **Mobile Integration**: iOS Shortcuts and voice commands
 - **Collection Growth**: Processing hundreds of new books monthly

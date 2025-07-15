@@ -60,7 +60,7 @@ The system will automatically detect your local IP (e.g., 10.0.0.13)
 
 3. **Student Access**
 - **Hell Theme**: http://YOUR_IP:5571 (Red/black dramatic theme)
-- **Production API**: https://api.ashortstayinhell.com:5562 (838 books, authenticated)
+- **Production API**: https://api.example.com:5562 (838 books, authenticated)
 
 ### **Educational Features**
 - ✅ **Safe Content**: All generated books are educational and appropriate
