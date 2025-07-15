@@ -1,0 +1,45 @@
+# Page snapshot
+
+```yaml
+- heading "HR Management System" [level=1]
+- paragraph: Managed by Linda Zhang (张丽娜) - HR Operations & Agent Performance
+- navigation:
+  - heading "👔 Linda's HR Management" [level=2]
+  - paragraph: by Linda Zhang (张丽娜) & Alex Chen (Frontend) + Lexi (UX)
+  - button "🏠 Overview"
+  - button "📊 Reports"
+  - button "🎓 Training"
+  - button "👥 Mentorship"
+  - button "🔄 Refresh"
+- main:
+  - heading "🏢 System Status" [level=2]
+  - paragraph: Managed by Linda Zhang (张丽娜)
+  - text: 🟢 OPERATIONAL
+  - heading "🏆 Agent Leaderboard" [level=3]
+  - text: "⚡ 2 Active #1"
+  - heading "Maya Rodriguez (Frontend QA)" [level=4]
+  - paragraph: 189 tasks completed
+  - text: "Success Rate 🏆 Champion 97.2% 🚀 2.1% #2"
+  - heading "Linda Zhang (HR Manager)" [level=4]
+  - paragraph: 247 tasks completed
+  - text: "Success Rate ⚡ Speed 95.8% 📉 0.8% #1 📈 ↗️ 2.1%"
+  - heading "99.8%" [level=3]
+  - paragraph: System Uptime
+  - text: ⚡ ↘️ 10%
+  - heading "0.5s" [level=3]
+  - paragraph: Response Time
+  - text: 🛡️ ↘️ 15%
+  - heading "0.2%" [level=3]
+  - paragraph: Error Rate
+  - text: 😊 ↗️ 5%
+  - heading "94%" [level=3]
+  - paragraph: User Satisfaction
+- link "← Back to Library Search":
+  - /url: /
+- alert
+- button "Open Next.js Dev Tools":
+  - img
+- button "Open issues overlay": 1 Issue
+- button "Collapse issues badge":
+  - img
+```

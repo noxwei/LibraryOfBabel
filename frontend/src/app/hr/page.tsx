@@ -1,6 +1,7 @@
-'use client'
+"use client";
 
-import HRDashboard from '../../components/hr/HRDashboard'
+import Link from "next/link";
+import HRDashboard from "../../components/hr/HRDashboard";
 
 export default function HRPage() {
   return (
@@ -14,18 +15,18 @@ export default function HRPage() {
             Managed by Linda Zhang (张丽娜) - HR Operations & Agent Performance
           </p>
         </div>
-        
+
         <HRDashboard />
-        
+
         <div className="mt-8 text-center">
-          <a 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             ← Back to Library Search
-          </a>
+          </Link>
         </div>
       </div>
     </div>
-  )
+  );
 }
