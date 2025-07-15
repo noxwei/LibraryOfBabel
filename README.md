@@ -174,7 +174,7 @@ print(f"Found {results['search_stats']['total_results']} semantic matches")
 
 ### **JavaScript with Fuzzy Search**
 ```javascript
-const API_KEY = 'your_api_key_here';
+const API_KEY = 'YOUR_ACTUAL_API_KEY';
 const BASE_URL = 'https://api.ashortstayinhell.com:5562';
 
 // Hybrid fuzzy search

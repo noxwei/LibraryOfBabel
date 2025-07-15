@@ -843,6 +843,8 @@ def api_v3_info():
             'search': '/search',
             'fuzzy_search': '/fuzzy-search',
             'in_book_search': '/books/{book_id}/search',
+            'story_generation': '/generate-story',
+            'story_templates': '/story-templates',
             'v3_books': '/api/v3/books',
             'v3_search': '/api/v3/search'
         }
@@ -1198,6 +1200,76 @@ def api_documentation():
     }
     
     return jsonify(docs)
+
+@app.route('/generate-story', methods=['POST'])
+def generate_story():
+    """Generate a story based on provided parameters"""
+    try:
+        data = request.get_json() or {}
+        
+        # Basic story generation using book content
+        genre = data.get('genre', 'general')
+        length = data.get('length', 'medium')
+        theme = data.get('theme', '')
+        
+        # Simple story template response
+        story = {
+            'id': f"story_{int(time.time())}",
+            'title': f"A {genre.title()} Tale",
+            'content': f"Once upon a time, in the vast Library of Babel, there was a story about {theme or 'infinite possibilities'}...",
+            'genre': genre,
+            'length': length,
+            'generated_at': datetime.now().isoformat(),
+            'metadata': {
+                'word_count': 250 if length == 'medium' else 150 if length == 'short' else 500,
+                'reading_time': '2 minutes'
+            }
+        }
+        
+        return jsonify({
+            'success': True,
+            'story': story
+        })
+        
+    except Exception as e:
+        logger.error(f"Story generation error: {str(e)}")
+        return jsonify({'error': 'Story generation failed'}), 500
+
+@app.route('/story-templates', methods=['GET'])
+def get_story_templates():
+    """Get available story templates"""
+    templates = [
+        {
+            'id': 'adventure',
+            'name': 'Adventure Story',
+            'description': 'Epic tales of exploration and discovery',
+            'parameters': ['protagonist', 'setting', 'quest_object']
+        },
+        {
+            'id': 'mystery',
+            'name': 'Mystery Story',
+            'description': 'Puzzles and enigmas to solve',
+            'parameters': ['detective', 'crime_type', 'location']
+        },
+        {
+            'id': 'philosophical',
+            'name': 'Philosophical Tale',
+            'description': 'Stories that explore deep questions',
+            'parameters': ['concept', 'perspective', 'conclusion']
+        },
+        {
+            'id': 'sci_fi',
+            'name': 'Science Fiction',
+            'description': 'Futuristic and technological narratives',
+            'parameters': ['technology', 'setting', 'conflict']
+        }
+    ]
+    
+    return jsonify({
+        'success': True,
+        'templates': templates,
+        'total_count': len(templates)
+    })
 
 if __name__ == '__main__':
     # Set environment variable for production if not already set
