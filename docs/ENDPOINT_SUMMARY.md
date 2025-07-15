@@ -1,6 +1,6 @@
 # 🚀 LibraryOfBabel Unified API - Endpoint Summary
 
-**Base URL**: `https://api.ashortstayinhell.com:5562`  
+**Base URL**: `https://api.example.com:5562`  
 **Version**: Unified (consolidates former v2 + v3)
 
 ## 📋 Quick Reference - All Available Endpoints
@@ -90,22 +90,22 @@ The new `/fuzzy-search` endpoint supports multiple search algorithms:
 
 ```bash
 # Health check
-curl "https://api.ashortstayinhell.com:5562/health"
+curl "https://api.example.com:5562/health"
 
 # List books
-curl "https://api.ashortstayinhell.com:5562/books?api_key=YOUR_KEY&page_size=5"
+curl "https://api.example.com:5562/books?api_key=YOUR_KEY&page_size=5"
 
 # Traditional search
-curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_KEY&q=Foucault"
+curl "https://api.example.com:5562/search?api_key=YOUR_KEY&q=Foucault"
 
 # NEW: In-book search
-curl "https://api.ashortstayinhell.com:5562/books/1099/search?api_key=YOUR_KEY&q=discourse"
+curl "https://api.example.com:5562/books/1099/search?api_key=YOUR_KEY&q=discourse"
 
 # NEW: Semantic fuzzy search
-curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=YOUR_KEY&q=artificial%20intelligence&type=semantic&limit=5"
+curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_KEY&q=artificial%20intelligence&type=semantic&limit=5"
 
 # NEW: Hybrid search with custom weights
-curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=YOUR_KEY&q=democracy&type=hybrid&semantic_weight=0.6&fuzzy_weight=0.3&keyword_weight=0.1"
+curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_KEY&q=democracy&type=hybrid&semantic_weight=0.6&fuzzy_weight=0.3&keyword_weight=0.1"
 ```
 
 ---

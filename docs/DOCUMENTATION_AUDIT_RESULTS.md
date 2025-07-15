@@ -2,7 +2,7 @@
 
 ## 🎯 Audit Summary
 
-Following the major API consolidation to `https://api.ashortstayinhell.com:5562` with 838 books, 25,067 chunks, and 18,363 embeddings, a comprehensive documentation audit revealed significant outdated content across multiple files.
+Following the major API consolidation to `https://api.example.com:5562` with 838 books, 25,067 chunks, and 18,363 embeddings, a comprehensive documentation audit revealed significant outdated content across multiple files.
 
 ## 🚨 Critical Issues Found
 
@@ -11,7 +11,7 @@ Following the major API consolidation to `https://api.ashortstayinhell.com:5562`
 - **Documented**: 14-360 books, 331 chunks (severely outdated)
 
 ### **API Endpoint Confusion**
-- **Current Reality**: `https://api.ashortstayinhell.com:5562` (consolidated)
+- **Current Reality**: `https://api.example.com:5562` (consolidated)
 - **Documented**: Various localhost ports (5000, 5560, 5570, 5571, 5572)
 
 ### **Missing Security Requirements**
@@ -26,7 +26,7 @@ Following the major API consolidation to `https://api.ashortstayinhell.com:5562`
 
 #### 1. `/docs/setup_guides/API.md`
 **Status**: Completely Outdated ⛔
-- ❌ Base URL: `http://localhost:5000/api` → Should be `https://api.ashortstayinhell.com:5562`
+- ❌ Base URL: `http://localhost:5000/api` → Should be `https://api.example.com:5562`
 - ❌ Authentication: "No authentication required" → API key required
 - ❌ Book count: 14 books → 838 books
 - ❌ API version: "1.0" → "2.0-secure-paginated"
@@ -36,7 +36,7 @@ Following the major API consolidation to `https://api.ashortstayinhell.com:5562`
 **Status**: Multiple Critical Issues 🔥
 - ❌ Port references: 5570, 5571, 5572 → Should be 5562
 - ❌ Health check: Shows 14 books → Should show 838
-- ❌ API calls: `localhost:5570` → `api.ashortstayinhell.com:5562`
+- ❌ API calls: `localhost:5570` → `api.example.com:5562`
 - ❌ Environment variables: Old ports in examples
 
 #### 3. `/docs/reports/API_ENDPOINTS_STATUS_REPORT.md`
@@ -44,25 +44,25 @@ Following the major API consolidation to `https://api.ashortstayinhell.com:5562`
 - ❌ Ports: 9001, 9002 → 5562
 - ❌ Book count: 360 → 838
 - ❌ Missing: Chunk count (25,067) and embeddings (18,363)
-- ❌ Domain: `api.ashort` → `api.ashortstayinhell.com:5562`
+- ❌ Domain: `api.ashort` → `api.example.com:5562`
 
 ### 🟡 HIGH PRIORITY - Update Soon
 
 #### 4. `/docs/FRONTEND_INTEGRATION_GUIDE.md`
 **Status**: Major Updates Needed 🖥️
-- ❌ Backend URL: `localhost:5570` → `api.ashortstayinhell.com:5562`
+- ❌ Backend URL: `localhost:5570` → `api.example.com:5562`
 - ❌ Missing: Authentication requirements
 - ❌ Missing: Production deployment info
 
 #### 5. `/docs/SIMPLE_USAGE_GUIDE.md`
 **Status**: Mixed (Some Correct, Some Wrong) ⚡
-- ✅ Has correct production URL `api.ashortstayinhell.com:5562`
+- ✅ Has correct production URL `api.example.com:5562`
 - ❌ Book count: 360 → 838
 - ❌ Local ports: Still references old development ports
 
 #### 6. `/docs/AI-Agents-Guide.md`
 **Status**: Missing Production Info 🤖
-- ❌ API port: `localhost:5560` → `api.ashortstayinhell.com:5562`
+- ❌ API port: `localhost:5560` → `api.example.com:5562`
 - ❌ Missing: Authentication requirements
 - ❌ Missing: Current statistics (838 books, etc.)
 
@@ -109,7 +109,7 @@ All documentation should reference these **authoritative values**:
 
 ### **API Endpoint**
 ```
-Production: https://api.ashortstayinhell.com:5562
+Production: https://api.example.com:5562
 Development: http://localhost:5562 (mirror production port)
 ```
 

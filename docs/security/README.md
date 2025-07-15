@@ -1,6 +1,6 @@
 # Production SSL Certificates
 
-Working Let's Encrypt certificates for api.ashortstayinhell.com
+Working Let's Encrypt certificates for api.example.com
 
 - cert.pem - Server certificate
 - chain.pem - Certificate chain  

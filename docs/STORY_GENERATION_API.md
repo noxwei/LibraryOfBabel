@@ -20,7 +20,7 @@
 **Example Usage**:
 ```bash
 # Reproducible philosophical story with seed
-curl "https://api.ashortstayinhell.com:5562/generate-story" \
+curl "https://api.example.com:5562/generate-story" \
   -H "Content-Type: application/json" \
   -d '{
     "api_key": "YOUR_API_KEY",
@@ -193,14 +193,14 @@ Study relationships between authors, genres, and narrative elements
 
 ### **Simple Story Generation**
 ```bash
-curl "https://api.ashortstayinhell.com:5562/generate-story" \
+curl "https://api.example.com:5562/generate-story" \
   -H "Content-Type: application/json" \
   -d '{"api_key": "YOUR_KEY", "criteria": {"genre": "mystery"}}'
 ```
 
 ### **Advanced Configuration**
 ```bash
-curl "https://api.ashortstayinhell.com:5562/generate-story" \
+curl "https://api.example.com:5562/generate-story" \
   -H "Content-Type: application/json" \
   -d '{
     "api_key": "YOUR_KEY",
@@ -219,7 +219,7 @@ curl "https://api.ashortstayinhell.com:5562/generate-story" \
 ### **Quality Analysis**
 ```bash
 # Get detailed quality metrics
-curl "https://api.ashortstayinhell.com:5562/analyze-story/STORY_ID?api_key=YOUR_KEY"
+curl "https://api.example.com:5562/analyze-story/STORY_ID?api_key=YOUR_KEY"
 ```
 
 ## 🎯 **Roadmap**
