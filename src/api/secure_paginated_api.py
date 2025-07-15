@@ -231,6 +231,37 @@ def chunk_text(text: str, chunk_level: str = 'medium') -> List[Dict]:
     
     return chunks
 
+def build_navigation_links(endpoint, page, page_size, total_pages, extra_params=None, **kwargs):
+    """Build navigation links for pagination"""
+    if extra_params is None:
+        extra_params = {}
+    
+    params = {'page_size': page_size, 'api_key': EXISTING_API_KEY, **extra_params}
+    
+    links = {}
+    
+    # First page
+    if total_pages > 0:
+        first_params = {**params, 'page': 1}
+        links['first'] = url_for(endpoint, _external=True, **kwargs, **first_params)
+    
+    # Previous page
+    if page > 1:
+        prev_params = {**params, 'page': page - 1}
+        links['prev'] = url_for(endpoint, _external=True, **kwargs, **prev_params)
+    
+    # Next page
+    if page < total_pages:
+        next_params = {**params, 'page': page + 1}
+        links['next'] = url_for(endpoint, _external=True, **kwargs, **next_params)
+    
+    # Last page
+    if total_pages > 0:
+        last_params = {**params, 'page': total_pages}
+        links['last'] = url_for(endpoint, _external=True, **kwargs, **last_params)
+    
+    return links
+
 @app.route('/health')
 def health_check():
     """Health check endpoint - NO AUTH REQUIRED"""
@@ -622,6 +653,461 @@ def search_books():
     except Exception as e:
         logger.error(f"Search query failed: {e}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/books/<int:book_id>/search')
+@security_manager.require_api_key
+@security_manager.log_request
+def search_within_book(book_id):
+    """Search within a specific book - AUTHENTICATION REQUIRED"""
+    start_time = time.time()
+    
+    query_text = request.args.get('q', '').strip()
+    if not query_text:
+        return jsonify({'error': 'Query parameter q is required'}), 400
+    
+    # Pagination parameters
+    page = int(request.args.get('page', 1))
+    page_size = min(int(request.args.get('page_size', API_CONFIG['default_page_size'])), API_CONFIG['max_page_size'])
+    offset = (page - 1) * page_size
+    
+    try:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                # First verify book exists
+                cur.execute("SELECT title, author FROM books WHERE book_id = %s", (book_id,))
+                book = cur.fetchone()
+                if not book:
+                    return jsonify({'error': f'Book with ID {book_id} not found'}), 404
+                
+                # Get total count for pagination
+                cur.execute("""
+                    SELECT COUNT(*) as total
+                    FROM chunks 
+                    WHERE book_id = %s 
+                    AND content ILIKE %s
+                """, (book_id, f'%{query_text}%'))
+                
+                total_items = cur.fetchone()['total']
+                total_pages = math.ceil(total_items / page_size)
+                
+                # Get search results with ranking
+                cur.execute("""
+                    SELECT 
+                        chunk_id, book_id, chapter_number, content, word_count,
+                        ts_rank(to_tsvector('english', content), plainto_tsquery('english', %s)) as relevance
+                    FROM chunks 
+                    WHERE book_id = %s 
+                    AND to_tsvector('english', content) @@ plainto_tsquery('english', %s)
+                    ORDER BY relevance DESC, chapter_number, chunk_id
+                    LIMIT %s OFFSET %s
+                """, (query_text, book_id, query_text, page_size, offset))
+                
+                results = cur.fetchall()
+                
+                # Build navigation links
+                nav_links = build_navigation_links(
+                    endpoint='search_within_book',
+                    book_id=book_id,
+                    page=page,
+                    page_size=page_size,
+                    total_pages=total_pages,
+                    extra_params={'q': query_text}
+                )
+                
+                result = {
+                    'results': [dict(row) for row in results],
+                    'pagination': {
+                        'page': page,
+                        'page_size': page_size,
+                        'total_items': total_items,
+                        'total_pages': total_pages,
+                        'has_next': page < total_pages,
+                        'has_prev': page > 1
+                    },
+                    'navigation': nav_links,
+                    'book_info': {
+                        'book_id': book_id,
+                        'title': book['title'],
+                        'author': book['author']
+                    },
+                    'meta': {
+                        'timestamp': datetime.now().isoformat(),
+                        'query_time_ms': round((time.time() - start_time) * 1000, 2),
+                        'search_query': query_text,
+                        'search_scope': f'within book {book_id}'
+                    }
+                }
+                
+                return jsonify(result)
+                
+    except Exception as e:
+        logger.error(f"In-book search failed for book {book_id}: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/fuzzy-search')
+@security_manager.require_api_key
+@security_manager.log_request
+def fuzzy_semantic_search():
+    """Advanced fuzzy search using vector embeddings and semantic similarity - AUTHENTICATION REQUIRED"""
+    start_time = time.time()
+    
+    query_text = request.args.get('q', '').strip()
+    if not query_text:
+        return jsonify({'error': 'Query parameter q is required'}), 400
+    
+    # Search parameters
+    limit = min(int(request.args.get('limit', 10)), 50)
+    search_type = request.args.get('type', 'hybrid')  # hybrid, semantic, fuzzy, keyword
+    
+    # Weight parameters for hybrid search
+    semantic_weight = float(request.args.get('semantic_weight', 0.5))
+    fuzzy_weight = float(request.args.get('fuzzy_weight', 0.3))
+    keyword_weight = float(request.args.get('keyword_weight', 0.2))
+    
+    try:
+        # Import fuzzy search system
+        import sys
+        sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+        from fuzzy_semantic_search import FuzzySemanticSearch
+        
+        searcher = FuzzySemanticSearch()
+        
+        if search_type == 'semantic':
+            results = searcher.semantic_search(query_text, limit)
+            search_stats = {
+                'search_type': 'semantic_only',
+                'total_results': len(results),
+                'processing_time_ms': round((time.time() - start_time) * 1000, 2)
+            }
+        elif search_type == 'fuzzy':
+            results = searcher.fuzzy_text_search(query_text, limit)
+            search_stats = {
+                'search_type': 'fuzzy_only',
+                'total_results': len(results),
+                'processing_time_ms': round((time.time() - start_time) * 1000, 2)
+            }
+        elif search_type == 'keyword':
+            results = searcher.keyword_search(query_text, limit)
+            search_stats = {
+                'search_type': 'keyword_only',
+                'total_results': len(results),
+                'processing_time_ms': round((time.time() - start_time) * 1000, 2)
+            }
+        else:  # hybrid
+            weights = {
+                'semantic': semantic_weight,
+                'fuzzy': fuzzy_weight,
+                'keyword': keyword_weight
+            }
+            result = searcher.hybrid_search(query_text, limit, weights)
+            results = result['results']
+            search_stats = result['search_stats']
+        
+        response = {
+            'results': results,
+            'search_stats': search_stats,
+            'meta': {
+                'timestamp': datetime.now().isoformat(),
+                'query_time_ms': round((time.time() - start_time) * 1000, 2),
+                'search_query': query_text,
+                'search_type': search_type,
+                'api_version': '2.0-fuzzy-semantic'
+            }
+        }
+        
+        return jsonify(response)
+        
+    except Exception as e:
+        logger.error(f"Fuzzy search failed: {e}")
+        return jsonify({'error': f'Fuzzy search error: {str(e)}'}), 500
+
+# ==============================================================================
+# V3 API ENDPOINTS MERGED INTO V2 FOR UNIFIED SEARCH API
+# ==============================================================================
+
+@app.route('/api/v3/info')
+def api_v3_info():
+    """API v3 info endpoint - NO AUTH REQUIRED"""
+    return jsonify({
+        'api_name': 'LibraryOfBabel Unified Search API',
+        'version': '3.0-unified',
+        'description': 'Unified API combining v2 and v3 functionality',
+        'base_url': request.host_url.rstrip('/'),
+        'features': [
+            'pagination', 'chunking_levels', 'fuzzy_search', 'semantic_search',
+            'in_book_search', 'vector_embeddings', 'authentication', 'rate_limiting'
+        ],
+        'endpoints': {
+            'health': '/health',
+            'books': '/books',
+            'search': '/search',
+            'fuzzy_search': '/fuzzy-search',
+            'in_book_search': '/books/{book_id}/search',
+            'v3_books': '/api/v3/books',
+            'v3_search': '/api/v3/search'
+        }
+    })
+
+@app.route('/api/v3/health')
+def api_v3_health():
+    """API v3 health check - NO AUTH REQUIRED"""
+    start_time = time.time()
+    
+    db = get_db()
+    if db:
+        try:
+            with db.cursor() as cur:
+                cur.execute("SELECT COUNT(*) FROM books")
+                book_count = cur.fetchone()[0]
+                cur.execute("SELECT COUNT(*) FROM chunks")
+                chunk_count = cur.fetchone()[0]
+                
+            db_status = "healthy"
+        except Exception as e:
+            logger.error(f"Database health check failed: {e}")
+            db_status = "unhealthy"
+            book_count = 0
+            chunk_count = 0
+        finally:
+            db.close()
+    else:
+        db_status = "unhealthy"
+        book_count = 0
+        chunk_count = 0
+    
+    response_time = round((time.time() - start_time) * 1000, 2)
+    
+    return jsonify({
+        'status': 'healthy' if db_status == 'healthy' else 'degraded',
+        'components': {
+            'api': 'healthy',
+            'database': db_status
+        },
+        'stats': {
+            'books': book_count,
+            'chunks': chunk_count,
+            'response_time_ms': response_time
+        },
+        'timestamp': datetime.now().isoformat()
+    })
+
+@app.route('/api/v3/books')
+@security_manager.require_api_key
+@security_manager.log_request
+def api_v3_list_books():
+    """List all books (v3 format) - AUTHENTICATION REQUIRED"""
+    try:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("""
+                    SELECT 
+                        book_id, title, author, publication_year, genre,
+                        word_count, processed_date,
+                        (SELECT COUNT(*) FROM chunks WHERE chunks.book_id = books.book_id) as chunk_count
+                    FROM books 
+                    ORDER BY title
+                """)
+                books = cur.fetchall()
+                
+                return jsonify({
+                    'success': True,
+                    'data': {
+                        'books': [dict(book) for book in books],
+                        'total_count': len(books)
+                    },
+                    'api_version': '3.0-unified'
+                })
+    except Exception as e:
+        logger.error(f"Error listing books (v3): {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/v3/books/<int:book_id>')
+@security_manager.require_api_key
+@security_manager.log_request
+def api_v3_get_book(book_id):
+    """Get book details (v3 format) - AUTHENTICATION REQUIRED"""
+    try:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("""
+                    SELECT 
+                        book_id, title, author, publication_year, genre,
+                        word_count, processed_date,
+                        (SELECT COUNT(*) FROM chunks WHERE chunks.book_id = books.book_id) as chunk_count
+                    FROM books 
+                    WHERE book_id = %s
+                """, (book_id,))
+                
+                book = cur.fetchone()
+                if not book:
+                    return jsonify({'success': False, 'error': f'Book {book_id} not found'}), 404
+                
+                return jsonify({
+                    'success': True,
+                    'data': {
+                        'book': dict(book)
+                    },
+                    'api_version': '3.0-unified'
+                })
+    except Exception as e:
+        logger.error(f"Error getting book {book_id} (v3): {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/v3/search')
+@security_manager.require_api_key
+@security_manager.log_request
+def api_v3_search():
+    """Advanced search (v3 format) - AUTHENTICATION REQUIRED"""
+    start_time = time.time()
+    
+    query_text = request.args.get('q', '').strip()
+    if not query_text:
+        return jsonify({'success': False, 'error': 'Query parameter q is required'}), 400
+    
+    search_type = request.args.get('type', 'content')  # content, author, title, semantic
+    limit = min(int(request.args.get('limit', 20)), 100)
+    
+    try:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                if search_type == 'semantic':
+                    # Use our fuzzy search system for semantic search
+                    import sys
+                    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+                    from fuzzy_semantic_search import FuzzySemanticSearch
+                    
+                    searcher = FuzzySemanticSearch()
+                    results = searcher.semantic_search(query_text, limit)
+                    
+                    return jsonify({
+                        'success': True,
+                        'data': {
+                            'results': results,
+                            'search_type': 'semantic',
+                            'total_count': len(results)
+                        },
+                        'meta': {
+                            'query': query_text,
+                            'processing_time_ms': round((time.time() - start_time) * 1000, 2)
+                        },
+                        'api_version': '3.0-unified'
+                    })
+                
+                elif search_type == 'author':
+                    cur.execute("""
+                        SELECT DISTINCT
+                            b.book_id, b.title, b.author, b.publication_year, b.genre,
+                            b.word_count, b.processed_date
+                        FROM books b
+                        WHERE LOWER(b.author) LIKE LOWER(%s)
+                        ORDER BY b.title
+                        LIMIT %s
+                    """, (f'%{query_text}%', limit))
+                    
+                elif search_type == 'title':
+                    cur.execute("""
+                        SELECT DISTINCT
+                            b.book_id, b.title, b.author, b.publication_year, b.genre,
+                            b.word_count, b.processed_date
+                        FROM books b
+                        WHERE LOWER(b.title) LIKE LOWER(%s)
+                        ORDER BY b.title
+                        LIMIT %s
+                    """, (f'%{query_text}%', limit))
+                
+                else:  # content search
+                    cur.execute("""
+                        SELECT 
+                            c.chunk_id, c.book_id, c.chapter_number, c.section_number,
+                            c.content, c.word_count, c.chunk_type,
+                            b.title, b.author,
+                            ts_rank(to_tsvector('english', c.content), plainto_tsquery('english', %s)) as relevance
+                        FROM chunks c
+                        JOIN books b ON c.book_id = b.book_id
+                        WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
+                        ORDER BY relevance DESC
+                        LIMIT %s
+                    """, (query_text, query_text, limit))
+                
+                if search_type != 'semantic':
+                    results = [dict(row) for row in cur.fetchall()]
+                    
+                    return jsonify({
+                        'success': True,
+                        'data': {
+                            'results': results,
+                            'search_type': search_type,
+                            'total_count': len(results)
+                        },
+                        'meta': {
+                            'query': query_text,
+                            'processing_time_ms': round((time.time() - start_time) * 1000, 2)
+                        },
+                        'api_version': '3.0-unified'
+                    })
+                    
+    except Exception as e:
+        logger.error(f"V3 search failed: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/v3/books/<int:book_id>/search')
+@security_manager.require_api_key 
+@security_manager.log_request
+def api_v3_search_within_book(book_id):
+    """Search within a specific book (v3 format) - AUTHENTICATION REQUIRED"""
+    start_time = time.time()
+    
+    query_text = request.args.get('q', '').strip()
+    if not query_text:
+        return jsonify({'success': False, 'error': 'Query parameter q is required'}), 400
+    
+    limit = min(int(request.args.get('limit', 20)), 100)
+    
+    try:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                # Verify book exists
+                cur.execute("SELECT title, author FROM books WHERE book_id = %s", (book_id,))
+                book = cur.fetchone()
+                if not book:
+                    return jsonify({'success': False, 'error': f'Book {book_id} not found'}), 404
+                
+                # Search within book
+                cur.execute("""
+                    SELECT 
+                        c.chunk_id, c.book_id, c.chapter_number, c.content, c.word_count,
+                        ts_rank(to_tsvector('english', c.content), plainto_tsquery('english', %s)) as relevance
+                    FROM chunks c 
+                    WHERE c.book_id = %s 
+                    AND to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
+                    ORDER BY relevance DESC, c.chapter_number, c.chunk_id
+                    LIMIT %s
+                """, (query_text, book_id, query_text, limit))
+                
+                results = [dict(row) for row in cur.fetchall()]
+                
+                return jsonify({
+                    'success': True,
+                    'data': {
+                        'results': results,
+                        'book_info': {
+                            'book_id': book_id,
+                            'title': book['title'],
+                            'author': book['author']
+                        },
+                        'total_count': len(results)
+                    },
+                    'meta': {
+                        'query': query_text,
+                        'search_scope': f'within book {book_id}',
+                        'processing_time_ms': round((time.time() - start_time) * 1000, 2)
+                    },
+                    'api_version': '3.0-unified'
+                })
+                
+    except Exception as e:
+        logger.error(f"V3 in-book search failed for book {book_id}: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api-docs')
 def api_documentation():
