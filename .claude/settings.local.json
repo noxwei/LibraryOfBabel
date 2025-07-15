@@ -35,7 +35,8 @@
       "Bash(API_KEY=babel_secure_LKi-NkGfNRI3-plfVA3ud8vG8v-SzbTSbhl34LW5QzE python3 src/api/secure_paginated_api.py)",
       "Bash(sudo fuser:*)",
       "Bash(launchctl:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git merge:*)"
     ],
     "deny": []
   }
