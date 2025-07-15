@@ -676,9 +676,9 @@ class SecurityAuditor:
 #### Environment Variables
 ```bash
 # Required security environment variables
-export JWT_SECRET="your-super-secure-jwt-secret-key"
-export DATABASE_ENCRYPTION_KEY="your-database-encryption-key"
-export API_SECRET_KEY="your-api-secret-key"
+export JWT_SECRET="<YOUR_JWT_SECRET_KEY>"
+export DATABASE_ENCRYPTION_KEY="<YOUR_DATABASE_ENCRYPTION_KEY>"
+export API_SECRET_KEY="<YOUR_API_SECRET_KEY>"
 export ALLOWED_ORIGINS="https://yourdomain.com,https://research.yourdomain.com"
 
 # Security settings

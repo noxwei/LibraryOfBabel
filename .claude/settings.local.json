@@ -56,7 +56,9 @@
       "Bash(git branch:*)",
       "Bash(git for-each-ref:*)",
       "Bash(git stash:*)",
-      "Bash(echo \"\" echo \"🤔 STRATEGIC ANALYSIS OF SURVIVORS:\" echo \"\" echo \"ollama-integration (July 8) - Check if this was merged...\" git log --oneline main..ollama-integration)"
+      "Bash(echo \"\" echo \"🤔 STRATEGIC ANALYSIS OF SURVIVORS:\" echo \"\" echo \"ollama-integration (July 8) - Check if this was merged...\" git log --oneline main..ollama-integration)",
+      "Bash(chmod:*)",
+      "Bash(unzip:*)"
     ],
     "deny": []
   }
