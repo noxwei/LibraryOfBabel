@@ -276,3 +276,6 @@ dist/
 *.egg-info/
 test_api_debug.py
 agents/bulletin_board/agent_memory.json
+.claude/settings.local.json
+.claude/settings.local.json
+.claude/settings.local.json
