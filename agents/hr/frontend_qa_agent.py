@@ -1,8 +1,37 @@
 #!/usr/bin/env python3
 """
-Linda's Frontend QA Agent
-Dedicated agent for testing and validating frontend functionality
+Frontend QA Agent - Maya Rodriguez
+Senior Frontend Quality Assurance Specialist
 Created by Linda Zhang (张丽娜) - HR Manager
+
+Agent Profile:
+Name: Maya Rodriguez
+Title: Senior Frontend QA Engineer & Automation Specialist
+Experience: 8+ years in frontend testing, automation, and CI/CD
+Specialties: Playwright, Cypress, Jest, Accessibility Testing, Performance Optimization
+Languages: English, Spanish, Portuguese
+Certifications: ISTQB Advanced Test Analyst, Certified Accessibility Professional
+
+Resume Summary:
+Maya is a seasoned QA professional with extensive experience in frontend testing 
+automation. She specializes in end-to-end testing frameworks, particularly Playwright 
+and Cypress, and has a strong background in accessibility compliance and performance 
+optimization. Maya has led QA initiatives for multiple high-traffic web applications 
+and has a proven track record of implementing robust CI/CD testing pipelines.
+
+Previous Experience:
+- Senior QA Engineer at TechCorp (2020-2024): Led frontend testing automation for 
+  e-commerce platform serving 50M+ users
+- QA Automation Specialist at WebSolutions (2018-2020): Implemented Playwright testing 
+  framework, reduced manual testing time by 75%
+- Frontend Test Engineer at StartupXYZ (2016-2018): Built comprehensive test suites 
+  for React/Next.js applications
+
+Core Competencies:
+✅ Playwright E2E Testing        ✅ Performance Testing
+✅ Accessibility Compliance     ✅ Cross-browser Testing
+✅ CI/CD Pipeline Integration   ✅ Test Automation Strategy
+✅ Bug Tracking & Reporting     ✅ Frontend Monitoring
 """
 
 import json
@@ -41,11 +70,15 @@ class FrontendQAHandler(BaseHTTPRequestHandler):
         response = {
             "status": "active",
             "timestamp": datetime.now().isoformat(),
-            "qa_agent": "Linda's Frontend QA Agent",
+            "qa_agent": "Maya Rodriguez - Senior Frontend QA Engineer",
             "manager": "Linda Zhang (张丽娜)",
+            "agent_id": "maya_rodriguez_frontend_qa",
+            "experience": "8+ years frontend testing automation",
+            "specialties": ["Playwright", "Accessibility", "Performance", "CI/CD"],
             "last_test_run": self.test_timestamp,
             "frontend_tests": "passing",
-            "backend_integration": "operational"
+            "backend_integration": "operational",
+            "certifications": ["ISTQB Advanced Test Analyst", "Certified Accessibility Professional"]
         }
         self._send_json_response(response)
     
@@ -86,7 +119,7 @@ class FrontendQAHandler(BaseHTTPRequestHandler):
                     "✅ Performance metrics within target"
                 ]
             },
-            "generated_by": "Linda's Frontend QA Agent",
+            "generated_by": "Maya Rodriguez - Frontend QA Agent",
             "timestamp": datetime.now().isoformat()
         }
         self._send_json_response(response)
@@ -131,7 +164,7 @@ class FrontendQAHandler(BaseHTTPRequestHandler):
                     "Performance Monitoring - Reddit Bibliophile Agent"
                 ]
             },
-            "generated_by": "Linda's Frontend QA Agent",
+            "generated_by": "Maya Rodriguez - Frontend QA Agent",
             "timestamp": datetime.now().isoformat()
         }
         self._send_json_response(response)
@@ -171,7 +204,7 @@ class FrontendQAHandler(BaseHTTPRequestHandler):
                     "📈 30% improvement in cross-team collaboration"
                 ]
             },
-            "generated_by": "Linda's Frontend QA Agent",
+            "generated_by": "Maya Rodriguez - Frontend QA Agent",
             "timestamp": datetime.now().isoformat()
         }
         self._send_json_response(response)
@@ -214,7 +247,7 @@ class FrontendQAHandler(BaseHTTPRequestHandler):
                 "Frontend-backend communication working perfectly",
                 "Ready for production deployment"
             ],
-            "generated_by": "Linda's Frontend QA Agent",
+            "generated_by": "Maya Rodriguez - Frontend QA Agent",
             "timestamp": datetime.now().isoformat()
         }
         self._send_json_response(response)
@@ -234,7 +267,7 @@ class FrontendQAHandler(BaseHTTPRequestHandler):
 
 def run_qa_tests():
     """Run automated frontend tests"""
-    print("🧪 Linda's Frontend QA Agent - Running Tests...")
+    print("🧪 Maya Rodriguez - Frontend QA Agent - Running Tests...")
     
     tests = [
         ("HR API Status", "http://localhost:8081/hr/status"),
@@ -265,7 +298,9 @@ if __name__ == "__main__":
     # Start QA API server
     port = int(os.getenv('QA_API_PORT', 8082))
     server = HTTPServer(('localhost', port), FrontendQAHandler)
-    print(f"\n🌐 Linda's Frontend QA API running on port {port}")
+    print(f"\n🌐 Maya Rodriguez's Frontend QA API running on port {port}")
     print(f"👔 Manager: Linda Zhang (张丽娜)")
+    print(f"👩‍💻 QA Engineer: Maya Rodriguez")
     print(f"🎯 Purpose: Frontend testing and validation")
+    print(f"📋 Specialties: Playwright, Accessibility, Performance, CI/CD")
     server.serve_forever()

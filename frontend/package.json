@@ -6,7 +6,22 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:coverage": "jest --coverage --passWithNoTests",
+    "test:integration": "jest --testPathPattern=integration --passWithNoTests",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:debug": "playwright test --debug",
+    "e2e:hr": "playwright test tests/e2e/hr-dashboard-comprehensive.spec.ts",
+    "qa:maya": "playwright test tests/e2e/hr-dashboard-comprehensive.spec.ts --reporter=html",
+    "qa:full": "node scripts/cicd-qa-automation.js",
+    "analyze": "cross-env ANALYZE=true next build",
+    "reports": "mkdir -p reports"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
