@@ -63,7 +63,13 @@
       "Bash(timeout:*)",
       "Bash(cp:*)",
       "Bash(./daemons/daemon_control.sh:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(brew install:*)",
+      "Bash(brew services restart:*)",
+      "Bash(sudo cp:*)",
+      "Bash(\"/Users/weixiangzhang/Local Dev/LibraryOfBabel/scripts/redis_caching_setup.sh\")",
+      "Bash(pip install:*)",
+      "Bash(./daemon_control.sh:*)"
     ],
     "deny": []
   }

@@ -1,0 +1,140 @@
+{
+  "summary": {
+    "total_tests": 13,
+    "passed": 1,
+    "failed": 12,
+    "skipped": 0,
+    "success_rate": 7.6923076923076925,
+    "avg_response_time": 0.0028497089039195666
+  },
+  "detailed_results": [
+    {
+      "test_name": "Health Check: Phase 1",
+      "status": "PASS",
+      "timestamp": 1752638791.1759071,
+      "details": {
+        "response_time": 0.009428977966308594,
+        "status": "healthy",
+        "features": []
+      }
+    },
+    {
+      "test_name": "Health Check: Phase 2",
+      "status": "FAIL",
+      "timestamp": 1752638791.176933,
+      "details": {
+        "response_time": 0.0010180473327636719,
+        "error": "HTTPConnectionPool(host='localhost', port=5002): Max retries exceeded with url: /api/v2/discover/genre/health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10404f250>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    },
+    {
+      "test_name": "Health Check: Phase 2.5",
+      "status": "FAIL",
+      "timestamp": 1752638791.177682,
+      "details": {
+        "response_time": 0.0007410049438476562,
+        "error": "HTTPConnectionPool(host='localhost', port=5003): Max retries exceeded with url: /api/v2.5/search/hybrid/health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10404fd90>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    },
+    {
+      "test_name": "Phase 1 Search Test 1",
+      "status": "FAIL",
+      "timestamp": 1752638791.186762,
+      "details": {
+        "response_time": 0.00906991958618164,
+        "status_code": 500,
+        "error": "{\n  \"error\": \"Internal server error\"\n}\n"
+      }
+    },
+    {
+      "test_name": "Phase 1 Search Test 2",
+      "status": "FAIL",
+      "timestamp": 1752638791.190741,
+      "details": {
+        "response_time": 0.003972768783569336,
+        "status_code": 500,
+        "error": "{\n  \"error\": \"Internal server error\"\n}\n"
+      }
+    },
+    {
+      "test_name": "Phase 1 Search Test 3",
+      "status": "FAIL",
+      "timestamp": 1752638791.19441,
+      "details": {
+        "response_time": 0.003664731979370117,
+        "status_code": 500,
+        "error": "{\n  \"error\": \"Internal server error\"\n}\n"
+      }
+    },
+    {
+      "test_name": "Phase 2 Genre Discovery Test 1",
+      "status": "FAIL",
+      "timestamp": 1752638791.195225,
+      "details": {
+        "response_time": 0.0007960796356201172,
+        "error": "HTTPConnectionPool(host='localhost', port=5002): Max retries exceeded with url: /api/v2/discover/genre (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10402b130>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    },
+    {
+      "test_name": "Phase 2 Genre Discovery Test 2",
+      "status": "FAIL",
+      "timestamp": 1752638791.195816,
+      "details": {
+        "response_time": 0.0005848407745361328,
+        "error": "HTTPConnectionPool(host='localhost', port=5002): Max retries exceeded with url: /api/v2/discover/genre (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10402b8a0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    },
+    {
+      "test_name": "Phase 2 Genre Discovery Test 3",
+      "status": "FAIL",
+      "timestamp": 1752638791.196398,
+      "details": {
+        "response_time": 0.0005769729614257812,
+        "error": "HTTPConnectionPool(host='localhost', port=5002): Max retries exceeded with url: /api/v2/discover/genre (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10402bac0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    },
+    {
+      "test_name": "Phase 2.5 Hybrid Search Test 1",
+      "status": "FAIL",
+      "timestamp": 1752638791.197016,
+      "details": {
+        "response_time": 0.0006101131439208984,
+        "error": "HTTPConnectionPool(host='localhost', port=5003): Max retries exceeded with url: /api/v2.5/search/hybrid (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10402bce0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    },
+    {
+      "test_name": "Phase 2.5 Hybrid Search Test 2",
+      "status": "FAIL",
+      "timestamp": 1752638791.1979039,
+      "details": {
+        "response_time": 0.0008833408355712891,
+        "error": "HTTPConnectionPool(host='localhost', port=5003): Max retries exceeded with url: /api/v2.5/search/hybrid (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10402bce0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    },
+    {
+      "test_name": "Redis Caching Performance",
+      "status": "FAIL",
+      "timestamp": 1752638791.205088,
+      "details": {
+        "error": "HTTP errors: 500, 500"
+      }
+    },
+    {
+      "test_name": "Concurrent Load Test",
+      "status": "FAIL",
+      "timestamp": 1752638791.216599,
+      "details": {
+        "total_time": 0.01147317886352539,
+        "successful_requests": "0/5",
+        "avg_response_time": 0.007919073104858398,
+        "errors": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      }
+    }
+  ]
+}

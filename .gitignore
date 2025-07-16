@@ -403,5 +403,15 @@ dist/
 test_api_debug.py
 agents/bulletin_board/agent_memory.json
 .claude/settings.local.json
-.claude/settings.local.json
-.claude/settings.local.json
+
+# === DAEMON STATE & OPERATIONAL FILES ===
+# Comprehensive reclassification daemon state and logs
+daemons/reclassification_state.json
+daemons/reclassification.log
+daemons/reclassification.pid
+daemons/*.pid
+daemons/*.log
+daemons/*_state.json
+
+# Production readiness reports with internal metrics
+PRODUCTION_READINESS_REPORT.md
