@@ -41,6 +41,7 @@ current_dir = os.path.dirname(__file__)
 src_dir = os.path.dirname(current_dir)
 project_root = os.path.dirname(src_dir)
 sys.path.insert(0, src_dir)
+sys.path.insert(0, project_root)
 
 # Import existing Flask infrastructure
 from flask import Flask, request, jsonify, Blueprint

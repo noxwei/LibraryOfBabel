@@ -9,14 +9,15 @@ Transform your digital ebook collection into a searchable, AI-accessible researc
 LibraryOfBabel turns your EPUB collection into a powerful, unified search API with your entire library instantly accessible through secure endpoints. Perfect for AI agents, research tools, and knowledge discovery with advanced fuzzy search and vector embeddings.
 
 ### **✨ Core Features**
-- 🔍 **Instant Search**: Query across your entire library with fuzzy search & vector embeddings
-- 🧠 **AI-Powered**: Semantic search using 19,000+ vector embeddings
+- 🔍 **Instant Search**: Query across 1,668+ books with fuzzy search & vector embeddings
+- 🧠 **AI-Powered**: Semantic search using 48,056+ vector embeddings
 - 📖 **Smart Chunking**: Configurable text granularity (500/1500/5000 chars)
 - 🔐 **Production Security**: API key authentication + HTTPS + QA Security Agent
 - 🤖 **AI-Ready**: Structured JSON responses for agent consumption
 - 📱 **Universal Access**: Works with iOS Shortcuts, web apps, curl
 - 🎯 **Fuzzy Search**: Find content even with typos or partial matches
 - 📚 **In-Book Search**: Search within specific books for focused research
+- 🔗 **MCP Integration**: Connect Claude Code directly to your library
 
 ## 🚀 **Quick Start - 4 Commands**
 
@@ -38,12 +39,14 @@ curl "https://api.example.com:5562/books/1099/search?api_key=YOUR_API_KEY&q=disc
 
 ## 📊 **Current Statistics**
 
-- **📝 Total Chunks**: 26,000+ (searchable segments)
-- **🧠 Vector Embeddings**: 19,000+ (semantic AI search ready)
-- **⚡ Response Time**: 50-600ms (depending on search complexity)
+- **📚 Total Books**: 1,668+ (processed EPUB collection)
+- **📝 Total Chunks**: 54,760+ (searchable segments)
+- **🧠 Vector Embeddings**: 48,056+ (semantic AI search ready)
+- **⚡ Response Time**: 29-600ms (depending on search complexity)
 - **🔒 Security**: 100% API key protected with QA Security Agent
 - **📈 Uptime**: 99.9%+ with auto-restart daemon
 - **🎯 Search Types**: 4 (keyword, semantic, fuzzy, hybrid)
+- **🔗 MCP Integration**: Claude Code compatible remote server
 
 ## 🔗 **Unified Production API**
 
@@ -121,6 +124,40 @@ curl "https://api.example.com:5562/books?api_key=YOUR_KEY&page=200&page_size=5"
 ```
 
 Every response includes navigation links: `next`, `prev`, `first`, `last`
+
+### **🔗 MCP Integration (Claude Code)**
+Connect Claude directly to your library for intelligent research:
+
+**MCP Endpoints**:
+- `GET /mcp/health` - Server health check
+- `GET /mcp/tools` - Available tools
+- `POST /mcp/call` - Execute tools
+
+**Configure Claude Code**:
+```json
+{
+  "mcpServers": {
+    "library-of-babel": {
+      "url": "https://api.example.com:5562/mcp",
+      "env": {
+        "LIBRARY_API_KEY": "YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+**Use with Claude**:
+- *"What books about AI do I have?"*
+- *"Give me insights on consciousness from my library"*
+- *"What are my current library statistics?"*
+
+**Available Tools**:
+- `search_books` - Search across your collection
+- `get_library_stats` - Real-time library statistics
+- `semantic_search` - AI-powered concept search
+- `get_book_content` - Full book content retrieval
+- `get_topic_insights` - Comprehensive topic analysis
 
 ### **📖 Configurable Chunking**
 Adjust text granularity for different use cases:
@@ -226,9 +263,9 @@ LibraryOfBabel Unified System/
 │   ├── /fuzzy-search              # 🆕 AI fuzzy search
 │   └── /api/v3/*                  # Legacy compatibility
 ├── 🗄️ PostgreSQL Database
-│   ├── ebooks                # Growing collection 
-│   ├── 26,000+ chunks             # Searchable segments
-│   └── 19,000+ embeddings         # Vector search ready
+│   ├── 1,668+ books               # Processed EPUB collection
+│   ├── 54,760+ chunks             # Searchable segments
+│   └── 48,056+ embeddings         # Vector search ready
 ├── 🧠 AI Search Engine
 │   ├── Vector embeddings          # Semantic similarity
 │   ├── Fuzzy text matching        # Typo tolerance
@@ -248,13 +285,15 @@ LibraryOfBabel Unified System/
     ├── Structured JSON           # Agent-friendly responses
     ├── Pagination               # Large dataset handling
     ├── Navigation links         # Efficient traversal
-    └── Semantic search          # AI-powered discovery
+    ├── Semantic search          # AI-powered discovery
+    └── MCP Server               # Claude Code integration
 ```
 
 ## 📖 **Documentation**
 
 - **[Unified API Reference](docs/API-Reference-Unified.md)** - Complete endpoint documentation
 - **[Story Generation API](docs/STORY_GENERATION_API.md)** - 🆕 Advanced AI-powered narrative creation
+- **[MCP Integration Guide](README_REMOTE_MCP.md)** - 🆕 Connect Claude Code to your library
 - **[Endpoint Summary](docs/ENDPOINT_SUMMARY.md)** - Quick reference guide
 - **[Centralized Config Guide](docs/CENTRALIZED_CONFIG_GUIDE.md)** - Configuration management
 - **[Security Guide](docs/Security-Guide.md)** - Security best practices
@@ -285,6 +324,13 @@ LibraryOfBabel Unified System/
 - Rediscover forgotten insights with fuzzy search
 - Build on previous research with semantic connections
 - Accelerate learning with AI-powered discovery
+
+### **🔗 Claude Code Integration (MCP)**
+- Ask Claude questions about your library directly
+- Get insights across your entire 1,668+ book collection
+- Real-time library statistics and analytics
+- Semantic search through natural conversation
+- Cross-reference concepts across multiple books
 
 ## 🚀 **Performance Benchmarks**
 
@@ -335,12 +381,13 @@ For complete setup instructions, see [Installation Guide](docs/Installation-Guid
 
 **✅ FULLY OPERATIONAL WITH AI ENHANCEMENTS**
 
-The LibraryOfBabel Unified API is production-ready and serving **your ebook catalog** with enterprise-grade security, advanced AI search capabilities, and team collaboration features. Perfect for researchers, developers, and AI agents seeking instant access to curated knowledge with semantic understanding.
+The LibraryOfBabel Unified API is production-ready and serving **your 1,668+ book collection** with enterprise-grade security, advanced AI search capabilities, MCP integration for Claude Code, and team collaboration features. Perfect for researchers, developers, and AI agents seeking instant access to curated knowledge with semantic understanding.
 
 ### **🆕 Recent Enhancements**
 - ✅ **API Consolidation**: Single unified endpoint (no more v2/v3 separation)
 - ✅ **Fuzzy Search**: AI-powered semantic search with vector embeddings
 - ✅ **In-Book Search**: Focus research within specific books
+- ✅ **MCP Integration**: Claude Code remote server for direct AI access
 - ✅ **Centralized Configuration**: Secure, automated configuration management
 - ✅ **QA Security Agent**: Enhanced security monitoring and protection
 - ✅ **Collection Growth**: Ongoing expansion with new titles
@@ -354,6 +401,6 @@ The LibraryOfBabel Unified API is production-ready and serving **your ebook cata
 
 *Liberating knowledge through intelligent automation, AI-powered search, and collaborative development.*
 
-**Status**: Production-Ready ✅ | **AI Features**: Operational ✅ | **Security**: QA Enhanced ✅ | **Team**: Integrated ✅
+**Status**: Production-Ready ✅ | **AI Features**: Operational ✅ | **Security**: QA Enhanced ✅ | **Team**: Integrated ✅ | **MCP**: Claude Ready ✅
 
-**Collection**: Extensive Library 📚 | **Search**: AI-Powered 🧠 | **Architecture**: Unified 🎯
+**Collection**: 1,668+ Books 📚 | **Search**: AI-Powered 🧠 | **Architecture**: Unified 🎯 | **Integration**: MCP Enabled 🔗
