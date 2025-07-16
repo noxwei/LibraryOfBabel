@@ -26,6 +26,9 @@ from pathlib import Path
 from typing import List, Dict, Optional
 from datetime import datetime
 import psycopg2
+import requests
+import re
+import json
 
 # Import existing processing components
 sys.path.append('src')
@@ -67,6 +70,21 @@ class AutomatedEbookProcessor:
         
         # Vector embedding system (Lexi + Dr. Elena integration)
         self.vector_embedder = OllamaVectorEmbedder(self.db_config)
+        
+        # Enhanced classification system
+        self.ollama_url = "http://localhost:11434/api/generate"
+        self.model_name = "llama3.2:3b"  # Fast, accurate model
+        
+        # Valid genres with enhanced list
+        self.valid_genres = [
+            "Romance", "Literary Fiction", "Science Fiction", "Fantasy",
+            "Mystery & Thriller", "Historical Fiction", "Contemporary Fiction",
+            "Self-Help", "Biography & Memoir", "Psychology", "Philosophy",
+            "Business & Economics", "History", "Science & Nature",
+            "Programming & Technology", "Data Science & Analytics",
+            "Religion & Spirituality", "Political Science", "Academic & Research",
+            "Health & Medicine", "True Crime", "Travel", "Art & Design"
+        ]
         
         # Statistics
         self.stats = {
@@ -370,6 +388,15 @@ class AutomatedEbookProcessor:
             else:
                 self.logger.warning(f"    ⚠️ Vector embedding generation failed (book still processed)")
             
+            # Enhanced genre classification
+            self.logger.info(f"    🧠 Classifying genre with structure intelligence...")
+            genre_success = self._classify_book_genre(book_id, metadata, chapters)
+            
+            if genre_success:
+                self.logger.info(f"    ✅ Genre classification completed")
+            else:
+                self.logger.warning(f"    ⚠️ Genre classification failed (book still processed)")
+            
             return True
             
         except Exception as e:
@@ -472,6 +499,326 @@ class AutomatedEbookProcessor:
             self.logger.info("⏹️ Monitoring stopped by user")
         except Exception as e:
             self.logger.error(f"❌ Monitoring error: {e}")
+
+    def is_front_matter(self, content):
+        """Advanced front matter detection"""
+        content_lower = content.lower().strip()
+        
+        # Strong front matter indicators
+        strong_indicators = [
+            'copyright', '©', 'all rights reserved', 'published by',
+            'isbn', 'library of congress', 'cataloging', 'first published',
+            'this book is sold', 'reproduction or translation', 'without permission',
+            'printed in', 'designed by', 'cover design', 'jacket design'
+        ]
+        
+        # Moderate indicators
+        moderate_indicators = [
+            'dedication', 'acknowledgments', 'acknowledgement', 'table of contents',
+            'contents', 'index', 'bibliography', 'notes', 'about the author',
+            'also by', 'other books', 'praise for', 'advance praise'
+        ]
+        
+        # Weak indicators (need multiple)
+        weak_indicators = [
+            'publisher', 'edition', 'printing', 'version', 'imprint'
+        ]
+        
+        # Check for strong indicators (any one triggers)
+        for indicator in strong_indicators:
+            if indicator in content_lower:
+                return True
+        
+        # Check for moderate indicators (1-2 trigger)
+        moderate_count = sum(1 for indicator in moderate_indicators if indicator in content_lower)
+        if moderate_count >= 1:
+            return True
+        
+        # Check for weak indicators (need multiple)
+        weak_count = sum(1 for indicator in weak_indicators if indicator in content_lower)
+        if weak_count >= 2:
+            return True
+        
+        # Very short chunks that are just structural
+        if len(content.strip()) < 150:
+            structural_words = ['chapter', 'part', 'section', 'book', 'volume', 'preface', 'foreword', 'introduction']
+            if any(word in content_lower for word in structural_words) and len(content.strip().split()) < 20:
+                return True
+        
+        # Mostly numbers/dates/codes (catalog info)
+        if re.search(r'^\s*[\d\-\.\s]+$', content) or re.search(r'isbn[\d\-\s]+', content_lower):
+            return True
+        
+        return False
+    
+    def is_actual_content(self, content):
+        """Verify this is actual book content"""
+        content_clean = re.sub(r'<[^>]+>', '', content).strip()
+        
+        # Must have reasonable length
+        if len(content_clean) < 100:
+            return False
+        
+        # Check for narrative/content indicators
+        content_indicators = [
+            # Fiction indicators
+            'said', 'asked', 'replied', 'thought', 'looked', 'walked', 'felt',
+            'character', 'protagonist', 'story', 'narrative', 'dialogue',
+            # Non-fiction indicators  
+            'research', 'study', 'analysis', 'theory', 'evidence', 'argument',
+            'according', 'however', 'therefore', 'furthermore', 'moreover',
+            # General content indicators
+            'because', 'although', 'while', 'when', 'where', 'what', 'how', 'why'
+        ]
+        
+        indicator_count = sum(1 for indicator in content_indicators if indicator in content.lower())
+        
+        # Should have some content indicators
+        return indicator_count >= 2
+
+    def get_optimized_content_sample(self, book_id, chapters):
+        """Get optimized content sample avoiding front matter completely"""
+        # Filter out front matter
+        content_chunks = []
+        front_matter_count = 0
+        
+        for chapter in chapters:
+            if self.is_front_matter(chapter.content):
+                front_matter_count += 1
+            elif self.is_actual_content(chapter.content):
+                content_chunks.append(chapter)
+        
+        # Ensure we have actual content
+        if not content_chunks:
+            # Fallback: take chunks from middle/end, avoiding first few
+            fallback_start = max(len(chapters) // 4, 3)
+            content_chunks = chapters[fallback_start:fallback_start + 5]
+        
+        # Select diverse content chunks strategically
+        if len(content_chunks) >= 4:
+            # Early, early-middle, late-middle, late content
+            selected = [
+                content_chunks[0],                                          # Early content
+                content_chunks[len(content_chunks) // 3],                  # Early-middle
+                content_chunks[len(content_chunks) * 2 // 3],              # Late-middle
+                content_chunks[-1]                                         # Late content
+            ]
+        elif len(content_chunks) >= 2:
+            # Beginning and end
+            selected = [content_chunks[0], content_chunks[-1]]
+        else:
+            selected = content_chunks
+        
+        # Create optimized sample
+        samples = []
+        for chapter in selected:
+            # Clean and extract meaningful content
+            clean_content = re.sub(r'<[^>]+>', '', chapter.content)
+            clean_content = re.sub(r'\s+', ' ', clean_content).strip()
+            
+            # Take a substantial sample
+            if len(clean_content) > 250:
+                sample = clean_content[:250]
+            else:
+                sample = clean_content
+            
+            samples.append(sample)
+        
+        return " ... ".join(samples)[:800]  # Generous content sample
+
+    def analyze_book_structure_intelligence(self, book_id, chapters):
+        """Advanced structure analysis for enhanced classification"""
+        # Get first 6 chunks for structure analysis (front matter + early content)
+        analysis_chunks = chapters[:6] if len(chapters) >= 6 else chapters
+        
+        structure_intelligence = {
+            "academic_score": 0.0,
+            "fiction_score": 0.0,
+            "genre_hints": [],
+            "confidence_boost": 0.0
+        }
+        
+        for chunk in analysis_chunks:
+            content_lower = chunk.content.lower()
+            
+            # Academic indicators (increase confidence for non-fiction)
+            academic_indicators = [
+                'bibliography', 'references', 'index', 'table of contents', 
+                'research', 'study', 'analysis', 'methodology', 'hypothesis',
+                'citations', 'notes', 'appendix', 'works cited'
+            ]
+            
+            academic_count = sum(1 for indicator in academic_indicators if indicator in content_lower)
+            structure_intelligence["academic_score"] += academic_count * 0.1
+            
+            # Fiction indicators (increase confidence for fiction)
+            fiction_indicators = [
+                'chapter', 'character', 'dialogue', 'protagonist', 'plot',
+                'story', 'narrative', 'novel', 'fiction', 'characters'
+            ]
+            
+            fiction_count = sum(1 for indicator in fiction_indicators if indicator in content_lower)
+            structure_intelligence["fiction_score"] += fiction_count * 0.05
+            
+            # Specific genre hints
+            if any(word in content_lower for word in ['biography', 'memoir', 'life story', 'autobiography']):
+                structure_intelligence["genre_hints"].append("Biography & Memoir")
+            
+            if any(word in content_lower for word in ['history', 'historical', 'century', 'timeline']):
+                structure_intelligence["genre_hints"].append("History")
+            
+            if any(word in content_lower for word in ['psychology', 'psychological', 'therapy', 'mental']):
+                structure_intelligence["genre_hints"].append("Psychology")
+            
+            if any(word in content_lower for word in ['philosophy', 'philosophical', 'theory', 'ethics']):
+                structure_intelligence["genre_hints"].append("Philosophy")
+            
+            if any(word in content_lower for word in ['business', 'economics', 'market', 'finance']):
+                structure_intelligence["genre_hints"].append("Business & Economics")
+            
+            if any(word in content_lower for word in ['science fiction', 'sci-fi', 'future', 'technology', 'space']):
+                structure_intelligence["genre_hints"].append("Science Fiction")
+            
+            if any(word in content_lower for word in ['fantasy', 'magic', 'magical', 'dragon', 'wizard']):
+                structure_intelligence["genre_hints"].append("Fantasy")
+        
+        # Calculate confidence boost based on structural clarity
+        if structure_intelligence["academic_score"] > 0.3:
+            structure_intelligence["confidence_boost"] = 0.2
+        elif structure_intelligence["fiction_score"] > 0.3:
+            structure_intelligence["confidence_boost"] = 0.15
+        
+        return structure_intelligence
+
+    def classify_with_structure_intelligence(self, book_data, content, structure_intel):
+        """Classification enhanced with structural intelligence"""
+        
+        # Build structure context
+        structure_context = ""
+        if structure_intel["academic_score"] > 0.2:
+            structure_context = "STRUCTURE: Academic/research book with bibliography, references, or scholarly apparatus. "
+        elif structure_intel["fiction_score"] > 0.2:
+            structure_context = "STRUCTURE: Narrative fiction with chapters and story elements. "
+        
+        if structure_intel["genre_hints"]:
+            most_common_hint = max(set(structure_intel["genre_hints"]), key=structure_intel["genre_hints"].count)
+            structure_context += f"STRONG STRUCTURAL INDICATOR: {most_common_hint}. "
+        
+        prompt = f"""You are an expert book classifier using both content and structural analysis.
+
+BOOK: "{book_data['title']}" by {book_data['author']}
+
+{structure_context}
+
+CONTENT SAMPLE:
+{content}
+
+AVAILABLE GENRES:
+Romance, Literary Fiction, Science Fiction, Fantasy, Mystery & Thriller, Historical Fiction, Contemporary Fiction, Self-Help, Biography & Memoir, Psychology, Philosophy, Business & Economics, History, Science & Nature, Programming & Technology, Academic & Research, Religion & Spirituality, Political Science
+
+ENHANCED CLASSIFICATION RULES:
+1. Use BOTH content and structural indicators for maximum accuracy
+2. Academic structure (bibliography, index, references) strongly suggests non-fiction
+3. Chapter-based narrative structure suggests fiction genres
+4. Respect structural hints but prioritize actual content
+5. Choose the most specific and accurate genre
+
+Based on both content analysis and structural intelligence, what is the correct genre?
+
+GENRE:"""
+
+        try:
+            start_time = time.time()
+            
+            response = requests.post(
+                self.ollama_url,
+                json={
+                    "model": self.model_name,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {"temperature": 0.05, "top_p": 0.9}
+                },
+                timeout=25
+            )
+            
+            duration = time.time() - start_time
+            
+            if response.status_code == 200:
+                result = response.json()
+                classification = result['response'].strip()
+                
+                # Enhanced genre extraction with structure confidence
+                classification_lines = [line.strip() for line in classification.split('\n') if line.strip()]
+                
+                for line in classification_lines:
+                    for genre in self.valid_genres:
+                        if genre.lower() == line.lower() or genre.lower() in line.lower():
+                            # Apply structure confidence boost
+                            confidence = 1.0 + structure_intel["confidence_boost"]
+                            return genre, duration, confidence
+                
+                # Fallback
+                if classification_lines:
+                    return classification_lines[0], duration, 1.0
+                
+                return classification, duration, 1.0
+            else:
+                return None, duration, 0.0
+                
+        except Exception as e:
+            self.logger.error(f"Enhanced classification error: {e}")
+            return None, 25, 0.0
+
+    def _classify_book_genre(self, book_id, metadata, chapters):
+        """Classify book genre using enhanced AI system"""
+        try:
+            # Get structure intelligence
+            structure_intel = self.analyze_book_structure_intelligence(book_id, chapters)
+            
+            # Get optimized content
+            content = self.get_optimized_content_sample(book_id, chapters)
+            if not content or len(content) < 80:
+                self.logger.warning(f"    ❌ Insufficient content for genre classification")
+                return False
+            
+            # Prepare book data for classification
+            book_data = {
+                'title': metadata.title,
+                'author': metadata.author
+            }
+            
+            # Classify with structure intelligence
+            new_genre, duration, confidence = self.classify_with_structure_intelligence(book_data, content, structure_intel)
+            if not new_genre:
+                self.logger.warning(f"    ❌ Genre classification failed")
+                return False
+            
+            confidence_indicator = "🔥" if confidence > 1.1 else "🎯"
+            self.logger.info(f"    {confidence_indicator} Genre: {new_genre} ({duration:.1f}s, confidence: {confidence:.2f})")
+            
+            # Log structure insights
+            if structure_intel["genre_hints"]:
+                hints = list(set(structure_intel["genre_hints"]))[:2]
+                self.logger.info(f"    📋 Structure hints: {', '.join(hints)}")
+            
+            # Update book genre in database
+            if new_genre in self.valid_genres:
+                conn = psycopg2.connect(**self.db_config)
+                cursor = conn.cursor()
+                cursor.execute("UPDATE books SET genre = %s WHERE book_id = %s", (new_genre, book_id))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                
+                self.logger.info(f"    ✅ Genre assigned: {new_genre}")
+                return True
+            else:
+                self.logger.warning(f"    ⚠️ Invalid genre returned: {new_genre}")
+                return False
+                
+        except Exception as e:
+            self.logger.error(f"    💥 Genre classification error: {e}")
+            return False
 
 
 def main():
