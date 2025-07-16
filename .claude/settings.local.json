@@ -71,7 +71,10 @@
       "Bash(pip install:*)",
       "Bash(./daemon_control.sh:*)",
       "Bash(./ultimate_daemon_control.sh:*)",
-      "Bash(PYTHONPATH=/Users/weixiangzhang/Library/Python/3.11/lib/python/site-packages python3 -c \"\n# Test MCP server imports\nimport sys\nsys.path.insert(0, ''src'')\n\nprint(''🧪 Testing MCP server components...'')\n\n# Test configuration\ntry:\n    from config.api_config import get_mcp_config\n    config = get_mcp_config()\n    print(f''✅ MCP config loaded: {config}'')\nexcept Exception as e:\n    print(f''❌ Config test failed: {e}'')\n\n# Test MCP imports\ntry:\n    from mcp.server import Server\n    from mcp.server.stdio import stdio_server\n    from mcp.types import Resource, Tool, TextContent\n    print(''✅ MCP imports successful'')\nexcept Exception as e:\n    print(f''❌ MCP imports failed: {e}'')\n\n# Test server creation\ntry:\n    server = Server(''test-server'')\n    print(''✅ MCP server creation successful'')\nexcept Exception as e:\n    print(f''❌ MCP server creation failed: {e}'')\n\nprint(''🎉 MCP server is ready!'')\n\")"
+      "Bash(PYTHONPATH=/Users/weixiangzhang/Library/Python/3.11/lib/python/site-packages python3 -c \"\n# Test MCP server imports\nimport sys\nsys.path.insert(0, ''src'')\n\nprint(''🧪 Testing MCP server components...'')\n\n# Test configuration\ntry:\n    from config.api_config import get_mcp_config\n    config = get_mcp_config()\n    print(f''✅ MCP config loaded: {config}'')\nexcept Exception as e:\n    print(f''❌ Config test failed: {e}'')\n\n# Test MCP imports\ntry:\n    from mcp.server import Server\n    from mcp.server.stdio import stdio_server\n    from mcp.types import Resource, Tool, TextContent\n    print(''✅ MCP imports successful'')\nexcept Exception as e:\n    print(f''❌ MCP imports failed: {e}'')\n\n# Test server creation\ntry:\n    server = Server(''test-server'')\n    print(''✅ MCP server creation successful'')\nexcept Exception as e:\n    print(f''❌ MCP server creation failed: {e}'')\n\nprint(''🎉 MCP server is ready!'')\n\")",
+      "WebFetch(domain:support.anthropic.com)",
+      "WebFetch(domain:modelcontextprotocol.io)",
+      "Bash(./scripts/setup_mcp_env.sh:*)"
     ],
     "deny": []
   }
