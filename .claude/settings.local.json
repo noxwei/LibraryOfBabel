@@ -69,7 +69,8 @@
       "Bash(sudo cp:*)",
       "Bash(\"/Users/weixiangzhang/Local Dev/LibraryOfBabel/scripts/redis_caching_setup.sh\")",
       "Bash(pip install:*)",
-      "Bash(./daemon_control.sh:*)"
+      "Bash(./daemon_control.sh:*)",
+      "Bash(./ultimate_daemon_control.sh:*)"
     ],
     "deny": []
   }

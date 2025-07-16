@@ -415,3 +415,20 @@ daemons/*_state.json
 
 # Production readiness reports with internal metrics
 PRODUCTION_READINESS_REPORT.md
+
+# === ENHANCED AI CLASSIFICATION SYSTEM ===
+# Enhanced ebook processor logs (contains processing activity)
+ebook_processor.log
+
+# Production status reports (contains live metrics)
+PRODUCTION_STATUS_REPORT.md
+AGENT_BULLETIN_BOARD.md
+
+# Ultimate daemon logs and state (contains classification details)
+daemons/ultimate_library.log
+daemons/ultimate_library_state.json
+daemons/ultimate_library.pid
+
+# Daemon control scripts (contains runtime configuration)
+ultimate_daemon_control.sh
+daemon_control.sh
