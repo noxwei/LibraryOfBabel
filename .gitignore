@@ -432,3 +432,37 @@ daemons/ultimate_library.pid
 # Daemon control scripts (contains runtime configuration)
 ultimate_daemon_control.sh
 daemon_control.sh
+
+# === MCP EXPANSION SECURITY (QA SECURITY AGENT) ===
+# MCP endpoint testing and development files
+mcp_test_*.json
+mcp_security_*.json
+mcp_performance_*.json
+mcp_load_test_*.json
+
+# MCP configuration with sensitive data
+mcp_config_*.json
+mcp_api_keys.json
+mcp_secrets.json
+mcp_credentials.json
+
+# MCP development workspace
+mcp_workspace/
+mcp_testing/
+mcp_staging/
+mcp_development/
+
+# MCP logs and monitoring
+mcp_*.log
+mcp_monitoring_*.json
+mcp_performance_*.json
+mcp_security_audit_*.json
+
+# MCP consultation and planning documents with internal details
+reports/mcp_feasibility_consultation.json
+reports/mcp_implementation_*.json
+reports/mcp_security_assessment_*.json
+
+# MCP backup configurations
+mcp_backup_*.json
+mcp_config_backup_*.json

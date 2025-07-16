@@ -130,6 +130,19 @@ class APIConfig:
         """Get default embedding model name"""
         return self._config["embedding_models"]["default"]
     
+    def get_mcp_config(self) -> Dict[str, Any]:
+        """Get MCP configuration"""
+        return self._config.get("mcp", {})
+    
+    def update_mcp_config(self, key: str, value: Any):
+        """Update MCP configuration parameter"""
+        if "mcp" not in self._config:
+            self._config["mcp"] = {}
+        self._config["mcp"][key] = value
+        self._config["last_updated"] = self._get_timestamp()
+        self._save_config()
+        print(f"✅ MCP config updated: {key} = {value}")
+    
     def get_available_embedding_models(self) -> Dict[str, Dict]:
         """Get all available embedding models"""
         return self._config["embedding_models"]["available"]
@@ -247,6 +260,14 @@ def get_available_embedding_models() -> Dict[str, Dict]:
 def get_default_embedding_model() -> str:
     """Get default embedding model - primary interface"""
     return config.get_default_embedding_model()
+
+def get_mcp_config() -> Dict[str, Any]:
+    """Get MCP configuration - primary interface"""
+    return config.get_mcp_config()
+
+def update_mcp_config(key: str, value: Any):
+    """Update MCP configuration parameter - primary interface"""
+    config.update_mcp_config(key, value)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,21 @@
+# MCP Server Requirements for Library of Babel
+# Install with: pip install -r requirements_mcp.txt
+
+# Core MCP server
+mcp>=1.0.0
+
+# Async support
+asyncio
+
+# Database connections (if needed)
+psycopg2-binary
+
+# JSON handling
+orjson
+
+# Logging
+structlog
+
+# Optional: For real database integration
+# sqlalchemy
+# alembic
