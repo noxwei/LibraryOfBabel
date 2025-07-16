@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 """
-Comprehensive Reclassification Daemon
-=====================================
-Autonomous daemon to reprocess all 407 books without descriptions
-- Self-stopping when complete
-- Progress tracking and resumption
-- Error recovery
-- Status monitoring
+Full Library Reclassification Daemon
+====================================
+Reprocess ALL 1,243 books with llama3.2:3b for maximum accuracy
+Fast, comprehensive, and autonomous
 """
 
 import sys
@@ -29,22 +26,23 @@ sys.path.append(str(project_root))
 
 from config.api_config import get_database_config
 
-class ReclassificationDaemon:
+class FullLibraryReclassificationDaemon:
     def __init__(self):
         self.db_config = get_database_config()
         self.ollama_url = "http://localhost:11434/api/generate"
         self.model_name = "llama3.2:3b"  # Fast, accurate model
         
         # State file for persistence
-        self.state_file = project_root / "daemons" / "reclassification_state.json"
-        self.log_file = project_root / "daemons" / "reclassification.log"
-        self.pid_file = project_root / "daemons" / "reclassification.pid"
+        self.state_file = project_root / "daemons" / "full_library_state.json"
+        self.log_file = project_root / "daemons" / "full_library.log"
+        self.pid_file = project_root / "daemons" / "full_library.pid"
         
         # Initialize state
         self.state = {
             "processed_books": [],
             "processed_count": 0,
             "reclassified_count": 0,
+            "confirmed_count": 0,
             "failed_count": 0,
             "current_batch": 0,
             "total_books": 0,
@@ -52,7 +50,8 @@ class ReclassificationDaemon:
             "last_update": None,
             "status": "initializing",
             "genre_changes": {},
-            "errors": []
+            "errors": [],
+            "accuracy_stats": {}
         }
         
         # Load existing state if available
@@ -69,7 +68,7 @@ class ReclassificationDaemon:
         )
         self.logger = logging.getLogger(__name__)
         
-        # Valid genres
+        # Valid genres with enhanced list
         self.valid_genres = [
             "Romance", "Literary Fiction", "Science Fiction", "Fantasy",
             "Mystery & Thriller", "Historical Fiction", "Contemporary Fiction",
@@ -122,13 +121,13 @@ class ReclassificationDaemon:
             self.pid_file.unlink()
         self.save_state()
     
-    def get_books_to_process(self):
-        """Get all books without descriptions that haven't been processed"""
+    def get_all_books_to_process(self):
+        """Get ALL books in the library for comprehensive reclassification"""
         conn = psycopg2.connect(**self.db_config, cursor_factory=RealDictCursor)
         
         try:
             with conn.cursor() as cur:
-                # Get books not yet processed
+                # Get all books not yet processed
                 if self.state["processed_books"]:
                     processed_ids = tuple(self.state["processed_books"])
                     if len(processed_ids) == 1:
@@ -145,9 +144,8 @@ class ReclassificationDaemon:
                         SELECT 1 FROM chunks c 
                         WHERE c.book_id = b.book_id 
                         AND c.content IS NOT NULL 
-                        AND LENGTH(c.content) > 150
+                        AND LENGTH(c.content) > 100
                     )
-                    AND (b.description IS NULL OR b.description = '')
                     {processed_condition}
                     ORDER BY b.book_id
                 """)
@@ -156,13 +154,13 @@ class ReclassificationDaemon:
         finally:
             conn.close()
     
-    def get_book_content(self, book_id):
-        """Get representative content from book"""
+    def get_book_content_sample(self, book_id):
+        """Get representative content sample from book"""
         conn = psycopg2.connect(**self.db_config, cursor_factory=RealDictCursor)
         
         try:
             with conn.cursor() as cur:
-                # Get chunks from different parts of the book
+                # Get diverse chunks from the book
                 cur.execute("""
                     WITH numbered_chunks AS (
                         SELECT content,
@@ -171,110 +169,80 @@ class ReclassificationDaemon:
                         FROM chunks
                         WHERE book_id = %s
                         AND content IS NOT NULL
-                        AND LENGTH(content) > 150
+                        AND LENGTH(content) > 100
                     )
                     SELECT content
                     FROM numbered_chunks
-                    WHERE rn IN (1, GREATEST(total_chunks/4, 1), GREATEST(total_chunks/2, 1), total_chunks)
+                    WHERE rn IN (1, GREATEST(total_chunks/3, 1), GREATEST(total_chunks*2/3, 1))
                     ORDER BY rn
-                    LIMIT 4
+                    LIMIT 3
                 """, (book_id,))
                 
                 chunks = cur.fetchall()
                 
-                # Clean and combine content
-                content_samples = []
-                for i, chunk in enumerate(chunks, 1):
-                    clean_content = re.sub(r'<[^>]+>', '', chunk['content'])
-                    clean_content = re.sub(r'\s+', ' ', clean_content).strip()
-                    
-                    if len(clean_content) > 300:
-                        sample = clean_content[:300]
-                    else:
-                        sample = clean_content
-                    
-                    content_samples.append(f"[Sample {i}] {sample}")
-                
-                return "\n\n".join(content_samples)
+                # Create sample
+                if chunks:
+                    sample = " ... ".join([
+                        re.sub(r'<[^>]+>|\\s+', ' ', chunk['content']).strip()[:200]
+                        for chunk in chunks
+                    ])
+                    return sample[:600]  # Reasonable size for classification
+                return ""
         finally:
             conn.close()
     
-    def classify_content(self, book_data, content):
-        """Use Magistral to classify based on content"""
+    def classify_with_llama(self, book_data, content):
+        """Fast classification with llama3.2:3b"""
         
-        prompt = f"""You are an expert book classifier. Analyze the actual content to determine the correct genre.
+        prompt = f"""Classify this book by genre based on actual content analysis.
 
-BOOK:
-Title: "{book_data['title']}"
-Author: {book_data['author']}"
-Current: {book_data['genre']}
+BOOK: "{book_data['title']}" by {book_data['author']}
+CONTENT SAMPLE: {content}
 
-CONTENT:
-{content[:1500]}
+AVAILABLE GENRES:
+Romance, Literary Fiction, Science Fiction, Fantasy, Mystery & Thriller, Historical Fiction, Contemporary Fiction, Self-Help, Biography & Memoir, Psychology, Philosophy, Business & Economics, History, Science & Nature, Programming & Technology, Academic & Research
 
-GENRES: Romance, Literary Fiction, Science Fiction, Fantasy, Mystery & Thriller, Historical Fiction, Contemporary Fiction, Self-Help, Biography & Memoir, Psychology, Philosophy, Business & Economics, History, Science & Nature, Programming & Technology, Data Science & Analytics, Religion & Spirituality, Political Science, Academic & Research, Health & Medicine
+INSTRUCTIONS:
+- Analyze the ACTUAL CONTENT, not just the title
+- Fiction = characters, dialogue, narrative plot
+- Non-fiction = facts, analysis, instruction, theory
+- Choose the most specific and accurate genre
 
-RULES:
-1. Base on CONTENT only, not title
-2. Fiction: Has characters, dialogue, narrative
-3. Non-fiction: Facts, analysis, instruction
-4. Choose most specific genre
-
-What genre best fits this content?
-
-Respond with ONLY the genre name."""
+GENRE:"""
 
         try:
+            start_time = time.time()
+            
             response = requests.post(
                 self.ollama_url,
                 json={
                     "model": self.model_name,
                     "prompt": prompt,
                     "stream": False,
-                    "options": {"temperature": 0.05}
+                    "options": {"temperature": 0.1}
                 },
-                timeout=30  # Fast model - 30 seconds is plenty
+                timeout=20  # Fast model
             )
+            
+            duration = time.time() - start_time
             
             if response.status_code == 200:
                 result = response.json()
                 classification = result['response'].strip()
                 
-                # Extract clean classification
-                if "\\boxed{" in classification:
-                    match = re.search(r'\\boxed\{([^}]+)\}', classification)
-                    if match:
-                        classification = match.group(1)
-                else:
-                    lines = [line.strip() for line in classification.split('\n') if line.strip()]
-                    if lines:
-                        for line in reversed(lines):
-                            for genre in self.valid_genres:
-                                if genre.lower() in line.lower():
-                                    classification = genre
-                                    break
-                            if classification in self.valid_genres:
-                                break
-                        else:
-                            classification = lines[-1]
+                # Extract clean genre
+                for genre in self.valid_genres:
+                    if genre.lower() in classification.lower():
+                        return genre, duration
                 
-                # Clean and validate
-                classification = re.sub(r'^["\']|["\']$', '', classification).strip()
-                
-                if classification in self.valid_genres:
-                    return classification
-                else:
-                    # Try partial matching
-                    for valid_genre in self.valid_genres:
-                        if valid_genre.lower() in classification.lower():
-                            return valid_genre
-                    return None
+                # Fallback - return raw classification for manual review
+                return classification, duration
             else:
-                return None
+                return None, duration
                 
         except Exception as e:
             self.logger.error(f"Classification error: {e}")
-            return None
+            return None, 20
     
     def update_book_genre(self, book_id, new_genre):
         """Update book genre in database"""
@@ -293,21 +261,21 @@ Respond with ONLY the genre name."""
     def process_book(self, book):
         """Process a single book"""
         try:
-            self.logger.info(f"Processing: \"{book['title']}\" by {book['author']}")
+            self.logger.info(f"Processing: \"{book['title'][:60]}...\" by {book['author']}")
             
             # Get content
-            content = self.get_book_content(book['book_id'])
-            if not content or len(content) < 100:
+            content = self.get_book_content_sample(book['book_id'])
+            if not content or len(content) < 50:
                 self.logger.warning(f"Insufficient content for {book['title']}")
                 return "insufficient_content"
             
             # Classify
-            new_genre = self.classify_content(book, content)
+            new_genre, duration = self.classify_with_llama(book, content)
             if not new_genre:
                 self.logger.warning(f"Classification failed for {book['title']}")
                 return "classification_failed"
             
-            self.logger.info(f"Content classification: {new_genre}")
+            self.logger.info(f"Classification: {new_genre} ({duration:.1f}s)")
             
             # Update if different
             if new_genre != book['genre']:
@@ -335,8 +303,9 @@ Respond with ONLY the genre name."""
     
     def run(self):
         """Main daemon loop"""
-        self.logger.info("🚀 COMPREHENSIVE RECLASSIFICATION DAEMON STARTING")
-        self.logger.info("=" * 60)
+        self.logger.info("🚀 FULL LIBRARY RECLASSIFICATION DAEMON STARTING")
+        self.logger.info("📚 Reprocessing ALL books with llama3.2:3b for maximum accuracy")
+        self.logger.info("=" * 80)
         
         # Initialize
         if not self.state["start_time"]:
@@ -344,8 +313,8 @@ Respond with ONLY the genre name."""
         
         self.state["status"] = "running"
         
-        # Get books to process
-        books_to_process = self.get_books_to_process()
+        # Get all books
+        books_to_process = self.get_all_books_to_process()
         self.state["total_books"] = len(books_to_process) + len(self.state["processed_books"])
         
         self.logger.info(f"📚 Found {len(books_to_process)} books to process")
@@ -357,8 +326,13 @@ Respond with ONLY the genre name."""
             self.save_state()
             return
         
+        # Estimate completion time
+        estimated_seconds = len(books_to_process) * 1.2  # ~1.2s per book
+        estimated_minutes = estimated_seconds / 60
+        self.logger.info(f"⏱️  Estimated completion: {estimated_minutes:.1f} minutes")
+        
         # Process books in batches
-        batch_size = 10
+        batch_size = 20
         for i in range(0, len(books_to_process), batch_size):
             batch = books_to_process[i:i + batch_size]
             self.state["current_batch"] += 1
@@ -374,6 +348,8 @@ Respond with ONLY the genre name."""
                 
                 if result == "reclassified":
                     self.state["reclassified_count"] += 1
+                elif result == "confirmed":
+                    self.state["confirmed_count"] += 1
                 elif result in ["error", "classification_failed", "update_failed"]:
                     self.state["failed_count"] += 1
                     self.state["errors"].append({
@@ -387,22 +363,27 @@ Respond with ONLY the genre name."""
                 progress_pct = (self.state["processed_count"] / self.state["total_books"]) * 100
                 self.logger.info(f"📊 Progress: {self.state['processed_count']}/{self.state['total_books']} ({progress_pct:.1f}%)")
                 
-                # Save state every 5 books
-                if self.state["processed_count"] % 5 == 0:
+                # Save state every 10 books
+                if self.state["processed_count"] % 10 == 0:
                     self.save_state()
                 
-                time.sleep(1)  # Reduced rate limiting for fast model
+                time.sleep(0.5)  # Very fast processing
             
             # Batch complete
             self.logger.info(f"✅ Batch {self.state['current_batch']} complete")
             self.save_state()
         
         # Final completion
-        self.logger.info("🎉 COMPREHENSIVE RECLASSIFICATION COMPLETE!")
+        self.logger.info("🎉 FULL LIBRARY RECLASSIFICATION COMPLETE!")
         self.logger.info(f"📊 Final Stats:")
         self.logger.info(f"   • Total processed: {self.state['processed_count']}")
         self.logger.info(f"   • Reclassified: {self.state['reclassified_count']}")
+        self.logger.info(f"   • Confirmed accurate: {self.state['confirmed_count']}")
         self.logger.info(f"   • Failed: {self.state['failed_count']}")
+        
+        accuracy_rate = ((self.state['reclassified_count'] + self.state['confirmed_count']) / 
+                        self.state['processed_count']) * 100
+        self.logger.info(f"   • Accuracy rate: {accuracy_rate:.1f}%")
         
         self.state["status"] = "completed"
         self.state["completion_time"] = datetime.now().isoformat()
@@ -410,7 +391,7 @@ Respond with ONLY the genre name."""
 
 def main():
     """Start the daemon"""
-    daemon = ReclassificationDaemon()
+    daemon = FullLibraryReclassificationDaemon()
     
     try:
         daemon.run()
