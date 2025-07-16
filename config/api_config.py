@@ -63,6 +63,35 @@ class APIConfig:
                 "in_book_search": True,
                 "chunking_levels": ["small", "medium", "large"]
             },
+            "embedding_models": {
+                "default": "nomic-embed-text",
+                "available": {
+                    "nomic-embed-text": {
+                        "dimension": 768,
+                        "max_length": 8000,
+                        "description": "Optimized for text embeddings",
+                        "model_id": "nomic-embed-text:latest"
+                    },
+                    "bge-m3": {
+                        "dimension": 1024,
+                        "max_length": 8192,
+                        "description": "BGE M3 multilingual embedding model",
+                        "model_id": "bge-m3:latest"
+                    },
+                    "mxbai-embed-large": {
+                        "dimension": 1024,
+                        "max_length": 8000,
+                        "description": "MixedBread AI large embedding model",
+                        "model_id": "mxbai-embed-large:latest"
+                    },
+                    "granite-embedding": {
+                        "dimension": 768,
+                        "max_length": 8192,
+                        "description": "IBM Granite embedding model (278M parameters)",
+                        "model_id": "granite-embedding:278m"
+                    }
+                }
+            },
             "version": "unified",
             "last_updated": "2025-07-14T23:15:00Z"
         }
@@ -91,6 +120,19 @@ class APIConfig:
     def project_paths(self) -> Dict[str, str]:
         """Get project paths"""
         return self._config["paths"]
+    
+    @property
+    def embedding_models(self) -> Dict[str, Any]:
+        """Get embedding models configuration"""
+        return self._config["embedding_models"]
+    
+    def get_default_embedding_model(self) -> str:
+        """Get default embedding model name"""
+        return self._config["embedding_models"]["default"]
+    
+    def get_available_embedding_models(self) -> Dict[str, Dict]:
+        """Get all available embedding models"""
+        return self._config["embedding_models"]["available"]
     
     def update_api_key(self, new_key: str):
         """Update API key and save configuration"""
@@ -197,6 +239,14 @@ def update_api_key(new_key: str):
 def validate_configuration() -> bool:
     """Validate all configuration"""
     return config.validate_config()
+
+def get_available_embedding_models() -> Dict[str, Dict]:
+    """Get available embedding models - primary interface"""
+    return config.get_available_embedding_models()
+
+def get_default_embedding_model() -> str:
+    """Get default embedding model - primary interface"""
+    return config.get_default_embedding_model()
 
 
 if __name__ == "__main__":

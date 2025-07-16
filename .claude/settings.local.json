@@ -58,7 +58,12 @@
       "Bash(git stash:*)",
       "Bash(echo \"\" echo \"🤔 STRATEGIC ANALYSIS OF SURVIVORS:\" echo \"\" echo \"ollama-integration (July 8) - Check if this was merged...\" git log --oneline main..ollama-integration)",
       "Bash(chmod:*)",
-      "Bash(unzip:*)"
+      "Bash(unzip:*)",
+      "Bash(ollama list:*)",
+      "Bash(timeout:*)",
+      "Bash(cp:*)",
+      "Bash(./daemons/daemon_control.sh:*)",
+      "Bash(true)"
     ],
     "deny": []
   }
