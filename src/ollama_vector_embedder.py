@@ -53,16 +53,30 @@ class OllamaVectorEmbedder:
     Optimized for LibraryOfBabel's knowledge base and semantic search.
     """
     
-    def __init__(self, db_config: Dict, ollama_base_url: str = "http://localhost:11434"):
+    def __init__(self, db_config: Dict, ollama_base_url: str = "http://localhost:11434", embedding_model: str = "nomic-embed-text"):
         """Initialize Ollama vector embedder"""
         self.db_config = db_config
         self.ollama_base_url = ollama_base_url.rstrip('/')
         
         # Embedding configuration (Dr. Elena's performance optimization)
-        self.embedding_model = "nomic-embed-text"  # Optimized for text embeddings
+        # Multi-model support for enhanced embedding quality
+        self.available_models = {
+            "nomic-embed-text": {"dimension": 768, "max_length": 8000, "description": "Optimized for text embeddings"},
+            "bge-m3": {"dimension": 1024, "max_length": 8192, "description": "BGE M3 multilingual embedding model"},
+            "mxbai-embed-large": {"dimension": 1024, "max_length": 8000, "description": "MixedBread AI large embedding model"},
+            "granite-embedding:278m": {"dimension": 768, "max_length": 8192, "description": "IBM Granite embedding model (278M parameters)"}
+        }
+        
+        # Set embedding model (validate against available models)
+        if embedding_model in self.available_models:
+            self.embedding_model = embedding_model
+        else:
+            self.logger.warning(f"⚠️ Model '{embedding_model}' not recognized, defaulting to nomic-embed-text")
+            self.embedding_model = "nomic-embed-text"
+        
         self.batch_size = 10  # Process embeddings in batches
-        self.max_chunk_length = 8000  # Optimal chunk size for embeddings
-        self.embedding_dimension = 768  # Standard dimension for nomic-embed-text
+        self.max_chunk_length = self.available_models[self.embedding_model]["max_length"]
+        self.embedding_dimension = self.available_models[self.embedding_model]["dimension"]
         
         # Performance settings (Lexi's content strategy)
         self.timeout_seconds = 30
@@ -87,9 +101,10 @@ class OllamaVectorEmbedder:
         self.team_signature = "OLLAMA_VECTOR_TEAM_v1.0"
         
         self.logger.info("🧠 Ollama Vector Embedder initialized")
-        self.logger.info(f"🎯 Model: {self.embedding_model}")
+        self.logger.info(f"🎯 Model: {self.embedding_model} ({self.available_models[self.embedding_model]['description']})")
         self.logger.info(f"📊 Batch size: {self.batch_size}")
         self.logger.info(f"📏 Max chunk length: {self.max_chunk_length}")
+        self.logger.info(f"🔢 Embedding dimension: {self.embedding_dimension}")
         
         # Verify Ollama connection
         self._verify_ollama_connection()
@@ -136,6 +151,29 @@ class OllamaVectorEmbedder:
                 
         except Exception as e:
             self.logger.error(f"❌ Error pulling model: {e}")
+    
+    def switch_embedding_model(self, new_model: str) -> bool:
+        """Switch to a different embedding model"""
+        if new_model not in self.available_models:
+            self.logger.error(f"❌ Model '{new_model}' not available. Available models: {list(self.available_models.keys())}")
+            return False
+        
+        old_model = self.embedding_model
+        self.embedding_model = new_model
+        self.max_chunk_length = self.available_models[new_model]["max_length"]
+        self.embedding_dimension = self.available_models[new_model]["dimension"]
+        
+        self.logger.info(f"🔄 Switched from '{old_model}' to '{new_model}'")
+        self.logger.info(f"📏 New max chunk length: {self.max_chunk_length}")
+        self.logger.info(f"🔢 New embedding dimension: {self.embedding_dimension}")
+        
+        # Verify new model is available
+        self._verify_ollama_connection()
+        return True
+    
+    def list_available_models(self) -> Dict[str, Dict]:
+        """List all available embedding models and their configurations"""
+        return self.available_models.copy()
     
     def get_db_connection(self):
         """Get database connection (Dr. Sarah's method)"""
@@ -283,17 +321,18 @@ class OllamaVectorEmbedder:
                                 cur.execute("""
                                     INSERT INTO chunk_embeddings (
                                         chunk_id, book_id, embedding, 
-                                        embedding_model, created_at
-                                    ) VALUES (%s, %s, %s, %s, NOW())
-                                    ON CONFLICT (chunk_id) DO UPDATE SET
+                                        embedding_model, embedding_dimension, created_at
+                                    ) VALUES (%s, %s, %s, %s, %s, NOW())
+                                    ON CONFLICT (chunk_id, embedding_model) DO UPDATE SET
                                         embedding = EXCLUDED.embedding,
-                                        embedding_model = EXCLUDED.embedding_model,
+                                        embedding_dimension = EXCLUDED.embedding_dimension,
                                         created_at = NOW()
                                 """, (
                                     result.chunk_id,
                                     book_id,
                                     json.dumps(result.embedding),
-                                    self.embedding_model
+                                    self.embedding_model,
+                                    len(result.embedding)
                                 ))
                                 stored_count += 1
                                 
@@ -313,13 +352,14 @@ class OllamaVectorEmbedder:
         cursor.execute("""
             CREATE TABLE chunk_embeddings (
                 embedding_id SERIAL PRIMARY KEY,
-                chunk_id VARCHAR(255) UNIQUE NOT NULL,
+                chunk_id VARCHAR(255) NOT NULL,
                 book_id INTEGER NOT NULL,
                 embedding JSONB NOT NULL,
                 embedding_model VARCHAR(100) NOT NULL,
-                embedding_dimension INTEGER DEFAULT 768,
+                embedding_dimension INTEGER NOT NULL,
                 created_at TIMESTAMP DEFAULT NOW(),
-                FOREIGN KEY (book_id) REFERENCES books(book_id)
+                FOREIGN KEY (book_id) REFERENCES books(book_id),
+                UNIQUE(chunk_id, embedding_model)
             )
         """)
         
