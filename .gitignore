@@ -466,3 +466,15 @@ reports/mcp_security_assessment_*.json
 # MCP backup configurations
 mcp_backup_*.json
 mcp_config_backup_*.json
+
+# === POSTGRESQL OPTIMIZATION & PERFORMANCE ===
+# PostgreSQL function testing and performance data
+*speed_test_results*.json
+postgresql_functions_test_results.json
+*performance_test*.json
+*benchmark_results*.json
+
+# Production deployment and optimization logs
+*optimization_status*.json
+scripts/optimization_status.json
+scripts/vector_optimization_daemon.py

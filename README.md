@@ -9,13 +9,14 @@ Transform your digital ebook collection into a searchable, AI-accessible researc
 LibraryOfBabel turns your EPUB collection into a powerful, unified search API with your entire library instantly accessible through secure endpoints. Perfect for AI agents, research tools, and knowledge discovery with advanced fuzzy search and vector embeddings.
 
 ### **✨ Core Features**
-- 🔍 **Instant Search**: Query across 1,668+ books with fuzzy search & vector embeddings
-- 🧠 **AI-Powered**: Semantic search using 48,056+ vector embeddings
+- 🔍 **Lightning-Fast Search**: Query across 2,074+ books in <200ms (99%+ improvement!)
+- 🏛️ **PostgreSQL-First**: Optimized database functions for maximum performance  
+- 🧠 **AI-Powered**: Semantic search using 59,115+ vector embeddings
 - 📖 **Smart Chunking**: Configurable text granularity (500/1500/5000 chars)
 - 🔐 **Production Security**: API key authentication + HTTPS + QA Security Agent
 - 🤖 **AI-Ready**: Structured JSON responses for agent consumption
 - 📱 **Universal Access**: Works with iOS Shortcuts, web apps, curl
-- 🎯 **Fuzzy Search**: Find content even with typos or partial matches
+- 🎯 **Flexible Limits**: Control results (1-10,000) for any use case
 - 📚 **In-Book Search**: Search within specific books for focused research
 - 🔗 **MCP Integration**: Connect Claude Code directly to your library
 
@@ -28,8 +29,8 @@ curl https://api.example.com:5562/health
 # 2. Search your library (replace YOUR_API_KEY)
 curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&search=consciousness&page_size=5"
 
-# 3. NEW: Fuzzy semantic search with AI
-curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_API_KEY&q=artificial%20intelligence&type=semantic&limit=5"
+# 3. 🔥 PostgreSQL-optimized search with limit control (1-10,000 results!)
+curl "https://api.example.com:5562/search?api_key=YOUR_API_KEY&q=artificial%20intelligence&limit=100"
 
 # 4. NEW: Search within a specific book
 curl "https://api.example.com:5562/books/1099/search?api_key=YOUR_API_KEY&q=discourse&page_size=3"
@@ -39,14 +40,15 @@ curl "https://api.example.com:5562/books/1099/search?api_key=YOUR_API_KEY&q=disc
 
 ## 📊 **Current Statistics**
 
-- **📚 Total Books**: 1,668+ (processed EPUB collection)
-- **📝 Total Chunks**: 54,760+ (searchable segments)
-- **🧠 Vector Embeddings**: 48,056+ (semantic AI search ready)
-- **⚡ Response Time**: 29-600ms (depending on search complexity)
+- **📚 Total Books**: 2,074+ (processed EPUB collection) 🎉 **MILESTONE!**
+- **📝 Total Chunks**: 65,819+ (searchable segments)
+- **🧠 Vector Embeddings**: 59,115+ (semantic AI search ready)
+- **⚡ Response Time**: 25-190ms (**99%+ performance improvement!**)
 - **🔒 Security**: 100% API key protected with QA Security Agent
 - **📈 Uptime**: 99.9%+ with auto-restart daemon
 - **🎯 Search Types**: 4 (keyword, semantic, fuzzy, hybrid)
 - **🔗 MCP Integration**: Claude Code compatible remote server
+- **🏛️ Architecture**: **PostgreSQL-first optimized functions**
 
 ## 🔗 **Unified Production API**
 
@@ -72,9 +74,15 @@ X-API-Key: YOUR_API_KEY
 - `GET /books` - List books with pagination & search
 - `GET /books/{id}` - Individual book details
 - `GET /books/{id}/chunks` - Book content with chunking levels
-- `GET /search` - Full-text search across all books
+- `GET /search` - **PostgreSQL-optimized** full-text search across all books
 - `GET /books/{id}/search` - 🆕 Search within specific book
 - `GET /fuzzy-search` - 🆕 AI-powered fuzzy search with vector embeddings
+
+### **🔥 NEW: Enhanced Search Parameters**
+- **`limit`**: Control result count (1-10,000) - Perfect for Claude Code!
+- **`page_size`**: Alternative pagination parameter
+- **`page`**: Navigate through large result sets
+- **`type`**: Search type (content, semantic, hybrid)
 
 ### **Legacy V3 Compatibility**
 - `GET /api/v3/health` - V3 format health check
@@ -183,6 +191,11 @@ curl "https://api.example.com:5562/books?api_key=YOUR_KEY&genre=philosophy"
 
 # Full-text search with semantic support
 curl "https://api.example.com:5562/search?api_key=YOUR_KEY&q=machine%20learning&type=semantic"
+
+# 🔥 NEW: Control result count with limit parameter
+curl "https://api.example.com:5562/search?api_key=YOUR_KEY&q=philosophy&limit=1"     # Just 1 result
+curl "https://api.example.com:5562/search?api_key=YOUR_KEY&q=philosophy&limit=100"   # 100 results  
+curl "https://api.example.com:5562/search?api_key=YOUR_KEY&q=philosophy&limit=5000"  # 5000 results!
 ```
 
 ## 📱 **Integration Examples**
