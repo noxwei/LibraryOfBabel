@@ -1,0 +1,44 @@
+{
+  "health_check": {
+    "time_ms": 34.221649169921875,
+    "metrics_count": 6,
+    "status": "success"
+  },
+  "book_listing": {
+    "time_ms": 1.0030269622802734,
+    "results_count": 10,
+    "status": "success"
+  },
+  "book_details": {
+    "time_ms": 0.6959438323974609,
+    "status": "success"
+  },
+  "book_chunks": {
+    "time_ms": 1.6789436340332031,
+    "results_count": 5,
+    "status": "success"
+  },
+  "text_search": [
+    {
+      "query": "science",
+      "time_ms": 215.13700485229492,
+      "results_count": 10,
+      "status": "success"
+    }
+  ],
+  "vector_search": {
+    "time_ms": 4.790067672729492,
+    "results_count": 10,
+    "status": "success"
+  },
+  "hybrid_search": {
+    "time_ms": 25.803089141845703,
+    "results_count": 10,
+    "status": "success"
+  },
+  "performance_metrics": {
+    "time_ms": 0.8740425109863281,
+    "functions_tracked": 0,
+    "status": "success"
+  }
+}
