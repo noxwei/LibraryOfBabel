@@ -47,6 +47,21 @@ agents/*/_personal_*.json
 agents/*/_user_*.json
 agents/*/_private_*.json
 
+# === DR. SARAH CHEN'S VECTOR OPTIMIZATION ===
+# Virtual environment for semantic processing
+venv_semantic/
+__pycache__/
+*.pyc
+*.pyo
+
+# Vector optimization logs and status
+logs/vector_optimization_*.log
+logs/vector_daemon_*.log
+scripts/optimization_status*.json
+
+# Archive directories (cleanup results)
+archive/
+
 # === STANDARD DEVELOPMENT EXCLUDES ===
 # Python
 __pycache__/

@@ -36,7 +36,8 @@ from epub_processor import EPUBProcessor
 from batch_processor import BatchProcessor
 from database_ingestion import DatabaseIngestor
 from deduplication_layer import DeduplicationLayer  # DBA Team deduplication system
-from ollama_vector_embedder import OllamaVectorEmbedder  # Vector embedding integration
+from advanced_semantic_chunker import AdvancedSemanticChunker  # Dr. Sarah Chen's semantic chunker
+from multimodal_embedding_pipeline import MultiModalEmbeddingPipeline  # Dr. Sarah Chen's multi-modal embeddings
 # from frictionless_ebook_harvester import FrictionlessEbookHarvester  # Removed MAM dependency
 
 class AutomatedEbookProcessor:
@@ -68,8 +69,9 @@ class AutomatedEbookProcessor:
         # DBA Team deduplication system
         self.deduplication_layer = DeduplicationLayer(self.db_config)
         
-        # Vector embedding system (Lexi + Dr. Elena integration)
-        self.vector_embedder = OllamaVectorEmbedder(self.db_config)
+        # Dr. Sarah Chen's advanced processing systems
+        self.semantic_chunker = AdvancedSemanticChunker(self.db_config)
+        self.embedding_pipeline = MultiModalEmbeddingPipeline(self.db_config)
         
         # Enhanced classification system
         self.ollama_url = "http://localhost:11434/api/generate"
@@ -109,14 +111,29 @@ class AutomatedEbookProcessor:
         # Create directories
         self._setup_directories()
         
+        # Setup Dr. Sarah Chen's multi-modal infrastructure
+        self._setup_multimodal_infrastructure()
+        
         self.logger.info("🤖 Automated Ebook Processor initialized")
         self.logger.info(f"📁 Monitoring: {self.downloads_dir}")
         self.logger.info(f"📏 Size limits: <{self.large_file_threshold_mb}MB priority, <{self.max_file_size_mb}MB max")
+        self.logger.info("🏛️ Dr. Sarah Chen's multi-modal processing enabled")
     
     def _setup_directories(self):
         """Create necessary directories"""
         for directory in [self.processed_dir, self.large_files_dir, self.failed_dir]:
             directory.mkdir(parents=True, exist_ok=True)
+    
+    def _setup_multimodal_infrastructure(self):
+        """Setup Dr. Sarah Chen's multi-modal embedding infrastructure"""
+        try:
+            self.logger.info("🗂️ Setting up multi-modal embedding infrastructure...")
+            if self.embedding_pipeline.setup_multimodal_tables():
+                self.logger.info("✅ Multi-modal infrastructure ready")
+            else:
+                self.logger.warning("⚠️ Multi-modal infrastructure setup failed")
+        except Exception as e:
+            self.logger.error(f"❌ Multi-modal setup error: {e}")
     
     def get_file_size_mb(self, file_path: Path) -> float:
         """Get file size in MB"""
@@ -379,14 +396,36 @@ class AutomatedEbookProcessor:
             
             self.logger.info(f"    ✅ Database: {chunks_inserted} chunks inserted for book ID {book_id}")
             
-            # Generate vector embeddings (Lexi + DBA team integration)
-            self.logger.info(f"    🧠 Generating vector embeddings...")
-            embedding_success = self.vector_embedder.process_book_with_embeddings(book_id, chapters)
+            # Dr. Sarah Chen's Advanced Processing Pipeline
+            self.logger.info(f"    🏛️ Dr. Sarah Chen: Starting advanced semantic processing...")
             
-            if embedding_success:
-                self.logger.info(f"    ✅ Vector embeddings generated and stored")
+            # Step 1: Create semantic chunks
+            self.logger.info(f"    🏗️ Creating semantic chunks...")
+            chunk_results = self.semantic_chunker.process_book_semantic_chunks(book_id, ['medium'])
+            
+            if 'error' not in chunk_results:
+                # Save semantic chunks
+                if self.semantic_chunker.save_semantic_chunks_to_db(chunk_results):
+                    chunk_count = chunk_results['chunk_levels']['medium']['chunk_count']
+                    self.logger.info(f"    ✅ Created {chunk_count} semantic chunks")
+                    
+                    # Step 2: Generate multi-modal embeddings
+                    self.logger.info(f"    🧠 Generating multi-modal embeddings...")
+                    embedding_results = self.embedding_pipeline.process_book_multimodal_pipeline(
+                        book_id=book_id,
+                        chunk_level='medium',
+                        max_workers=2  # Conservative for automation
+                    )
+                    
+                    if embedding_results['status'] in ['completed', 'completed_with_save_errors']:
+                        self.logger.info(f"    ✅ Generated {embedding_results['embeddings_generated']} multi-modal embeddings")
+                        self.logger.info(f"    🎯 Processing rate: {embedding_results['chunks_per_second']:.1f} chunks/sec")
+                    else:
+                        self.logger.warning(f"    ⚠️ Multi-modal embedding generation failed: {embedding_results.get('message', 'Unknown error')}")
+                else:
+                    self.logger.warning(f"    ⚠️ Failed to save semantic chunks")
             else:
-                self.logger.warning(f"    ⚠️ Vector embedding generation failed (book still processed)")
+                self.logger.warning(f"    ⚠️ Semantic chunking failed: {chunk_results['error']}")
             
             # Enhanced genre classification
             self.logger.info(f"    🧠 Classifying genre with structure intelligence...")

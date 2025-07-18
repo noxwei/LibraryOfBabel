@@ -79,7 +79,9 @@
       "Bash(npx:*)",
       "Bash(node:*)",
       "Bash(gtimeout:*)",
-      "Bash(env)"
+      "Bash(env)",
+      "Bash(source:*)",
+      "Bash(echo:*)"
     ],
     "deny": []
   }
