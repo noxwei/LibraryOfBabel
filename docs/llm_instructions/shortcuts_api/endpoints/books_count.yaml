@@ -1,0 +1,105 @@
+endpoint:
+  name: "Book Count"
+  path: "/books/count"
+  method: "GET"
+  authentication: true
+  
+  description: "Returns total number of books in the library as plain text"
+  
+  url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count"
+  
+  parameters:
+    - name: "api_key"
+      type: "string"
+      required: true
+      location: "query"
+      description: "API authentication key"
+      example: "?api_key=YOUR_API_KEY"
+  
+  response:
+    type: "text/plain"
+    format: "single_value"
+    description: "Plain text number - perfect for iOS Shortcuts"
+    
+    example: "2503"
+    data_type: "string (numeric)"
+    
+  ios_shortcuts:
+    action: "Get Contents of URL"
+    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=YOUR_KEY"
+    method: "GET"
+    response_handling: "Use directly - no JSON parsing needed"
+    
+    shortcuts_actions:
+      - "Get Contents of URL (this endpoint)"
+      - "Get Text from Input (result is already text)"
+      - "Use in calculations or display directly"
+      
+  use_cases:
+    - "Display library size in shortcuts"
+    - "Calculate reading percentages"
+    - "Show collection statistics"
+    - "Compare with personal reading goals"
+    
+  data_jar_usage:
+    store_as: "library_book_count"
+    data_type: "number"
+    update_frequency: "daily"
+    
+  curl_examples:
+    production: |
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=YOUR_KEY"
+      
+    development: |
+      curl "http://localhost:5001/api/shortcuts/books/count"
+      
+    with_header: |
+      curl -H "X-API-Key: YOUR_KEY" \
+      "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count"
+  
+  test_results:
+    production_auth_required: "✅ Returns error with invalid key"
+    development_no_auth: "✅ Returns 2503"
+    response_format: "✅ Plain text (not JSON)"
+    
+  performance:
+    response_time: "< 100ms"
+    cache_duration: "5 minutes"
+    rate_limit: "60 requests/minute"
+    
+  troubleshooting:
+    invalid_api_key:
+      response: '{"error":"Invalid API key"}'
+      solutions:
+        - "Check API key spelling"
+        - "Ensure key parameter is included"
+        - "Try X-API-Key header method"
+        
+    unexpected_json:
+      response: '{"error":"..."}'
+      cause: "Authentication or server error"
+      solution: "Fix authentication first"
+      
+    expected_vs_actual:
+      expected: "2503"
+      format: "Plain text number"
+      not_json: true
+      
+  integration_examples:
+    ios_shortcut:
+      name: "Library Size"
+      steps:
+        1: "Get Contents of URL"
+        2: "Set to https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=KEY"
+        3: "Show Result (displays: 2503)"
+        
+    data_jar:
+      action: "Store result as 'book_count'"
+      value: "2503"
+      type: "text"
+      
+    notification:
+      text: "📚 Library contains [book_count] books"
+      
+  last_tested: "2025-07-19T03:15:00"
+  test_status: "✅ WORKING - Plain text response"

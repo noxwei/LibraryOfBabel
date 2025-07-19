@@ -118,6 +118,41 @@ def random_author():
         logger.error(f"Random author error: {e}")
         return "Unknown Author", 500, {'Content-Type': 'text/plain'}
 
+@shortcuts_bp.route('/random/book')
+@require_auth
+def random_book():
+    """Returns: {"title": "Book Title", "author": "Author Name", "id": 123} - combined random book info"""
+    try:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT book_id, title, author 
+                    FROM books 
+                    WHERE author IS NOT NULL 
+                    ORDER BY RANDOM() 
+                    LIMIT 1;
+                """)
+                result = cur.fetchone()
+                if result:
+                    book_id, title, author = result
+                    return jsonify({
+                        "id": book_id,
+                        "title": title,
+                        "author": author,
+                        "shortcuts_ready": True
+                    })
+                else:
+                    return jsonify({
+                        "error": "No books available",
+                        "shortcuts_ready": True
+                    }), 404
+    except Exception as e:
+        logger.error(f"Random book error: {e}")
+        return jsonify({
+            "error": "Random book unavailable",
+            "shortcuts_ready": True
+        }), 500
+
 @shortcuts_bp.route('/search/<term>/count')
 @require_auth
 def search_count(term):

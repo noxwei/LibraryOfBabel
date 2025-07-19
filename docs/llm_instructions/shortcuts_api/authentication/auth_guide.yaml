@@ -1,0 +1,85 @@
+authentication:
+  base_url: "https://api.ashortstayinhell.com:5562/api/shortcuts"
+  
+  methods:
+    query_parameter:
+      format: "?api_key=YOUR_API_KEY"
+      example: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=abc123"
+      best_for: "iOS Shortcuts (easiest method)"
+      
+    header:
+      format: "X-API-Key: YOUR_API_KEY"
+      example: |
+        curl -H "X-API-Key: abc123" \
+        "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count"
+      best_for: "Advanced integrations"
+      
+    authorization_header:
+      format: "Authorization: Bearer YOUR_API_KEY"
+      example: |
+        curl -H "Authorization: Bearer abc123" \
+        "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count"
+      best_for: "Standard OAuth patterns"
+
+  no_auth_required:
+    - "/health"
+    
+  common_errors:
+    invalid_key:
+      response: '{"error": "Invalid API key"}'
+      solutions:
+        - "Check API key spelling"
+        - "Ensure key is not expired"
+        - "Try different authentication method"
+        
+    missing_key:
+      response: '{"error": "API key required"}'
+      solutions:
+        - "Add api_key parameter"
+        - "Add X-API-Key header"
+        - "Use /health endpoint to test connectivity first"
+
+  ios_shortcuts_setup:
+    steps:
+      1: "Add 'Get Contents of URL' action"
+      2: "Set URL to endpoint with ?api_key=YOUR_KEY"
+      3: "Set Method to GET"
+      4: "For headers method: Add X-API-Key header"
+      
+    example_shortcut:
+      name: "Get Book Count"
+      url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=YOUR_KEY"
+      method: "GET"
+      expected_response: "2503"
+      
+  testing:
+    health_check:
+      url: "https://api.ashortstayinhell.com:5562/api/shortcuts/health"
+      method: "GET"
+      auth_required: false
+      expected_status: 200
+      
+    authenticated_test:
+      url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=YOUR_KEY"
+      method: "GET"
+      auth_required: true
+      expected_response: "2503" # Plain text, not JSON
+      
+  troubleshooting:
+    connection_failed:
+      check:
+        - "Internet connectivity"
+        - "URL spelling (https://api.ashortstayinhell.com:5562)"
+        - "Port 5562 accessibility"
+        
+    auth_failed:
+      check:
+        - "API key validity"
+        - "Authentication method (query param vs header)"
+        - "URL encoding of special characters in key"
+        
+    empty_response:
+      check:
+        - "Endpoint path correctness"
+        - "Authentication success"
+        - "Database connectivity (use /health to verify)"
