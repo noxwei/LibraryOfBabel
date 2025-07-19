@@ -1,0 +1,161 @@
+endpoint:
+  name: "Books Title List"
+  path: "/books/title-list"
+  method: "GET"
+  authentication: true
+  
+  description: "Returns simple array of book titles - perfect for iOS Shortcuts loops"
+  
+  url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/title-list"
+  
+  parameters:
+    - name: "limit"
+      type: "integer"
+      required: false
+      location: "query"
+      description: "Maximum number of titles to return (1-500)"
+      default: 50
+      max_value: 500
+      example: "?limit=10"
+      
+    - name: "api_key"
+      type: "string"
+      required: true
+      location: "query"
+      description: "API authentication key"
+      example: "?api_key=YOUR_API_KEY"
+  
+  response:
+    type: "application/json"
+    format: "simple_array"
+    description: "Array of book title strings - no nested objects, perfect for shortcuts loops"
+    
+    examples:
+      small_limit: '["Book Title 1", "Book Title 2", "Book Title 3"]'
+      default_response: "Returns 50 titles alphabetically sorted"
+    
+    data_type: "array[string]"
+    
+  ios_shortcuts:
+    action: "Get Contents of URL"
+    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/title-list?limit=10&api_key=YOUR_KEY"
+    method: "GET"
+    response_handling: "Get Value from JSON > direct array access"
+    
+    shortcuts_workflows:
+      random_picker:
+        - "Get Contents of URL (this endpoint)"
+        - "Get Item from List > Random Item"
+        - "Show result: Random book title"
+        
+      reading_list_builder:
+        - "Get Contents of URL with limit=20"
+        - "Choose from List (show user 20 titles)"
+        - "Add selected titles to reading list"
+        
+      title_search:
+        - "Get Contents of URL with high limit"
+        - "Filter list by search term"
+        - "Show filtered results"
+        
+  use_cases:
+    content_discovery:
+      - "Browse available book titles"
+      - "Random title selection for reading"
+      - "Title-based book discovery"
+      
+    user_interface:
+      - "Populate dropdown lists with book titles"
+      - "Create searchable title lists"
+      - "Build reading recommendation interfaces"
+      
+    data_analysis:
+      - "Analyze title patterns and lengths"
+      - "Count titles by specific criteria"
+      - "Create title-based statistics"
+      
+  data_jar_usage:
+    store_as: "library_titles_list"
+    data_type: "array"
+    use_for: "Offline title browsing and caching"
+    
+  curl_examples:
+    production: |
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/title-list?limit=5&api_key=YOUR_KEY"
+      
+    development: |
+      curl "http://localhost:5001/api/shortcuts/books/title-list?limit=5"
+      
+    full_list: |
+      # Get all titles (up to 500)
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/title-list?limit=500&api_key=YOUR_KEY"
+      
+  test_results:
+    verified_format: '✅ Simple array ["Title1", "Title2", "Title3"]'
+    alphabetical_order: "✅ Titles returned in alphabetical order"
+    limit_respected: "✅ Limit parameter works correctly (tested with 5)"
+    no_nested_objects: "✅ Pure string array - no complex JSON structures"
+    
+  performance:
+    response_time: "< 300ms"
+    database_query: "SELECT title FROM books ORDER BY title LIMIT %limit%"
+    efficiency: "Simple query with ORDER BY title"
+    default_limit: "50 titles (optimal for mobile interfaces)"
+    
+  database_details:
+    table: "books"
+    column: "title"
+    sorting: "Alphabetical (A-Z)"
+    total_available: "2503 book titles"
+    
+  integration_examples:
+    ios_shortcut_random_book:
+      name: "Random Book Title Picker"
+      steps:
+        1: "Get Contents of URL → /books/title-list?limit=100"
+        2: "Get Item from List → Random Item"
+        3: "Show Notification: 'Consider reading: [Random Title]'"
+        
+    reading_goal_tracker:
+      name: "Reading Challenge Builder"
+      steps:
+        1: "Get Contents of URL → /books/title-list?limit=365"
+        2: "Choose from List → Multi-select interface"
+        3: "Add to Data Jar: yearly_reading_goals"
+        4: "Set reminder: Daily reading check"
+        
+    title_analyzer:
+      name: "Library Analysis Tool"
+      logic: "Get all titles → Count by length → Show statistics → Find patterns"
+      
+  comparison_with_search:
+    title_list_endpoint: "/books/title-list"
+    search_titles_endpoint: "/search/{term}/titles"
+    
+    when_to_use_title_list: "Browse all available titles, random selection"
+    when_to_use_search_titles: "Find specific titles matching search criteria"
+    
+    performance_difference: "title-list faster for browsing, search slower but filtered"
+      
+  troubleshooting:
+    empty_array:
+      response: "[]"
+      meaning: "No books in database (should not happen)"
+      
+    large_response:
+      issue: "Response too large for shortcuts"
+      solution: "Use smaller limit parameter (10-50 recommended)"
+      
+    timeout_errors:
+      cause: "Large limit values (>200)"
+      optimization: "Use pagination or smaller limits"
+      
+  shortcuts_best_practices:
+    optimal_limit: "10-50 titles for mobile interface"
+    caching: "Store in Data Jar for offline access"
+    user_experience: "Use 'Choose from List' for title selection"
+    performance: "Avoid limits >100 for responsive user experience"
+    
+  last_tested: "2025-07-19T03:50:00"
+  test_status: "✅ WORKING - Returns clean title arrays"
+  verified_examples: ["Title array format confirmed", "Alphabetical sorting verified", "Limit parameter functional"]

@@ -1,0 +1,207 @@
+endpoint:
+  name: "Search Titles (Array)"
+  path: "/search/{term}/titles"
+  method: "GET"
+  authentication: true
+  
+  description: "Returns array of book titles matching search term - perfect for iOS Shortcuts filtered lists"
+  
+  url: "https://api.ashortstayinhell.com:5562/api/shortcuts/search/{term}/titles"
+  
+  parameters:
+    - name: "term"
+      type: "string"
+      required: true
+      location: "path"
+      description: "Search term to find in book content"
+      example: "love"
+      url_encoding: "Required for special characters and spaces"
+      
+    - name: "limit"
+      type: "integer"
+      required: false
+      location: "query"
+      description: "Maximum number of titles to return (1-100)"
+      default: 10
+      max_value: 100
+      example: "?limit=5"
+      
+    - name: "api_key"
+      type: "string"
+      required: true
+      location: "query"
+      description: "API authentication key"
+      example: "?api_key=YOUR_API_KEY"
+  
+  response:
+    type: "application/json"
+    format: "simple_array"
+    description: "Array of book title strings that contain the search term in their content"
+    
+    examples:
+      successful_search: '["Book Title 1", "Book Title 2", "Book Title 3"]'
+      no_results: "[]"
+      typical_love_search: '["Multiple titles containing love theme"]'
+    
+    data_type: "array[string]"
+    uniqueness: "DISTINCT titles - no duplicates even if term appears multiple times"
+    
+  ios_shortcuts:
+    action: "Get Contents of URL"
+    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/search/TERM/titles?limit=10&api_key=YOUR_KEY"
+    method: "GET"
+    response_handling: "Get Value from JSON > direct array access"
+    
+    shortcuts_workflows:
+      topic_based_reading:
+        - "Ask for Input: Research topic"
+        - "Get Contents of URL → search/[topic]/titles"
+        - "Choose from List: Select books from results"
+        - "Add to reading list or Data Jar"
+        
+      content_validation:
+        - "Text Input: Search term"
+        - "Get Contents of URL → search/[term]/titles"
+        - "If results > 0: Show available books"
+        - "Else: Show 'No books found, try different terms'"
+        
+      research_book_finder:
+        - "Repeat with Each: research_topics_list"
+        - "Get Contents of URL → search/[topic]/titles?limit=5"
+        - "Add to variable: research_books"
+        - "Show compiled research reading list"
+        
+  use_cases:
+    content_discovery:
+      - "Find books containing specific topics or themes"
+      - "Topic-based reading list creation"
+      - "Research material identification"
+      
+    reading_planning:
+      - "Curate books by subject matter"
+      - "Build thematic reading collections"
+      - "Academic research book discovery"
+      
+    content_validation:
+      - "Check if library has books on specific topics"
+      - "Verify content availability before detailed search"
+      - "Quick topic coverage assessment"
+      
+  data_jar_usage:
+    store_as: "search_[term]_titles"
+    data_type: "array"
+    use_for: "Cached search results for offline browsing"
+    
+  curl_examples:
+    production: |
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/search/love/titles?limit=5&api_key=YOUR_KEY"
+      
+    development: |
+      curl "http://localhost:5001/api/shortcuts/search/love/titles?limit=5"
+      
+    multiple_topics: |
+      # Test different search terms
+      for topic in love technology science fiction; do
+        echo "Books about $topic:"
+        curl -s "http://localhost:5001/api/shortcuts/search/$topic/titles?limit=3"
+        echo
+      done
+      
+  test_results:
+    current_status: "⚠️  NEEDS TESTING - Database JOIN queries recently fixed"
+    expected_format: '✅ Simple array ["Title1", "Title2", "Title3"]'
+    search_logic: "✅ Uses content ILIKE %term% for case-insensitive search"
+    join_fix_applied: "✅ Fixed JOIN queries: b.book_id = c.book_id"
+    
+  performance:
+    response_time: "< 500ms (depends on search term complexity)"
+    database_query: |
+      SELECT DISTINCT b.title
+      FROM books b
+      JOIN chunks c ON b.book_id = c.book_id
+      WHERE c.content ILIKE %term%
+      ORDER BY b.title
+      LIMIT %limit%
+    efficiency: "Uses DISTINCT to prevent duplicate titles"
+    search_scope: "Searches across all 78,962 chunks"
+    
+  database_details:
+    tables_joined: "books + chunks"
+    join_condition: "b.book_id = c.book_id"
+    search_column: "chunks.content"
+    result_column: "books.title"
+    sorting: "Alphabetical by title"
+    
+  recent_fixes:
+    database_joins: "Fixed JOIN syntax from b.id to b.book_id"
+    column_references: "Updated all book table references to use book_id"
+    search_consistency: "Aligned with working search count/boolean endpoints"
+    
+  integration_examples:
+    ios_shortcut_topic_explorer:
+      name: "Topic-Based Reading Finder"
+      steps:
+        1: "Ask for Input: 'What topic interests you?'"
+        2: "Get Contents of URL → search/[topic]/titles?limit=15"
+        3: "If results found: Choose from List"
+        4: "Show: 'Consider reading: [Selected Title]'"
+        5: "Optional: Get more info about selected book"
+        
+    research_bibliography_builder:
+      name: "Academic Research Helper"
+      steps:
+        1: "Text: List of research keywords"
+        2: "Split Text by new line"
+        3: "Repeat with Each keyword"
+        4: "Get Contents of URL → search/[keyword]/titles?limit=10"
+        5: "Add to list: research_bibliography"
+        6: "Export: Complete research reading list"
+        
+    content_availability_checker:
+      name: "Library Coverage Validator"
+      workflow: "Input topics → Check availability → Report coverage → Suggest alternatives"
+      
+  comparison_with_other_endpoints:
+    search_titles: "/search/{term}/titles"
+    search_count: "/search/{term}/count" 
+    search_boolean: "/search/{term}/has-results"
+    
+    when_to_use_titles: "Need actual book titles for selection/display"
+    when_to_use_count: "Only need quantity information"
+    when_to_use_boolean: "Quick existence check for conditional logic"
+    
+    performance_order: "boolean fastest → count fast → titles slower (but still quick)"
+      
+  troubleshooting:
+    empty_array:
+      response: "[]"
+      meaning: "No books found containing the search term"
+      next_steps: "Try broader terms, check spelling, use search/count first"
+      
+    search_too_broad:
+      issue: "Very common terms return too many results"
+      solution: "Use lower limit, combine with more specific terms"
+      
+    join_errors:
+      previous_issue: "Database JOIN syntax was incorrect"
+      fix_applied: "Updated to use b.book_id = c.book_id"
+      verification_needed: "Test with production server restart"
+      
+    no_results_unexpected:
+      check: "Verify search term spelling and try search/count endpoint"
+      debug: "Use search/boolean to confirm term existence"
+      
+  shortcuts_best_practices:
+    optimal_limit: "5-15 titles for mobile selection interfaces"
+    search_strategy: "Start with search/boolean, then use titles if true"
+    user_experience: "Show 'Choose from List' for title selection"
+    error_handling: "Check for empty array and show helpful message"
+    
+  url_encoding_examples:
+    spaces: "quantum physics → quantum%20physics"
+    special_chars: "love & relationships → love%20%26%20relationships"
+    quotes: "\"the meaning\" → %22the%20meaning%22"
+    
+  last_tested: "2025-07-19T03:55:00"
+  test_status: "⚠️  PENDING - Needs verification after JOIN fixes"
+  next_test_priority: "High - Critical endpoint for content discovery workflows"

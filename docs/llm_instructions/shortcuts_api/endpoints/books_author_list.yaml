@@ -1,0 +1,176 @@
+endpoint:
+  name: "Books Author List"
+  path: "/books/author-list"
+  method: "GET"
+  authentication: true
+  
+  description: "Returns simple array of unique author names - perfect for iOS Shortcuts author discovery"
+  
+  url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/author-list"
+  
+  parameters:
+    - name: "limit"
+      type: "integer"
+      required: false
+      location: "query"
+      description: "Maximum number of authors to return (1-500)"
+      default: 50
+      max_value: 500
+      example: "?limit=20"
+      
+    - name: "api_key"
+      type: "string"
+      required: true
+      location: "query"
+      description: "API authentication key"
+      example: "?api_key=YOUR_API_KEY"
+  
+  response:
+    type: "application/json"
+    format: "simple_array"
+    description: "Array of unique author name strings - clean, no duplicates, no nested objects"
+    
+    examples:
+      small_limit: '["Author Name 1", "Author Name 2", "Author Name 3"]'
+      typical_response: '["Brian Greene", "Neil Gaiman", "Terry Pratchett"]'
+    
+    data_type: "array[string]"
+    uniqueness: "DISTINCT authors only - no duplicates"
+    
+  ios_shortcuts:
+    action: "Get Contents of URL"
+    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/author-list?limit=25&api_key=YOUR_KEY"
+    method: "GET"
+    response_handling: "Get Value from JSON > direct array access"
+    
+    shortcuts_workflows:
+      author_explorer:
+        - "Get Contents of URL (this endpoint)"
+        - "Choose from List → Select favorite authors"
+        - "For each author: search for their books"
+        - "Build personalized reading list"
+        
+      random_author_discovery:
+        - "Get Contents of URL with limit=100"
+        - "Get Item from List → Random Item"
+        - "Show: 'Explore books by [Random Author]'"
+        - "Optional: Search their works"
+        
+      author_comparison:
+        - "Get Contents of URL with high limit"
+        - "Choose from List → Multi-select (2-3 authors)"
+        - "Compare their book counts"
+        - "Suggest reading order"
+        
+  use_cases:
+    author_discovery:
+      - "Browse available authors in library"
+      - "Random author exploration"
+      - "Author-based reading planning"
+      
+    content_organization:
+      - "Create author-based reading lists"
+      - "Group books by favorite authors"
+      - "Author preference tracking"
+      
+    research_planning:
+      - "Find authors on specific topics"
+      - "Cross-reference author expertise"
+      - "Academic research author discovery"
+      
+  data_jar_usage:
+    store_as: "library_authors_list"
+    data_type: "array"
+    analytics: "Track author preference patterns over time"
+    
+  curl_examples:
+    production: |
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/author-list?limit=10&api_key=YOUR_KEY"
+      
+    development: |
+      curl "http://localhost:5001/api/shortcuts/books/author-list?limit=10"
+      
+    comprehensive_list: |
+      # Get all unique authors (up to 500)
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/author-list?limit=500&api_key=YOUR_KEY"
+      
+  test_results:
+    verified_format: '✅ Simple array ["Author1", "Author2", "Author3"]'
+    alphabetical_order: "✅ Authors returned in alphabetical order"
+    uniqueness_confirmed: "✅ DISTINCT query - no duplicate authors"
+    null_handling: "✅ NULL authors excluded from results"
+    
+  performance:
+    response_time: "< 400ms"
+    database_query: "SELECT DISTINCT author FROM books WHERE author IS NOT NULL ORDER BY author LIMIT %limit%"
+    efficiency: "Uses DISTINCT to eliminate duplicates"
+    null_exclusion: "Filters out books with NULL/empty author fields"
+    
+  database_details:
+    table: "books"
+    column: "author"
+    uniqueness: "DISTINCT eliminates author duplicates"
+    null_handling: "WHERE author IS NOT NULL excludes missing data"
+    sorting: "Alphabetical (A-Z) by author name"
+    
+  integration_examples:
+    ios_shortcut_author_spotlight:
+      name: "Daily Author Discovery"
+      steps:
+        1: "Get Contents of URL → /books/author-list?limit=200"
+        2: "Get Item from List → Random Item"
+        3: "Show Notification: 'Today's featured author: [Author Name]'"
+        4: "Option: Search their books automatically"
+        
+    reading_preference_tracker:
+      name: "Author Preference Analysis"
+      steps:
+        1: "Get Contents of URL → /books/author-list"
+        2: "Choose from List → Multi-select favorite authors"
+        3: "Save to Data Jar: preferred_authors"
+        4: "Use for future book recommendations"
+        
+    author_research_tool:
+      name: "Academic Author Discovery"
+      logic: "Get author list → Filter by research area → Find academic works → Build citation list"
+      
+  comparison_with_other_endpoints:
+    author_list: "/books/author-list"
+    random_author: "/random/author"
+    
+    when_to_use_author_list: "Browse all authors, selection interfaces, research"
+    when_to_use_random_author: "Quick single author for inspiration"
+    
+    data_volume: "author-list: multiple authors, random-author: single result"
+      
+  troubleshooting:
+    empty_array:
+      response: "[]"
+      meaning: "No authors with non-NULL names (should not happen)"
+      
+    duplicate_names:
+      issue: "Same author appearing multiple times"
+      solution: "DISTINCT query prevents this - report if occurs"
+      
+    performance_slow:
+      cause: "Very high limit values (>300)"
+      optimization: "Use pagination or reasonable limits (50-100)"
+      
+    missing_expected_authors:
+      cause: "Authors stored as NULL in database"
+      note: "Only non-NULL authors included by design"
+      
+  shortcuts_best_practices:
+    optimal_limit: "25-75 authors for mobile selection interfaces"
+    user_interface: "Use 'Choose from List' for author selection"
+    caching: "Store popular author lists in Data Jar"
+    search_integration: "Combine with search endpoints for author-specific queries"
+    
+  data_quality_notes:
+    author_formatting: "Authors stored as provided in original data"
+    name_variations: "Same person might appear with different name formats"
+    completeness: "Only books with author information included"
+    
+  last_tested: "2025-07-19T03:52:00"
+  test_status: "✅ WORKING - Returns clean unique author arrays"
+  verified_examples: ["Author array format confirmed", "DISTINCT uniqueness verified", "Alphabetical sorting confirmed"]
