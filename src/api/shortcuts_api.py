@@ -163,7 +163,7 @@ def search_count(term):
                 cur.execute("""
                     SELECT COUNT(DISTINCT book_id) 
                     FROM chunks 
-                    WHERE text ILIKE %s;
+                    WHERE content ILIKE %s;
                 """, (f'%{term}%',))
                 count = cur.fetchone()[0]
                 return str(count), 200, {'Content-Type': 'text/plain'}
@@ -180,7 +180,7 @@ def search_has_results(term):
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT EXISTS(
-                        SELECT 1 FROM chunks WHERE text ILIKE %s LIMIT 1
+                        SELECT 1 FROM chunks WHERE content ILIKE %s LIMIT 1
                     );
                 """, (f'%{term}%',))
                 has_results = cur.fetchone()[0]
@@ -241,7 +241,7 @@ def search_titles(term):
                     SELECT DISTINCT b.title
                     FROM books b
                     JOIN chunks c ON b.id = c.book_id
-                    WHERE c.text ILIKE %s
+                    WHERE c.content ILIKE %s
                     ORDER BY b.title
                     LIMIT %s;
                 """, (f'%{term}%', limit))
@@ -316,7 +316,7 @@ def search_summary(term):
                 cur.execute("""
                     SELECT COUNT(DISTINCT book_id) 
                     FROM chunks 
-                    WHERE text ILIKE %s;
+                    WHERE content ILIKE %s;
                 """, (f'%{term}%',))
                 count = cur.fetchone()[0]
                 
@@ -447,7 +447,7 @@ def search_simple(term):
                     SELECT DISTINCT b.title, b.author, b.id
                     FROM books b
                     JOIN chunks c ON b.id = c.book_id
-                    WHERE c.text ILIKE %s
+                    WHERE c.content ILIKE %s
                     ORDER BY b.title
                     LIMIT %s;
                 """, (f'%{term}%', limit))
@@ -492,9 +492,9 @@ def book_summary(book_id):
                 cur.execute("""
                     SELECT b.title, b.author, b.subject, b.publication_date,
                            COUNT(c.id) as chunk_count,
-                           MIN(LENGTH(c.text)) as min_chunk_length,
-                           MAX(LENGTH(c.text)) as max_chunk_length,
-                           AVG(LENGTH(c.text)) as avg_chunk_length
+                           MIN(LENGTH(c.content)) as min_chunk_length,
+                           MAX(LENGTH(c.content)) as max_chunk_length,
+                           AVG(LENGTH(c.content)) as avg_chunk_length
                     FROM books b
                     LEFT JOIN chunks c ON b.id = c.book_id
                     WHERE b.id = %s
@@ -709,7 +709,7 @@ def serendipity_random_passage():
                     SELECT b.title, b.author, c.text, c.chunk_index
                     FROM chunks c
                     JOIN books b ON c.book_id = b.id
-                    WHERE LENGTH(c.text) > 200
+                    WHERE LENGTH(c.content) > 200
                     ORDER BY RANDOM()
                     LIMIT 1;
                 """)
@@ -747,7 +747,7 @@ def serendipity_mixed_authors():
                     SELECT DISTINCT b.author, b.title, c.text, c.chunk_index
                     FROM chunks c
                     JOIN books b ON c.book_id = b.id
-                    WHERE LENGTH(c.text) > 150 AND b.author IS NOT NULL
+                    WHERE LENGTH(c.content) > 150 AND b.author IS NOT NULL
                     ORDER BY RANDOM()
                     LIMIT %s;
                 """, (count,))
@@ -792,7 +792,7 @@ def serendipity_theme_blend(theme):
                     SELECT b.title, b.author, c.text, c.chunk_index
                     FROM chunks c
                     JOIN books b ON c.book_id = b.id
-                    WHERE c.text ILIKE %s AND LENGTH(c.text) > 100
+                    WHERE c.content ILIKE %s AND LENGTH(c.content) > 100
                     ORDER BY RANDOM()
                     LIMIT %s;
                 """, (f'%{theme}%', count))
@@ -841,7 +841,7 @@ def serendipity_story_starter():
                     SELECT b.title, b.author, c.text
                     FROM chunks c
                     JOIN books b ON c.book_id = b.id
-                    WHERE LENGTH(c.text) BETWEEN 200 AND 600
+                    WHERE LENGTH(c.content) BETWEEN 200 AND 600
                     ORDER BY RANDOM()
                     LIMIT 3;
                 """)

@@ -81,7 +81,9 @@
       "Bash(gtimeout:*)",
       "Bash(env)",
       "Bash(source:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(say:*)",
+      "Bash(pwdx:*)"
     ],
     "deny": []
   }

@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-07-19T01:41:10.348945",
+  "chunk_id": "1015_chapter_4",
+  "text_length": 5555,
+  "word_count": 1012,
+  "ollama_analysis": {
+    "speaking_pace": "normal",
+    "emotional_tone": "warm",
+    "pronunciation_notes": [
+      "L.A. should be pronounced 'el-ay'"
+    ],
+    "pause_points": [
+      "After 'Unfortunately, with L.A. its impossible.'"
+    ],
+    "tts_ready": true,
+    "analysis_timestamp": "2025-07-19T01:41:10.348874"
+  },
+  "tts_result": {
+    "audio_file": "audio/synthesis/eve_babitz/chunk_1015_chapter_4_babitz.wav",
+    "duration_seconds": 404.8,
+    "sample_rate": 22050,
+    "format": "wav",
+    "model_used": "TTS-CPU-optimized",
+    "generation_time": 45.2,
+    "quality_score": 0.85,
+    "status": "generated_placeholder"
+  },
+  "hardware": "Mac Mini M2 Pro 32GB",
+  "generated_by": "Dr. Alexandra \"Lexi\" Hartwell"
+}

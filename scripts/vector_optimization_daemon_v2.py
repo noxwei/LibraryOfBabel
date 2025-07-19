@@ -35,6 +35,7 @@ import threading
 import queue
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import gc
+import pytz
 
 # Add src directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent / 'src'))
@@ -105,13 +106,27 @@ class VectorOptimizationDaemon:
         """Load daemon configuration"""
         default_config = {
             'chunk_levels': ['medium', 'large'],  # Focus on useful chunk sizes
-            'max_workers': 4,                     # Parallel processing workers
-            'batch_size': 10,                     # Books per batch
+            'adaptive_scheduling': True,          # 🌙 Smart day/night CPU scheduling
+            'night_mode': {                       # Midnight - 10 AM EST (80% CPU)
+                'max_workers': 10,                # 80% of 12 cores
+                'batch_size': 20,                 
+                'sleep_between_books': 0.3,
+                'start_hour': 0,                  # Midnight EST
+                'end_hour': 10                    # 10 AM EST
+            },
+            'day_mode': {                         # 10 AM - Midnight EST (50% CPU)  
+                'max_workers': 6,                 # 50% of 12 cores
+                'batch_size': 12,
+                'sleep_between_books': 1.0,
+                'start_hour': 10,                 # 10 AM EST
+                'end_hour': 24                    # Midnight EST
+            },
             'max_retries': 3,                     # Retry failed books
-            'sleep_between_books': 2,             # Seconds between books (be nice to system)
-            'progress_report_interval': 100,      # Report every N books
+            'progress_report_interval': 50,       # 📊 Progress reports
             'enable_garbage_collection': True,    # Memory management
-            'checkpoint_interval': 50             # Save status every N books
+            'checkpoint_interval': 25,            # 💾 Frequent saves
+            'thermal_protection': True,           # 🌡️ Protect M2 Pro from overheating
+            'timezone': 'US/Eastern'              # EST timezone
         }
         
         if config_file and Path(config_file).exists():
@@ -123,6 +138,33 @@ class VectorOptimizationDaemon:
                 print(f"⚠️ Error loading config file: {e}")
         
         return default_config
+    
+    def _get_current_mode(self) -> Dict[str, Any]:
+        """Get current processing mode based on time of day"""
+        if not self.config.get('adaptive_scheduling', False):
+            # Fallback to day mode settings if adaptive scheduling disabled
+            return self.config.get('day_mode', {})
+        
+        try:
+            # Get current time in EST
+            est = pytz.timezone(self.config.get('timezone', 'US/Eastern'))
+            current_time = datetime.now(est)
+            current_hour = current_time.hour
+            
+            night_mode = self.config['night_mode']
+            day_mode = self.config['day_mode']
+            
+            # Check if in night mode (midnight to 10 AM EST)
+            if night_mode['start_hour'] <= current_hour < night_mode['end_hour']:
+                self.logger.info(f"🌙 Night mode active: {current_hour}:00 EST (80% CPU)")
+                return night_mode
+            else:
+                self.logger.info(f"☀️ Day mode active: {current_hour}:00 EST (50% CPU)")
+                return day_mode
+                
+        except Exception as e:
+            self.logger.error(f"❌ Error determining time mode: {e}")
+            return self.config.get('day_mode', {})
     
     def _setup_logging(self):
         """Setup comprehensive logging for overnight processing"""
@@ -259,11 +301,12 @@ class VectorOptimizationDaemon:
                 self.logger.info(f"✅ Created {chunk_count} {chunk_level} chunks")
             
             # Step 2: Multi-Modal Embeddings (focus on medium chunks for efficiency)
+            current_mode = self._get_current_mode()
             self.logger.info(f"🧠 Generating multi-modal embeddings for book {book_id}...")
             embedding_results = self.embedding_pipeline.process_book_multimodal_pipeline(
                 book_id=book_id,
                 chunk_level='medium',
-                max_workers=self.config['max_workers']
+                max_workers=current_mode.get('max_workers', 6)
             )
             
             if embedding_results['status'] not in ['completed', 'completed_with_save_errors']:
@@ -354,9 +397,11 @@ class VectorOptimizationDaemon:
                 if i % self.config['checkpoint_interval'] == 0:
                     self._save_status()
                 
-                # Sleep between books (be nice to the system)
+                # Adaptive sleep between books (thermal management)
                 if i < total_books:  # Don't sleep after the last book
-                    time.sleep(self.config['sleep_between_books'])
+                    current_mode = self._get_current_mode()
+                    sleep_time = current_mode.get('sleep_between_books', 1.0)
+                    time.sleep(sleep_time)
             
             # Final processing summary
             total_time = time.time() - self.stats['start_time']

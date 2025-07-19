@@ -312,7 +312,7 @@ class MultiModalEmbeddingPipeline:
     
     def process_book_multimodal_pipeline(self, book_id: int, 
                                        chunk_level: str = 'medium',
-                                       max_workers: int = 4) -> Dict[str, Any]:
+                                       max_workers: int = 12) -> Dict[str, Any]:  # 🚀 M2 PRO NEURAL ENGINE POWER!
         """Process all chunks of a book through the multi-modal pipeline"""
         
         self.logger.info(f"🏛️ Starting multi-modal processing for book {book_id}")
@@ -426,7 +426,7 @@ def main():
     result = pipeline.process_book_multimodal_pipeline(
         book_id=test_book_id,
         chunk_level='medium',  # Use medium chunks for reasonable processing time
-        max_workers=4
+        max_workers=12  # 🚀 NEURAL ENGINE ZOOM ZOOM!
     )
     
     if result['status'] in ['completed', 'completed_with_save_errors']:

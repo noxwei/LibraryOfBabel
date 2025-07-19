@@ -38,6 +38,7 @@ from database_ingestion import DatabaseIngestor
 from deduplication_layer import DeduplicationLayer  # DBA Team deduplication system
 from advanced_semantic_chunker import AdvancedSemanticChunker  # Dr. Sarah Chen's semantic chunker
 from multimodal_embedding_pipeline import MultiModalEmbeddingPipeline  # Dr. Sarah Chen's multi-modal embeddings
+from advanced_genre_classifier import AdvancedGenreClassifier  # Enhanced classification with HTML cleaning
 # from frictionless_ebook_harvester import FrictionlessEbookHarvester  # Removed MAM dependency
 
 class AutomatedEbookProcessor:
@@ -72,6 +73,9 @@ class AutomatedEbookProcessor:
         # Dr. Sarah Chen's advanced processing systems
         self.semantic_chunker = AdvancedSemanticChunker(self.db_config)
         self.embedding_pipeline = MultiModalEmbeddingPipeline(self.db_config)
+        
+        # Enhanced genre classification with HTML cleaning and description enhancement
+        self.genre_classifier = AdvancedGenreClassifier(self.db_config)
         
         # Enhanced classification system
         self.ollama_url = "http://localhost:11434/api/generate"
@@ -427,14 +431,23 @@ class AutomatedEbookProcessor:
             else:
                 self.logger.warning(f"    ⚠️ Semantic chunking failed: {chunk_results['error']}")
             
-            # Enhanced genre classification
-            self.logger.info(f"    🧠 Classifying genre with structure intelligence...")
-            genre_success = self._classify_book_genre(book_id, metadata, chapters)
-            
-            if genre_success:
-                self.logger.info(f"    ✅ Genre classification completed")
-            else:
-                self.logger.warning(f"    ⚠️ Genre classification failed (book still processed)")
+            # Enhanced genre classification with description enhancement
+            self.logger.info(f"    🧠 Using advanced AI genre classifier...")
+            try:
+                result = self.genre_classifier.classify_book(book_id, use_semantic_chunks=True)
+                if 'error' not in result:
+                    self.logger.info(f"    🎯 Primary: {result['primary_genre']}")
+                    if result.get('secondary_genre'):
+                        self.logger.info(f"    🎯 Secondary: {result['secondary_genre']}")
+                    if result.get('tertiary_genre'):
+                        self.logger.info(f"    🎯 Tertiary: {result['tertiary_genre']}")
+                    self.logger.info(f"    📊 Confidence: {result['confidence']:.3f}")
+                    self.logger.info(f"    🧠 Used semantic chunks: {result['used_semantic_chunks']}")
+                    self.logger.info(f"    ✅ Enhanced genre classification completed")
+                else:
+                    self.logger.warning(f"    ⚠️ Genre classification failed: {result['error']}")
+            except Exception as e:
+                self.logger.warning(f"    ⚠️ Genre classification error: {e}")
             
             return True
             

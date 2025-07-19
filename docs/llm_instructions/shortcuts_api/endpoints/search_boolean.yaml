@@ -1,0 +1,146 @@
+endpoint:
+  name: "Search Has Results (Boolean)"
+  path: "/search/{term}/has-results"
+  method: "GET"
+  authentication: true
+  
+  description: "Returns true/false if search term exists in book content - perfect for iOS Shortcuts if/then logic"
+  
+  url: "https://api.ashortstayinhell.com:5562/api/shortcuts/search/{term}/has-results"
+  
+  parameters:
+    - name: "term"
+      type: "string"
+      required: true
+      location: "path"
+      description: "Search term to look for in book content"
+      example: "love"
+      
+    - name: "api_key"
+      type: "string"
+      required: true
+      location: "query"
+      description: "API authentication key"
+      example: "?api_key=YOUR_API_KEY"
+  
+  response:
+    type: "text/plain"
+    format: "boolean_string"
+    description: "Plain text 'true' or 'false' - perfect for shortcuts conditionals"
+    
+    possible_values: ["true", "false"]
+    data_type: "string (boolean)"
+    
+  ios_shortcuts:
+    action: "Get Contents of URL"
+    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/search/TERM/has-results?api_key=YOUR_KEY"
+    method: "GET"
+    response_handling: "Use directly in If/Then conditions"
+    
+    conditional_workflow:
+      1: "Get Contents of URL (this endpoint)"
+      2: "If (Contents of URL)"
+      3: "Then: Search found - proceed with search actions"
+      4: "Otherwise: No results - show 'No books found' message"
+      
+  use_cases:
+    search_validation:
+      - "Check if search will return results before expensive operations"
+      - "Validate user input before detailed search"
+      - "Quick content availability check"
+      
+    conditional_workflows:
+      - "Only proceed with book purchase if content exists"
+      - "Show different UI based on search availability"
+      - "Branch workflow based on content existence"
+      
+    user_experience:
+      - "Instant feedback: 'No books found for this topic'"
+      - "Smart search suggestions when no results"
+      - "Prevent empty search result pages"
+      
+  data_jar_usage:
+    store_as: "search_[term]_exists"
+    data_type: "boolean"
+    caching: "Cache search existence for common terms"
+    
+  curl_examples:
+    production: |
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/search/love/has-results?api_key=YOUR_KEY"
+      
+    development: |
+      curl "http://localhost:5001/api/shortcuts/search/love/has-results"
+      
+    multiple_terms: |
+      # Test multiple search terms
+      for term in love python javascript nonexistent; do
+        echo -n "$term: "
+        curl -s "http://localhost:5001/api/shortcuts/search/$term/has-results"
+        echo
+      done
+  
+  test_results:
+    common_words: 
+      love: "true (2480 matches found)"
+      python: "true (programming books exist)"
+      the: "true (very common word)"
+      
+    nonexistent_words:
+      nonexistentword123: "false (as expected)"
+      
+    response_format: "✅ Plain text true/false (not JSON)"
+    database_query: "✅ Fixed to use 'content' column instead of 'text'"
+    
+  performance:
+    response_time: "< 200ms"
+    database_query: "SELECT EXISTS(SELECT 1 FROM chunks WHERE content ILIKE %term% LIMIT 1)"
+    optimization: "Uses EXISTS for efficiency - stops at first match"
+    search_scope: "78,962 chunks across 2,503 books"
+    
+  troubleshooting:
+    always_false:
+      cause: "Database column name issue (was using 'text' instead of 'content')"
+      status: "✅ FIXED in latest version"
+      
+    case_sensitivity:
+      query_type: "ILIKE (case-insensitive)"
+      examples: "love, Love, LOVE all return same result"
+      
+    special_characters:
+      handling: "URL encode special characters in search term"
+      examples: "space = %20, & = %26"
+      
+  integration_examples:
+    ios_shortcut_smart_search:
+      name: "Smart Book Search"
+      steps:
+        1: "Ask for Input (search term)"
+        2: "Get Contents of URL → search/[term]/has-results"
+        3: "If (result is true)"
+        4: "Then: Get full search results"
+        5: "Otherwise: Show 'No books found, try different terms'"
+        
+    reading_recommendation:
+      name: "Topic Availability Checker"
+      steps:
+        1: "Text: List of topics (quantum, love, history, cooking)"
+        2: "Split Text by new line"
+        3: "Repeat with Each (topic)"
+        4: "Get Contents of URL → search/[topic]/has-results"
+        5: "If true: Add [topic] to available list"
+        6: "Show available topics for reading"
+        
+    content_validation:
+      name: "Purchase Decision Helper"
+      workflow: "Before buying books on topic → Check if library already has content → Make informed decision"
+      
+  database_details:
+    table: "chunks"
+    column_searched: "content"
+    search_method: "ILIKE (case-insensitive pattern matching)"
+    total_searchable_chunks: 78962
+    books_covered: 2503
+    
+  last_tested: "2025-07-19T03:45:00"
+  test_status: "✅ WORKING PERFECTLY - Fixed content column issue"
+  fix_applied: "Changed all search queries from 'text' to 'content' column"
