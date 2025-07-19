@@ -34,13 +34,13 @@ sys.path.insert(0, src_dir)
 sys.path.append(os.path.join(src_dir, 'agents'))
 from ollama_url_generator import OllamaUrlGeneratorAgent
 from ios_shortcuts_handler import IOSShortcutsHandler
-from remote_mcp_server import mcp_blueprint
+# from remote_mcp_server import mcp_blueprint  # Disabled for production
 from shortcuts_api import shortcuts_bp
 
 app = Flask(__name__)
 
 # Register MCP blueprint
-app.register_blueprint(mcp_blueprint)
+# app.register_blueprint(mcp_blueprint)  # Disabled for production
 
 # Register iOS Shortcuts blueprint
 app.register_blueprint(shortcuts_bp)

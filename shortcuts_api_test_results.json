@@ -1,0 +1,146 @@
+[
+  {
+    "endpoint": "/books/count",
+    "status": "FAIL",
+    "details": "Response: ",
+    "timestamp": 1752946420.959444
+  },
+  {
+    "endpoint": "/random/title",
+    "status": "FAIL",
+    "details": "Response: ",
+    "timestamp": 1752946420.962202
+  },
+  {
+    "endpoint": "/random/author",
+    "status": "FAIL",
+    "details": "Response: ",
+    "timestamp": 1752946420.965173
+  },
+  {
+    "endpoint": "/random/book",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946420.9688761
+  },
+  {
+    "endpoint": "/search/love/count",
+    "status": "FAIL",
+    "details": "Count: ",
+    "timestamp": 1752946420.9720519
+  },
+  {
+    "endpoint": "/search/love/has-results",
+    "status": "FAIL",
+    "details": "Has results: ",
+    "timestamp": 1752946420.974907
+  },
+  {
+    "endpoint": "/books/title-list (pagination)",
+    "status": "FAIL",
+    "details": "Page1\u2260Page2: False",
+    "timestamp": 1752946420.9801972
+  },
+  {
+    "endpoint": "/books/author-list (pagination)",
+    "status": "FAIL",
+    "details": "Page1\u2260Page2: False",
+    "timestamp": 1752946420.985821
+  },
+  {
+    "endpoint": "/search/love/titles (pagination)",
+    "status": "FAIL",
+    "details": "Page1\u2260Page2: False",
+    "timestamp": 1752946420.990081
+  },
+  {
+    "endpoint": "/random/citation",
+    "status": "FAIL",
+    "details": "Response: ",
+    "timestamp": 1752946420.991828
+  },
+  {
+    "endpoint": "/random/share-text",
+    "status": "FAIL",
+    "details": "Response: ",
+    "timestamp": 1752946420.9934452
+  },
+  {
+    "endpoint": "/search/love/summary",
+    "status": "FAIL",
+    "details": "Response: ",
+    "timestamp": 1752946420.995486
+  },
+  {
+    "endpoint": "/stats/dashboard",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946420.99791
+  },
+  {
+    "endpoint": "/user/reading-progress (GET)",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946420.999785
+  },
+  {
+    "endpoint": "/search/love/simple",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946421.0016708
+  },
+  {
+    "endpoint": "/books/2238/summary",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946421.0039659
+  },
+  {
+    "endpoint": "/books/2238/construct",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946421.006634
+  },
+  {
+    "endpoint": "/books/2238/page/1",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946421.009017
+  },
+  {
+    "endpoint": "/books/2238/toc",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946421.0111291
+  },
+  {
+    "endpoint": "/serendipity/random-passage",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946421.013275
+  },
+  {
+    "endpoint": "/serendipity/mixed-authors",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946421.0156748
+  },
+  {
+    "endpoint": "/serendipity/theme-blend/love",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946421.018324
+  },
+  {
+    "endpoint": "/serendipity/story-starter",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946421.020884
+  },
+  {
+    "endpoint": "/health",
+    "status": "FAIL",
+    "details": "Keys: Not JSON",
+    "timestamp": 1752946421.023413
+  }
+]
