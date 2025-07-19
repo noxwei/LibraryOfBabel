@@ -6,7 +6,7 @@ Complete documentation for the LibraryOfBabel Unified API. This consolidated API
 
 ## 🌐 Production Endpoint
 
-**Base URL**: `https://api.example.com:5562`  
+**Base URL**: `https://api.ashortstayinhell.com:5562`  
 **Version**: Unified (consolidates former v2 + v3 functionality)
 
 ## 🔐 Authentication
@@ -43,7 +43,7 @@ Complete documentation for the LibraryOfBabel Unified API. This consolidated API
 
 **Example Request:**
 ```bash
-curl https://api.example.com:5562/health
+curl https://api.ashortstayinhell.com:5562/health
 ```
 
 **Response:**
@@ -79,7 +79,7 @@ curl https://api.example.com:5562/health
 
 **Example Request:**
 ```bash
-curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=1&page_size=5"
+curl "https://api.ashortstayinhell.com:5562/books?api_key=***REMOVED***&page=1&page_size=5"
 ```
 
 **Response:**
@@ -97,9 +97,9 @@ curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=1&page_size=5
       "word_count": 50000,
       "processed_date": "2025-07-14T00:00:00+00:00",
       "links": {
-        "self": "https://api.example.com:5562/books/1373",
-        "chunks": "https://api.example.com:5562/books/1373/chunks",
-        "search_in_book": "https://api.example.com:5562/books/1373/search"
+        "self": "https://api.ashortstayinhell.com:5562/books/1373",
+        "chunks": "https://api.ashortstayinhell.com:5562/books/1373/chunks",
+        "search_in_book": "https://api.ashortstayinhell.com:5562/books/1373/search"
       }
     }
   ],
@@ -112,9 +112,9 @@ curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=1&page_size=5
     "has_prev": false
   },
   "navigation": {
-    "next": "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=2&page_size=5",
-    "first": "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=1&page_size=5",
-    "last": "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=168&page_size=5"
+    "next": "https://api.ashortstayinhell.com:5562/books?api_key=***REMOVED***&page=2&page_size=5",
+    "first": "https://api.ashortstayinhell.com:5562/books?api_key=***REMOVED***&page=1&page_size=5",
+    "last": "https://api.ashortstayinhell.com:5562/books?api_key=***REMOVED***&page=168&page_size=5"
   }
 }
 ```
@@ -124,7 +124,7 @@ curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page=1&page_size=5
 
 **Example Request:**
 ```bash
-curl "https://api.example.com:5562/books/1373?api_key=YOUR_API_KEY"
+curl "https://api.ashortstayinhell.com:5562/books/1373?api_key=***REMOVED***"
 ```
 
 **Response:**
@@ -145,8 +145,8 @@ curl "https://api.example.com:5562/books/1373?api_key=YOUR_API_KEY"
   "chunks_available": 45,
   "embeddings_available": 42,
   "links": {
-    "chunks": "https://api.example.com:5562/books/1373/chunks",
-    "search_in_book": "https://api.example.com:5562/books/1373/search"
+    "chunks": "https://api.ashortstayinhell.com:5562/books/1373/chunks",
+    "search_in_book": "https://api.ashortstayinhell.com:5562/books/1373/search"
   },
   "meta": {
     "query_time_ms": 12.34
@@ -167,7 +167,7 @@ curl "https://api.example.com:5562/books/1373?api_key=YOUR_API_KEY"
 
 **Example Request:**
 ```bash
-curl "https://api.example.com:5562/books/1373/chunks?api_key=YOUR_API_KEY&chunk_level=medium&page=1"
+curl "https://api.ashortstayinhell.com:5562/books/1373/chunks?api_key=***REMOVED***&chunk_level=medium&page=1"
 ```
 
 **Response:**
@@ -223,7 +223,7 @@ curl "https://api.example.com:5562/books/1373/chunks?api_key=YOUR_API_KEY&chunk_
 
 **Example Request:**
 ```bash
-curl "https://api.example.com:5562/search?api_key=YOUR_API_KEY&q=Foucault&type=semantic&page=1&page_size=3"
+curl "https://api.ashortstayinhell.com:5562/search?api_key=***REMOVED***&q=Foucault&type=semantic&page=1&page_size=3"
 ```
 
 **Response:**
@@ -267,7 +267,7 @@ curl "https://api.example.com:5562/search?api_key=YOUR_API_KEY&q=Foucault&type=s
 
 **Example Request:**
 ```bash
-curl "https://api.example.com:5562/books/1099/search?api_key=YOUR_API_KEY&q=discourse&page=1&page_size=3"
+curl "https://api.ashortstayinhell.com:5562/books/1099/search?api_key=***REMOVED***&q=discourse&page=1&page_size=3"
 ```
 
 **Response:**
@@ -326,17 +326,17 @@ curl "https://api.example.com:5562/books/1099/search?api_key=YOUR_API_KEY&q=disc
 
 #### Semantic Search
 ```bash
-curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_API_KEY&q=artificial%20intelligence&type=semantic&limit=3"
+curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=***REMOVED***&q=artificial%20intelligence&type=semantic&limit=3"
 ```
 
 #### Fuzzy Text Search
 ```bash
-curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_API_KEY&q=philosophy&type=fuzzy&limit=3"
+curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=***REMOVED***&q=philosophy&type=fuzzy&limit=3"
 ```
 
 #### Hybrid Search with Custom Weights
 ```bash
-curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_API_KEY&q=democracy&type=hybrid&semantic_weight=0.6&fuzzy_weight=0.3&keyword_weight=0.1&limit=5"
+curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=***REMOVED***&q=democracy&type=hybrid&semantic_weight=0.6&fuzzy_weight=0.3&keyword_weight=0.1&limit=5"
 ```
 
 **Response:**
@@ -383,7 +383,7 @@ For backwards compatibility with existing integrations, the following v3 endpoin
 **No authentication required** - V3 format health check.
 
 ```bash
-curl "https://api.example.com:5562/api/v3/health"
+curl "https://api.ashortstayinhell.com:5562/api/v3/health"
 ```
 
 ### `GET /api/v3/search`
@@ -395,7 +395,7 @@ curl "https://api.example.com:5562/api/v3/health"
 - `limit` (optional): Maximum results
 
 ```bash
-curl "https://api.example.com:5562/api/v3/search?api_key=YOUR_API_KEY&q=Foucault&limit=2"
+curl "https://api.ashortstayinhell.com:5562/api/v3/search?api_key=***REMOVED***&q=Foucault&limit=2"
 ```
 
 **Response includes `api_version: "3.0-unified"` for compatibility tracking.**
@@ -405,7 +405,7 @@ curl "https://api.example.com:5562/api/v3/search?api_key=YOUR_API_KEY&q=Foucault
 ## 🛡️ Security Features
 
 ### HTTPS/SSL
-- **Let's Encrypt certificates** for api.example.com
+- **Let's Encrypt certificates** for api.ashortstayinhell.com
 - **HTTPS enforced** for all connections
 - **Security headers** on all responses
 
@@ -438,31 +438,31 @@ curl "https://api.example.com:5562/api/v3/search?api_key=YOUR_API_KEY&q=Foucault
 ### Basic Book Discovery
 ```bash
 # Get first 5 books
-curl "https://api.example.com:5562/books?api_key=YOUR_API_KEY&page_size=5"
+curl "https://api.ashortstayinhell.com:5562/books?api_key=***REMOVED***&page_size=5"
 ```
 
 ### Traditional Search
 ```bash
 # Search for books about Foucault
-curl "https://api.example.com:5562/search?api_key=YOUR_API_KEY&q=Foucault"
+curl "https://api.ashortstayinhell.com:5562/search?api_key=***REMOVED***&q=Foucault"
 ```
 
 ### Semantic Vector Search
 ```bash
 # Find books similar to "artificial intelligence" using vector embeddings
-curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_API_KEY&q=artificial%20intelligence&type=semantic&limit=5"
+curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=***REMOVED***&q=artificial%20intelligence&type=semantic&limit=5"
 ```
 
 ### Search Within a Book
 ```bash
 # Search for "discourse" within a specific Foucault book
-curl "https://api.example.com:5562/books/1099/search?api_key=YOUR_API_KEY&q=discourse"
+curl "https://api.ashortstayinhell.com:5562/books/1099/search?api_key=***REMOVED***&q=discourse"
 ```
 
 ### Hybrid Fuzzy Search
 ```bash
 # Use hybrid search combining multiple algorithms
-curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_API_KEY&q=democracy&type=hybrid&limit=10"
+curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=***REMOVED***&q=democracy&type=hybrid&limit=10"
 ```
 
 ---

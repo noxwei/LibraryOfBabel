@@ -21,7 +21,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-PROJECT_ROOT="/Users/weixiangzhang/Local Dev/LibraryOfBabel"
+PROJECT_ROOT="/Users/weixiangzhang/Local_Dev/LibraryOfBabel"
 CRON_JOB="0 2 1 * * $PROJECT_ROOT/scripts/setup_mcp_env.sh --rotate-key"
 CRON_COMMENT="# Library of Babel MCP API Key Rotation"
 
@@ -124,9 +124,9 @@ create_rotation_log() {
     cat > "$PROJECT_ROOT/scripts/rotation_logger.sh" << 'EOF'
 #!/bin/bash
 # Log API key rotation events
-LOG_FILE="/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/api_rotation.log"
+LOG_FILE="/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/api_rotation.log"
 echo "$(date): API key rotation initiated" >> "$LOG_FILE"
-/Users/weixiangzhang/Local\ Dev/LibraryOfBabel/scripts/setup_mcp_env.sh --rotate-key >> "$LOG_FILE" 2>&1
+/Users/weixiangzhang/Local_Dev/LibraryOfBabel/scripts/setup_mcp_env.sh --rotate-key >> "$LOG_FILE" 2>&1
 echo "$(date): API key rotation completed" >> "$LOG_FILE"
 EOF
     
@@ -140,7 +140,7 @@ setup_notification() {
 #!/bin/bash
 # Notify when API key rotation completes
 WEBHOOK_URL="https://api.ashortstayinhell.com:5562/api/v3/agents/notify"
-API_KEY=$(grep LIBRARY_API_KEY /Users/weixiangzhang/Local\ Dev/LibraryOfBabel/.env | cut -d'=' -f2)
+API_KEY=$(grep LIBRARY_API_KEY /Users/weixiangzhang/Local_Dev/LibraryOfBabel/.env | cut -d'=' -f2)
 
 curl -X POST "$WEBHOOK_URL" \
   -H "Authorization: Bearer $API_KEY" \

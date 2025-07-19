@@ -2,7 +2,7 @@ testing_examples:
   production_urls:
     base: "https://api.ashortstayinhell.com:5562/api/shortcuts"
     auth_required: true
-    auth_method: "?api_key=YOUR_API_KEY"
+    auth_method: "?api_key=***REMOVED***"
     
   development_urls:
     base: "http://localhost:5001/api/shortcuts"  
@@ -16,17 +16,17 @@ testing_examples:
       auth_required: false
       
     books_count:
-      production: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=YOUR_KEY"
+      production: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=***REMOVED***"
       development: "http://localhost:5001/api/shortcuts/books/count"
       expected_response: "2503"
       
     random_book:
-      production: "https://api.ashortstayinhell.com:5562/api/shortcuts/random/book?api_key=YOUR_KEY"
+      production: "https://api.ashortstayinhell.com:5562/api/shortcuts/random/book?api_key=***REMOVED***"
       development: "http://localhost:5001/api/shortcuts/random/book"
       expected_format: '{"id": 123, "title": "Book", "author": "Author", "shortcuts_ready": true}'
       
     search_boolean:
-      production: "https://api.ashortstayinhell.com:5562/api/shortcuts/search/love/has-results?api_key=YOUR_KEY"
+      production: "https://api.ashortstayinhell.com:5562/api/shortcuts/search/love/has-results?api_key=***REMOVED***"
       development: "http://localhost:5001/api/shortcuts/search/love/has-results"
       expected_response: "true or false"
       
@@ -37,9 +37,9 @@ testing_examples:
       curl "http://localhost:5001/api/shortcuts/health"
       
     production_with_auth: |
-      # Replace YOUR_KEY with actual API key
-      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=YOUR_KEY"
-      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/random/book?api_key=YOUR_KEY"
+      # Production API key already included
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=***REMOVED***"
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/random/book?api_key=***REMOVED***"
       
     development_no_auth: |
       # Development server - no auth needed

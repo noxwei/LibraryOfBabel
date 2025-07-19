@@ -426,8 +426,8 @@ class AudiobookEbookTracker:
 def main():
     """Initialize tracker and import audiobooks"""
     # Configuration
-    PLEX_DB_PATH = "/Users/weixiangzhang/Local Dev/audiobook-metadata-extractor/library_1750488304.db"
-    TRACKER_DB_PATH = "/Users/weixiangzhang/Local Dev/LibraryOfBabel/audiobook_ebook_tracker.db"
+    PLEX_DB_PATH = "/Users/weixiangzhang/Local_Dev/audiobook-metadata-extractor/library_1750488304.db"
+    TRACKER_DB_PATH = "/Users/weixiangzhang/Local_Dev/LibraryOfBabel/audiobook_ebook_tracker.db"
     
     # Setup logging
     logging.basicConfig(level=logging.INFO)

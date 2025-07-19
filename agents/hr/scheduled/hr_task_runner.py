@@ -3,7 +3,7 @@
 
 import sys
 import os
-sys.path.append("/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/hr")
+sys.path.append("/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/hr")
 
 from weekly_performance_system import WeeklyPerformanceSystem
 from cross_training_system import CrossTrainingSystem

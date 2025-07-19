@@ -399,7 +399,7 @@ def main():
     """Main execution"""
     import time
     
-    cleanup = SafeFolderCleanup("/Users/weixiangzhang/Local Dev/LibraryOfBabel")
+    cleanup = SafeFolderCleanup("/Users/weixiangzhang/Local_Dev/LibraryOfBabel")
     
     print("⚠️  SAFETY FIRST: This script will reorganize your folder structure")
     print("⚠️  A complete backup will be created before any changes")

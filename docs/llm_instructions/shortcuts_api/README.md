@@ -20,8 +20,8 @@ https://api.ashortstayinhell.com:5562/api/shortcuts/
 
 ## 🔐 Authentication
 - All endpoints require API key except `/health`
-- Include as query parameter: `?api_key=YOUR_KEY`
-- Or use header: `X-API-Key: YOUR_KEY`
+- Include as query parameter: `?api_key=***REMOVED***`
+- Or use header: `X-API-Key: ***REMOVED***`
 
 ## 📁 Documentation Structure
 ```

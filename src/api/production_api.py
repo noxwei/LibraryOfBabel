@@ -742,7 +742,7 @@ def _update_agent_memory(session_id, query, response, search_results):
     """Update dual memory system (PostgreSQL + JSON)"""
     try:
         # Update JSON memory for short-term context
-        memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
+        memory_file = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
         
         if os.path.exists(memory_file):
             with open(memory_file, 'r') as f:
@@ -1765,7 +1765,7 @@ def _generate_lexi_response(query, search_results, unique_books, total_passages,
 def _update_lexi_memory(session_id, query, response, search_results):
     """Update Lexi memory in agent system - THE official mascot"""
     try:
-        memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
+        memory_file = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
         
         if os.path.exists(memory_file):
             with open(memory_file, 'r') as f:
@@ -1860,7 +1860,7 @@ def lexi_health():
         
         # Agent memory check
         try:
-            memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
+            memory_file = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
             if os.path.exists(memory_file):
                 health_status['components']['agent_memory'] = 'file_accessible'
             else:
@@ -1940,7 +1940,7 @@ def _build_updated_history(previous_history, user_query, lexi_response, include_
 def _load_agent_memory_context():
     """Load agent memory for Lexi's team awareness"""
     try:
-        memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
+        memory_file = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
         
         if not os.path.exists(memory_file):
             return None
@@ -2051,7 +2051,7 @@ class UnifiedMemoryHandler:
     def _load_agent_memory(self):
         """Load agent memory from JSON"""
         try:
-            memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
+            memory_file = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/bulletin_board/agent_memory.json'
             if os.path.exists(memory_file):
                 with open(memory_file, 'r') as f:
                     self.agent_memory = json.load(f)
@@ -2064,7 +2064,7 @@ class UnifiedMemoryHandler:
     def _load_user_memory(self):
         """Load user memory from JSON"""
         try:
-            memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/user_memory.json'
+            memory_file = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/bulletin_board/user_memory.json'
             if os.path.exists(memory_file):
                 with open(memory_file, 'r') as f:
                     self.user_memory = json.load(f)
@@ -2293,7 +2293,7 @@ unified_memory = UnifiedMemoryHandler()
 def _retrieve_user_memory(query, session_id):
     """Retrieve user memory for context"""
     try:
-        memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/user_memory.json'
+        memory_file = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/bulletin_board/user_memory.json'
         
         if not os.path.exists(memory_file):
             return None
@@ -2342,7 +2342,7 @@ def _format_memory_response(user_memory, current_query):
 def _log_user_action(action_type, description, session_id):
     """Log user action for short-term memory"""
     try:
-        memory_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/user_memory.json'
+        memory_file = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/bulletin_board/user_memory.json'
         
         # Load or create memory file
         if os.path.exists(memory_file):
@@ -2383,7 +2383,7 @@ def _log_user_action(action_type, description, session_id):
 def _schedule_audit():
     """Schedule the next 3-month audit"""
     try:
-        audit_file = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/bulletin_board/audit_schedule.json'
+        audit_file = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/bulletin_board/audit_schedule.json'
         
         audit_schedule = {
             'next_audit_date': (datetime.now() + timedelta(days=90)).isoformat(),
@@ -2429,8 +2429,8 @@ if __name__ == '__main__':
         logger.warning("⚠️ Audit scheduling failed - will retry on next startup")
     
     # Production server with SSL
-    ssl_cert_path = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem'
-    ssl_key_path = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/privkey.pem'
+    ssl_cert_path = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem'
+    ssl_key_path = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/privkey.pem'
     
     app.run(
         host='0.0.0.0',

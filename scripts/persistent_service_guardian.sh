@@ -2,9 +2,9 @@
 # 🛡️ Persistent Service Guardian - NEVER DIES
 # Linda Zhang's "Never Down Again" Ultimate Protection System
 
-CONFIG_FILE="/Users/weixiangzhang/Local Dev/LibraryOfBabel/config/key_rotation_config.json"
-LOG_FILE="/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/persistent_guardian.log"
-GUARDIAN_PID_FILE="/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/guardian.pid"
+CONFIG_FILE="/Users/weixiangzhang/Local_Dev/LibraryOfBabel/config/key_rotation_config.json"
+LOG_FILE="/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/persistent_guardian.log"
+GUARDIAN_PID_FILE="/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/guardian.pid"
 
 # Load API key
 API_KEY=$(python3 -c "
@@ -28,7 +28,7 @@ while true; do
     # Check LaunchDaemon API service
     if ! launchctl list | grep -q "com.librarybabel.api.*[0-9]"; then
         echo "$(date): 🚨 LaunchDaemon API service down - restarting..." >> "$LOG_FILE"
-        cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel"
+        cd "/Users/weixiangzhang/Local_Dev/LibraryOfBabel"
         launchctl unload config/macos/com.librarybabel.api.plist 2>/dev/null || true
         launchctl load config/macos/com.librarybabel.api.plist
         echo "$(date): ✅ LaunchDaemon API service restarted" >> "$LOG_FILE"
@@ -37,7 +37,7 @@ while true; do
     # Check production API process
     if ! pgrep -f "production_api.py" > /dev/null; then
         echo "$(date): 🚨 Production API process down - restarting..." >> "$LOG_FILE"
-        cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel"
+        cd "/Users/weixiangzhang/Local_Dev/LibraryOfBabel"
         export API_KEY="$API_KEY"
         nohup python3 src/api/production_api.py > logs/production_api_persistent.log 2>&1 &
         echo "$(date): ✅ Production API process restarted" >> "$LOG_FILE"
@@ -46,7 +46,7 @@ while true; do
     # Check HTTP proxy process
     if ! pgrep -f "port80_proxy.py" > /dev/null; then
         echo "$(date): 🚨 HTTP proxy down - restarting..." >> "$LOG_FILE"
-        cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel"
+        cd "/Users/weixiangzhang/Local_Dev/LibraryOfBabel"
         export API_KEY="$API_KEY"
         nohup python3 agents/domain_config/port80_proxy.py > logs/proxy_service.log 2>&1 &
         echo "$(date): ✅ HTTP proxy restarted" >> "$LOG_FILE"
@@ -62,7 +62,7 @@ while true; do
         sleep 5
         
         # Restart everything
-        cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel"
+        cd "/Users/weixiangzhang/Local_Dev/LibraryOfBabel"
         export API_KEY="$API_KEY"
         nohup python3 src/api/production_api.py > logs/production_api_persistent.log 2>&1 &
         nohup python3 agents/domain_config/port80_proxy.py > logs/proxy_service.log 2>&1 &

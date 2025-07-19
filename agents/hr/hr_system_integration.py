@@ -47,7 +47,7 @@ class HRSystemIntegration:
             'port': int(os.getenv('DB_PORT', 5432))
         }
         
-        self.project_root = "/Users/weixiangzhang/Local Dev/LibraryOfBabel"
+        self.project_root = "/Users/weixiangzhang/Local_Dev/LibraryOfBabel"
         self.hr_base_dir = f"{self.project_root}/agents/hr"
         
         # Setup logging

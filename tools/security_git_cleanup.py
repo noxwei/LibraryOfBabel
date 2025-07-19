@@ -15,7 +15,7 @@ def run_command(cmd, description):
     """Run a git command and handle errors"""
     print(f"🔧 {description}")
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd="/Users/weixiangzhang/Local Dev/LibraryOfBabel")
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd="/Users/weixiangzhang/Local_Dev/LibraryOfBabel")
         if result.returncode != 0:
             print(f"⚠️ Warning: {result.stderr}")
         else:
@@ -47,7 +47,7 @@ def main():
         
         # Use git filter-branch to replace sensitive content
         cmd = f'''
-        cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel" && 
+        cd "/Users/weixiangzhang/Local_Dev/LibraryOfBabel" && 
         FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --tree-filter '
             find . -name "*.py" -type f -exec sed -i.bak "s/{pattern.replace("[", "\[").replace("]", "\]")}/[REDACTED_API_KEY]/g" {{}} \; 2>/dev/null || true
             find . -name "*.md" -type f -exec sed -i.bak "s/{pattern.replace("[", "\[").replace("]", "\]")}/[REDACTED_API_KEY]/g" {{}} \; 2>/dev/null || true
@@ -69,7 +69,7 @@ def main():
     ]
     
     for file_path in files_to_check:
-        full_path = f"/Users/weixiangzhang/Local Dev/LibraryOfBabel/{file_path}"
+        full_path = f"/Users/weixiangzhang/Local_Dev/LibraryOfBabel/{file_path}"
         if os.path.exists(full_path):
             with open(full_path, 'r') as f:
                 content = f.read()

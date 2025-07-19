@@ -325,7 +325,7 @@ def main():
         return
     
     # Generate visualizations
-    output_dir = '/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/reddit_bibliophile'
+    output_dir = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/reddit_bibliophile'
     
     # 1. Semantic network visualization
     network_path = os.path.join(output_dir, 'vector_semantic_network.jpg')

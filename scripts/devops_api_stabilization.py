@@ -20,7 +20,7 @@ import psutil
 import signal
 
 # Add project root to path
-sys.path.append('/Users/weixiangzhang/Local Dev/LibraryOfBabel')
+sys.path.append('/Users/weixiangzhang/Local_Dev/LibraryOfBabel')
 
 def kill_existing_api_servers():
     """Kill any existing API servers on our ports"""
@@ -63,7 +63,7 @@ from psycopg2.extras import RealDictCursor
 from psycopg2 import pool
 from flask import Flask, request, jsonify
 import sys
-sys.path.append('/Users/weixiangzhang/Local Dev/LibraryOfBabel')
+sys.path.append('/Users/weixiangzhang/Local_Dev/LibraryOfBabel')
 from config.api_config import get_database_config
 
 # Enhanced logging
@@ -292,7 +292,7 @@ if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5001, threaded=True)
 '''
     
-    with open('/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/api/robust_confidence_search.py', 'w') as f:
+    with open('/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src/api/robust_confidence_search.py', 'w') as f:
         f.write(api_content)
     
     return "Robust Phase 1 API created"
@@ -315,7 +315,7 @@ from psycopg2.extras import RealDictCursor
 from psycopg2 import pool
 from flask import Flask, request, jsonify
 import sys
-sys.path.append('/Users/weixiangzhang/Local Dev/LibraryOfBabel')
+sys.path.append('/Users/weixiangzhang/Local_Dev/LibraryOfBabel')
 from config.api_config import get_database_config
 
 logging.basicConfig(level=logging.INFO)
@@ -470,7 +470,7 @@ if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5002, threaded=True)
 '''
     
-    with open('/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/api/robust_genre_discovery.py', 'w') as f:
+    with open('/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src/api/robust_genre_discovery.py', 'w') as f:
         f.write(api_content)
     
     return "Robust Phase 2 API created"
@@ -501,8 +501,8 @@ def main():
         # Start Phase 1 (robust)
         subprocess.Popen([
             'python3', 
-            '/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/api/robust_confidence_search.py'
-        ], cwd='/Users/weixiangzhang/Local Dev/LibraryOfBabel')
+            '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src/api/robust_confidence_search.py'
+        ], cwd='/Users/weixiangzhang/Local_Dev/LibraryOfBabel')
         print("   ✅ Phase 1 API started (robust version)")
         
         time.sleep(2)
@@ -510,8 +510,8 @@ def main():
         # Start Phase 2 (robust)
         subprocess.Popen([
             'python3',
-            '/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/api/robust_genre_discovery.py'
-        ], cwd='/Users/weixiangzhang/Local Dev/LibraryOfBabel')
+            '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src/api/robust_genre_discovery.py'
+        ], cwd='/Users/weixiangzhang/Local_Dev/LibraryOfBabel')
         print("   ✅ Phase 2 API started (robust version)")
         
     except Exception as e:

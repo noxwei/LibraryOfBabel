@@ -1,6 +1,6 @@
 # 🚀 LibraryOfBabel Unified API - Endpoint Summary
 
-**Base URL**: `https://api.example.com:5562`  
+**Base URL**: `https://api.ashortstayinhell.com:5562`  
 **Version**: Unified (consolidates former v2 + v3)
 
 ## 📋 Quick Reference - All Available Endpoints
@@ -42,13 +42,13 @@
 
 ```bash
 # Option 1: Query parameter (recommended for testing)
-?api_key=YOUR_API_KEY
+?api_key=***REMOVED***
 
 # Option 2: Authorization header
-Authorization: Bearer YOUR_API_KEY
+Authorization: Bearer ***REMOVED***
 
 # Option 3: X-API-Key header
-X-API-Key: YOUR_API_KEY
+X-API-Key: ***REMOVED***
 ```
 
 ## 🧠 Fuzzy Search Types
@@ -90,22 +90,22 @@ The new `/fuzzy-search` endpoint supports multiple search algorithms:
 
 ```bash
 # Health check
-curl "https://api.example.com:5562/health"
+curl "https://api.ashortstayinhell.com:5562/health"
 
 # List books
-curl "https://api.example.com:5562/books?api_key=YOUR_KEY&page_size=5"
+curl "https://api.ashortstayinhell.com:5562/books?api_key=***REMOVED***&page_size=5"
 
 # Traditional search
-curl "https://api.example.com:5562/search?api_key=YOUR_KEY&q=Foucault"
+curl "https://api.ashortstayinhell.com:5562/search?api_key=***REMOVED***&q=Foucault"
 
 # NEW: In-book search
-curl "https://api.example.com:5562/books/1099/search?api_key=YOUR_KEY&q=discourse"
+curl "https://api.ashortstayinhell.com:5562/books/1099/search?api_key=***REMOVED***&q=discourse"
 
 # NEW: Semantic fuzzy search
-curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_KEY&q=artificial%20intelligence&type=semantic&limit=5"
+curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=***REMOVED***&q=artificial%20intelligence&type=semantic&limit=5"
 
 # NEW: Hybrid search with custom weights
-curl "https://api.example.com:5562/fuzzy-search?api_key=YOUR_KEY&q=democracy&type=hybrid&semantic_weight=0.6&fuzzy_weight=0.3&keyword_weight=0.1"
+curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=***REMOVED***&q=democracy&type=hybrid&semantic_weight=0.6&fuzzy_weight=0.3&keyword_weight=0.1"
 ```
 
 ---

@@ -7,7 +7,7 @@
 
 ## 🎭 **BREAKING: LEXI CHAT IS NOW WORKING!** 
 **THE official LibraryOfBabel mascot is LIVE and chatting at:**
-**https://api.example.com:5562/api/v3/lexi** ✅
+**https://api.ashortstayinhell.com:5562/api/v3/lexi** ✅
 
 ---
 
@@ -16,7 +16,7 @@
 ### ⚡ Quick Health Check - PRODUCTION READY!
 ```bash
 # Test LIVE production server (VALIDATED ✅)
-curl -k -s https://api.example.com:5562/api/v3/health
+curl -k -s https://api.ashortstayinhell.com:5562/api/v3/health
 
 # Expected result:
 {"components":{"api":"healthy","database":"healthy"},"status":"healthy","timestamp":"2025-07-11T03:13:29.050827"}
@@ -32,7 +32,7 @@ curl -k -s https://api.example.com:5562/api/v3/health
 ### 🌐 **Current Working Servers**
 ```bash
 # Production server - LIVE AND VALIDATED ✅
-https://api.example.com:5562
+https://api.ashortstayinhell.com:5562
 
 # Local production server (when running locally)
 https://localhost:5562
@@ -43,7 +43,7 @@ http://localhost:9002
 
 ### 🔑 **API KEY (The One That Actually Works)**
 ```
-YOUR_API_KEY_HERE
+***REMOVED***
 ```
 
 **Save this somewhere. You'll need it for all authenticated endpoints.**
@@ -86,7 +86,7 @@ GET http://localhost:9002/api/v3/info
 ```bash
 # POST request with JSON body
 curl -X POST http://localhost:9002/api/v3/lexi/chat \
-  -H "API-Key: YOUR_API_KEY_HERE" \
+  -H "API-Key: ***REMOVED***" \
   -H "Content-Type: application/json" \
   -d '{"query": "What books do you recommend about artificial intelligence?"}'
 
@@ -104,7 +104,7 @@ curl -X POST http://localhost:9002/api/v3/lexi/chat \
 #### 🧠 Ollama Integration (LLaMA3 Model)
 ```bash
 curl -X POST http://localhost:9002/api/v3/ollama/chat \
-  -H "API-Key: YOUR_API_KEY_HERE" \
+  -H "API-Key: ***REMOVED***" \
   -H "Content-Type: application/json" \
   -d '{"query": "How does the knowledge base integration work?"}'
 
@@ -122,7 +122,7 @@ curl -X POST http://localhost:9002/api/v3/ollama/chat \
 #### 🧪 QA Testing Endpoint
 ```bash
 curl -X POST http://localhost:9002/api/v3/qa/test \
-  -H "API-Key: YOUR_API_KEY_HERE" \
+  -H "API-Key: ***REMOVED***" \
   -H "Content-Type: application/json" \
   -d '{}'
 
@@ -139,7 +139,7 @@ curl -X POST http://localhost:9002/api/v3/qa/test \
 #### 🛡️ Security Status Check
 ```bash
 curl -X GET http://localhost:9002/api/v3/security/status \
-  -H "API-Key: YOUR_API_KEY_HERE"
+  -H "API-Key: ***REMOVED***"
 
 # Returns:
 {
@@ -201,7 +201,7 @@ python3 test_api_endpoints.py &
 ### 🛡️ Start Production API Server
 ```bash
 cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel"
-export API_KEY="YOUR_API_KEY_HERE"
+export API_KEY="***REMOVED***"
 export PORT=9001
 python3 src/api/production_api.py &
 
@@ -267,11 +267,11 @@ python3 test_api_endpoints.py &
 ### 🚨 "API Key Not Working"
 ```bash
 # Verify the current API key
-echo "YOUR_API_KEY_HERE"
+echo "***REMOVED***"
 
 # Test authentication
 curl -X GET http://localhost:9002/api/v3/security/status \
-  -H "API-Key: YOUR_API_KEY_HERE"
+  -H "API-Key: ***REMOVED***"
 ```
 
 ### 🚨 "Endpoints Returning Errors"
@@ -281,7 +281,7 @@ cd "/Users/weixiangzhang/Local Dev/LibraryOfBabel"
 python3 -c "
 import requests
 base_url = 'http://localhost:9002/api/v3'
-api_key = 'YOUR_API_KEY_HERE'
+api_key = '***REMOVED***'
 headers = {'API-Key': api_key}
 
 # Test all endpoints
@@ -321,7 +321,7 @@ import requests
 import json
 
 base_url = 'http://localhost:9002/api/v3'
-api_key = 'YOUR_API_KEY_HERE'
+api_key = '***REMOVED***'
 headers = {'API-Key': api_key, 'Content-Type': 'application/json'}
 
 print('🔥 === QUICK ENDPOINT TEST ===')
@@ -335,10 +335,10 @@ print('=== ALL SYSTEMS GO! ===')
 ### 🎭 "I want to chat with Lexi (FIXED & WORKING!)"
 ```bash
 # Chat with THE official LibraryOfBabel mascot
-curl -k -X POST -H "Authorization: Bearer YOUR_API_KEY_HERE" \
+curl -k -X POST -H "Authorization: Bearer ***REMOVED***" \
   -H "Content-Type: application/json" \
   -d '{"query": "What philosophy books do you recommend?"}' \
-  "https://api.example.com:5562/api/v3/lexi"
+  "https://api.ashortstayinhell.com:5562/api/v3/lexi"
 
 # Returns full response with book recommendations from 363 books!
 ```
@@ -346,8 +346,8 @@ curl -k -X POST -H "Authorization: Bearer YOUR_API_KEY_HERE" \
 ### 🔒 "I want to check Lexi health status"
 ```bash
 # Lexi health dashboard - THE OFFICIAL MASCOT
-curl -k -s -H "Authorization: Bearer YOUR_API_KEY_HERE" \
-  "https://api.example.com:5562/api/v3/lexi/health" | \
+curl -k -s -H "Authorization: Bearer ***REMOVED***" \
+  "https://api.ashortstayinhell.com:5562/api/v3/lexi/health" | \
   python3 -m json.tool
 ```
 
@@ -406,7 +406,7 @@ ps aux | grep -E "(production_api|test_api_endpoints)"
 curl -s http://localhost:9002/api/v3/health
 
 # 2. Verify all agents operational
-curl -s -H "API-Key: YOUR_API_KEY_HERE" \
+curl -s -H "API-Key: ***REMOVED***" \
   http://localhost:9002/api/v3/security/status
 
 # 3. Test database connection
@@ -431,7 +431,7 @@ curl -s http://localhost:9002/api/v3/health
 
 # 3. Chat with Lexi
 curl -X POST http://localhost:9002/api/v3/lexi/chat \
-  -H "API-Key: YOUR_API_KEY_HERE" \
+  -H "API-Key: ***REMOVED***" \
   -H "Content-Type: application/json" \
   -d '{"query": "What books do you recommend?"}'
 
@@ -442,7 +442,7 @@ python3 test_api_endpoints.py &
 
 **🎯 REMEMBER THESE THREE THINGS:**
 1. **URL**: `http://localhost:9002`
-2. **API Key**: `YOUR_API_KEY_HERE`
+2. **API Key**: `***REMOVED***`
 3. **Fix command**: `python3 test_api_endpoints.py &`
 
 ---
@@ -460,11 +460,11 @@ python3 test_api_endpoints.py &
 ### 🔗 **URLs**
 - Test Server: `http://localhost:9002`
 - Production: `https://localhost:9001` 
-- External: `https://api.example.com:8080`
+- External: `https://api.ashortstayinhell.com:5562`
 
 ### 🔑 **API Key**
 ```
-YOUR_API_KEY_HERE
+***REMOVED***
 ```
 
 ### 🎯 **Endpoints**
@@ -501,10 +501,10 @@ YOUR_API_KEY_HERE
 
 ---
 
-**🚀 FINAL NOTE: This system is now LIVE IN PRODUCTION with Lexi (THE official mascot) fully operational! 363 books, 34M+ words, Ollama-powered chat, and bulletproof API. Production-ready and battle-tested. Chat with Lexi at https://api.example.com:5562/api/v3/lexi**
+**🚀 FINAL NOTE: This system is now LIVE IN PRODUCTION with Lexi (THE official mascot) fully operational! 363 books, 34M+ words, Ollama-powered chat, and bulletproof API. Production-ready and battle-tested. Chat with Lexi at https://api.ashortstayinhell.com:5562/api/v3/lexi**
 
 *Made with ❤️ by the LibraryOfBabel AI Agent Team*  
 *Lexi (THE official mascot - WORKING!), Linda Zhang, Backend Team, and Wei*
 
 **Last Updated: July 11, 2025 - Production endpoints validated ✅**
-**Production URL: https://api.example.com:5562**
+**Production URL: https://api.ashortstayinhell.com:5562**

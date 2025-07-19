@@ -141,7 +141,7 @@ class ConfidenceWeightedSearch:
         """
         # Import existing embedder
         import sys
-        sys.path.append('/Users/weixiangzhang/Local Dev/LibraryOfBabel/src')
+        sys.path.append('/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src')
         from ollama_vector_embedder import OllamaVectorEmbedder
         
         embedder = OllamaVectorEmbedder(self.db_config)
@@ -222,7 +222,7 @@ app = Flask(__name__)
 
 # Initialize search engine with proper LibraryOfBabel configuration
 import sys
-sys.path.append('/Users/weixiangzhang/Local Dev/LibraryOfBabel')
+sys.path.append('/Users/weixiangzhang/Local_Dev/LibraryOfBabel')
 from config.api_config import get_database_config
 
 search_engine = ConfidenceWeightedSearch(

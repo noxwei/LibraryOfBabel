@@ -4,20 +4,20 @@ authentication:
   methods:
     query_parameter:
       format: "?api_key=YOUR_API_KEY"
-      example: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=abc123"
+      example: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=***REMOVED***"
       best_for: "iOS Shortcuts (easiest method)"
       
     header:
       format: "X-API-Key: YOUR_API_KEY"
       example: |
-        curl -H "X-API-Key: abc123" \
+        curl -H "X-API-Key: ***REMOVED***" \
         "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count"
       best_for: "Advanced integrations"
       
     authorization_header:
       format: "Authorization: Bearer YOUR_API_KEY"
       example: |
-        curl -H "Authorization: Bearer abc123" \
+        curl -H "Authorization: Bearer ***REMOVED***" \
         "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count"
       best_for: "Standard OAuth patterns"
 
@@ -42,13 +42,13 @@ authentication:
   ios_shortcuts_setup:
     steps:
       1: "Add 'Get Contents of URL' action"
-      2: "Set URL to endpoint with ?api_key=YOUR_KEY"
+      2: "Set URL to endpoint with ?api_key=***REMOVED***"
       3: "Set Method to GET"
       4: "For headers method: Add X-API-Key header"
       
     example_shortcut:
       name: "Get Book Count"
-      url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=YOUR_KEY"
+      url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=***REMOVED***"
       method: "GET"
       expected_response: "2503"
       
@@ -60,7 +60,7 @@ authentication:
       expected_status: 200
       
     authenticated_test:
-      url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=YOUR_KEY"
+      url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=***REMOVED***"
       method: "GET"
       auth_required: true
       expected_response: "2503" # Plain text, not JSON

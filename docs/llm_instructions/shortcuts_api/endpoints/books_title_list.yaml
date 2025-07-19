@@ -38,7 +38,7 @@ endpoint:
     
   ios_shortcuts:
     action: "Get Contents of URL"
-    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/title-list?limit=10&api_key=YOUR_KEY"
+    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/title-list?limit=10&api_key=***REMOVED***"
     method: "GET"
     response_handling: "Get Value from JSON > direct array access"
     
@@ -81,14 +81,14 @@ endpoint:
     
   curl_examples:
     production: |
-      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/title-list?limit=5&api_key=YOUR_KEY"
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/title-list?limit=5&api_key=***REMOVED***"
       
     development: |
       curl "http://localhost:5001/api/shortcuts/books/title-list?limit=5"
       
     full_list: |
       # Get all titles (up to 500)
-      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/title-list?limit=500&api_key=YOUR_KEY"
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/title-list?limit=500&api_key=***REMOVED***"
       
   test_results:
     verified_format: '✅ Simple array ["Title1", "Title2", "Title3"]'

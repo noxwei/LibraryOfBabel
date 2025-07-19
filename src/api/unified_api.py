@@ -65,7 +65,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/unified_api.log'),
+        logging.FileHandler('/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/unified_api.log'),
         logging.StreamHandler()
     ]
 )

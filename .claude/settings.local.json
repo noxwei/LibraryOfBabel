@@ -83,7 +83,9 @@
       "Bash(source:*)",
       "Bash(echo:*)",
       "Bash(say:*)",
-      "Bash(pwdx:*)"
+      "Bash(pwdx:*)",
+      "Bash(cat:*)",
+      "Bash(pip3 list:*)"
     ],
     "deny": []
   }

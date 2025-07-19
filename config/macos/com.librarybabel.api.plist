@@ -11,11 +11,11 @@
     <key>ProgramArguments</key>
     <array>
         <string>/opt/homebrew/bin/python3</string>
-        <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/api/production_api.py</string>
+        <string>/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src/api/production_api.py</string>
     </array>
     
     <key>WorkingDirectory</key>
-    <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel</string>
+    <string>/Users/weixiangzhang/Local_Dev/LibraryOfBabel</string>
     
     <key>RunAtLoad</key>
     <true/>
@@ -24,17 +24,17 @@
     <true/>
     
     <key>StandardOutPath</key>
-    <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/api.out.log</string>
+    <string>/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/api.out.log</string>
     
     <key>StandardErrorPath</key>
-    <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/api.err.log</string>
+    <string>/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/api.err.log</string>
     
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
         <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
         <key>PYTHONPATH</key>
-        <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/src</string>
+        <string>/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src</string>
         <key>API_KEY</key>
         <string>babel_secure_8a52a0ad3a1fe3bf3ade37d04deef0054d8f58035a0e9d4760a9a08548d8cebf</string>
         <key>OLLAMA_MODEL</key>

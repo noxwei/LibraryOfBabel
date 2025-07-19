@@ -5,8 +5,8 @@ After=postgresql.service
 [Service]
 Type=simple
 User=weixiangzhang
-WorkingDirectory=/Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/hr/api
-ExecStart=/usr/bin/python3 /Users/weixiangzhang/Local Dev/LibraryOfBabel/agents/hr/api/hr_api.py
+WorkingDirectory=/Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/hr/api
+ExecStart=/usr/bin/python3 /Users/weixiangzhang/Local_Dev/LibraryOfBabel/agents/hr/api/hr_api.py
 Restart=always
 RestartSec=10
 Environment=HR_API_PORT=8081

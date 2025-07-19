@@ -26,7 +26,7 @@ endpoint:
     
   ios_shortcuts:
     action: "Get Contents of URL"
-    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=YOUR_KEY"
+    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=***REMOVED***"
     method: "GET"
     response_handling: "Use directly - no JSON parsing needed"
     
@@ -48,13 +48,13 @@ endpoint:
     
   curl_examples:
     production: |
-      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=YOUR_KEY"
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=***REMOVED***"
       
     development: |
       curl "http://localhost:5001/api/shortcuts/books/count"
       
     with_header: |
-      curl -H "X-API-Key: YOUR_KEY" \
+      curl -H "X-API-Key: ***REMOVED***" \
       "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count"
   
   test_results:
@@ -90,7 +90,7 @@ endpoint:
       name: "Library Size"
       steps:
         1: "Get Contents of URL"
-        2: "Set to https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=KEY"
+        2: "Set to https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=***REMOVED***"
         3: "Show Result (displays: 2503)"
         
     data_jar:

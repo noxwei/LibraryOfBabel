@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-sys.path.append('/Users/weixiangzhang/Local Dev/LibraryOfBabel')
+sys.path.append('/Users/weixiangzhang/Local_Dev/LibraryOfBabel')
 from config.api_config import get_database_config
 import psycopg2
 

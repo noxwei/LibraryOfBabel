@@ -33,7 +33,7 @@ endpoint:
     
   ios_shortcuts:
     action: "Get Contents of URL"
-    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/search/TERM/has-results?api_key=YOUR_KEY"
+    url: "https://api.ashortstayinhell.com:5562/api/shortcuts/search/TERM/has-results?api_key=***REMOVED***"
     method: "GET"
     response_handling: "Use directly in If/Then conditions"
     
@@ -66,7 +66,7 @@ endpoint:
     
   curl_examples:
     production: |
-      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/search/love/has-results?api_key=YOUR_KEY"
+      curl "https://api.ashortstayinhell.com:5562/api/shortcuts/search/love/has-results?api_key=***REMOVED***"
       
     development: |
       curl "http://localhost:5001/api/shortcuts/search/love/has-results"

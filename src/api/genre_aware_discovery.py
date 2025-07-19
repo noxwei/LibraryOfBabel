@@ -18,7 +18,7 @@ from psycopg2.extras import RealDictCursor
 from flask import Flask, request, jsonify
 from typing import Dict, List, Optional, Tuple
 import sys
-sys.path.append('/Users/weixiangzhang/Local Dev/LibraryOfBabel')
+sys.path.append('/Users/weixiangzhang/Local_Dev/LibraryOfBabel')
 from config.api_config import get_database_config
 
 # Configure logging

@@ -86,6 +86,13 @@ api_key.txt
 *password*.txt
 *PASSWORD*.txt
 
+# Production API keys (specific patterns)
+babel_prod_*
+babel_secure_*
+*_api_key*
+production_api_key*
+*.api_key
+
 # Allow API key management code (no actual keys)
 !*api_key_rotation*
 !*API_KEY_ROTATION*

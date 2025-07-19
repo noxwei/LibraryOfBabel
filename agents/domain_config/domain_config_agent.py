@@ -28,7 +28,7 @@ class DomainConfigAgent:
         self.domain = "api.ashortstayinhell.com"
         self.port = 443
         self.expected_ip = "73.161.54.75"  # From ping results
-        self.ssl_cert_path = "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/production_certs/"
+        self.ssl_cert_path = "/Users/weixiangzhang/Local_Dev/LibraryOfBabel/ssl/production_certs/"
         
         # Setup logging
         logging.basicConfig(level=logging.INFO)
@@ -64,7 +64,7 @@ class DomainConfigAgent:
             result = subprocess.run([
                 'git', 'log', '--oneline', '--grep=ashortstayinhell', 
                 '--grep=external', '--grep=domain', '--grep=SSL'
-            ], capture_output=True, text=True, cwd="/Users/weixiangzhang/Local Dev/LibraryOfBabel")
+            ], capture_output=True, text=True, cwd="/Users/weixiangzhang/Local_Dev/LibraryOfBabel")
             
             commits = result.stdout.strip().split('\n') if result.stdout.strip() else []
             
@@ -122,9 +122,9 @@ class DomainConfigAgent:
         """Find server configuration files"""
         config_files = []
         search_paths = [
-            "/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/api/",
-            "/Users/weixiangzhang/Local Dev/LibraryOfBabel/ssl/",
-            "/Users/weixiangzhang/Local Dev/LibraryOfBabel/scripts/"
+            "/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src/api/",
+            "/Users/weixiangzhang/Local_Dev/LibraryOfBabel/ssl/",
+            "/Users/weixiangzhang/Local_Dev/LibraryOfBabel/scripts/"
         ]
         
         for path in search_paths:

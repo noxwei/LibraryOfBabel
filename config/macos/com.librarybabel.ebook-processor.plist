@@ -11,13 +11,13 @@
     <key>ProgramArguments</key>
     <array>
         <string>/opt/homebrew/bin/python3</string>
-        <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/src/automated_ebook_processor.py</string>
+        <string>/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src/automated_ebook_processor.py</string>
         <string>--mode</string>
         <string>realtime</string>
     </array>
     
     <key>WorkingDirectory</key>
-    <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel</string>
+    <string>/Users/weixiangzhang/Local_Dev/LibraryOfBabel</string>
     
     <key>RunAtLoad</key>
     <true/>
@@ -26,17 +26,17 @@
     <true/>
     
     <key>StandardOutPath</key>
-    <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/ebook-processor.out.log</string>
+    <string>/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/ebook-processor.out.log</string>
     
     <key>StandardErrorPath</key>
-    <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/logs/ebook-processor.err.log</string>
+    <string>/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/ebook-processor.err.log</string>
     
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
         <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
         <key>PYTHONPATH</key>
-        <string>/Users/weixiangzhang/Local Dev/LibraryOfBabel/src</string>
+        <string>/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src</string>
     </dict>
     
     <key>ThrottleInterval</key>

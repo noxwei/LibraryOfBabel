@@ -23,11 +23,11 @@
 
 #### **Action 2: Get Contents of URL**
 - Action: **Get Contents of URL**
-- URL: `https://your-domain.com/api/v3/ollama/ios/chat`
+- URL: `https://api.ashortstayinhell.com:5562/api/v3/ollama/ios/chat`
 - Method: **POST**
 - Headers:
   - `Content-Type`: `application/json`
-  - `Authorization`: `Bearer YOUR_API_KEY_HERE`
+  - `Authorization`: `Bearer ***REMOVED***`
 - Request Body: 
 ```json
 {
@@ -215,7 +215,7 @@ Intent types and suggested actions:
 ### **Troubleshooting**
 
 #### **403 Forbidden Error**
-- Check API key format: `Bearer YOUR_API_KEY`
+- Check API key format: `Bearer ***REMOVED***`
 - Verify API key is active
 - Confirm URL is correct
 
