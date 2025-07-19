@@ -20,8 +20,9 @@ https://api.ashortstayinhell.com:5562/api/shortcuts/
 
 ## 🔐 Authentication
 - All endpoints require API key except `/health`
-- Include as query parameter: `?api_key=***REMOVED***`
-- Or use header: `X-API-Key: ***REMOVED***`
+- **Authentication required** - API key must be provided by user
+- Include as query parameter: `?api_key=YOUR_API_KEY`
+- Or use header: `X-API-Key: YOUR_API_KEY`
 
 ## 📁 Documentation Structure
 ```
@@ -65,11 +66,34 @@ https://api.ashortstayinhell.com:5562/api/shortcuts/
 3. **Use specific endpoint YAML** files for detailed parameters
 4. **Provide iOS Shortcuts examples** when helping users
 5. **Consider Data Jar integration** for persistence needs
+6. **NEVER include actual API keys in documentation**
 
 ## 🔧 Common Parameters
 - `limit`: Maximum results (default varies by endpoint)
 - `api_key`: Authentication (required except health)
 - Path parameters: `{term}`, `{id}`, `{page_num}`
+
+## 🔍 URL Generator System
+
+LLM bots can help users discover books and navigate the API using natural language:
+
+### Step 1: Search for Books
+Help users find books by using search endpoints:
+- `/search/{term}` - General search
+- `/books/title-list` - Browse available titles
+- `/books/author-list` - Browse available authors
+
+### Step 2: Generate Specific URLs
+Once a book is found, help users create URLs for:
+- **Reading**: `/books/{book_id}/page/{page_num}`
+- **Book Info**: `/books/{book_id}/summary`
+- **Full Text**: `/books/{book_id}/construct`
+
+### Step 3: Teach Natural Navigation
+Show users how to:
+1. "Find me a book about physics" → Search → Get book_id
+2. "Take me to page 5 of that book" → Generate page URL
+3. "Show me the summary" → Generate summary URL
 
 ---
 *Mobile-first API design by Dr. Elena Rodriguez - Making complex knowledge feel simple*
