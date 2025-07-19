@@ -199,9 +199,12 @@ def book_title_list():
     """Returns: ["Title1", "Title2", "Title3"] - simple array"""
     try:
         limit = min(int(request.args.get('limit', 50)), 500)
+        page = int(request.args.get('page', 1))
+        offset = (page - 1) * limit
+        
         with get_db() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT title FROM books ORDER BY title LIMIT %s;", (limit,))
+                cur.execute("SELECT title FROM books ORDER BY title LIMIT %s OFFSET %s;", (limit, offset))
                 titles = [row[0] for row in cur.fetchall()]
                 return jsonify(titles)
     except Exception as e:
@@ -214,6 +217,9 @@ def book_author_list():
     """Returns: ["Author1", "Author2", "Author3"] - simple array"""
     try:
         limit = min(int(request.args.get('limit', 50)), 500)
+        page = int(request.args.get('page', 1))
+        offset = (page - 1) * limit
+        
         with get_db() as conn:
             with conn.cursor() as cur:
                 cur.execute("""
@@ -221,8 +227,8 @@ def book_author_list():
                     FROM books 
                     WHERE author IS NOT NULL 
                     ORDER BY author 
-                    LIMIT %s;
-                """, (limit,))
+                    LIMIT %s OFFSET %s;
+                """, (limit, offset))
                 authors = [row[0] for row in cur.fetchall()]
                 return jsonify(authors)
     except Exception as e:
@@ -235,16 +241,19 @@ def search_titles(term):
     """Returns: ["Book1", "Book2"] - titles matching search term"""
     try:
         limit = min(int(request.args.get('limit', 10)), 100)
+        page = int(request.args.get('page', 1))
+        offset = (page - 1) * limit
+        
         with get_db() as conn:
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT DISTINCT b.title
                     FROM books b
-                    JOIN chunks c ON b.id = c.book_id
+                    JOIN chunks c ON b.book_id = c.book_id
                     WHERE c.content ILIKE %s
                     ORDER BY b.title
-                    LIMIT %s;
-                """, (f'%{term}%', limit))
+                    LIMIT %s OFFSET %s;
+                """, (f'%{term}%', limit, offset))
                 titles = [row[0] for row in cur.fetchall()]
                 return jsonify(titles)
     except Exception as e:
@@ -444,9 +453,9 @@ def search_simple(term):
         with get_db() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
                 cur.execute("""
-                    SELECT DISTINCT b.title, b.author, b.id
+                    SELECT DISTINCT b.title, b.author, b.book_id
                     FROM books b
-                    JOIN chunks c ON b.id = c.book_id
+                    JOIN chunks c ON b.book_id = c.book_id
                     WHERE c.content ILIKE %s
                     ORDER BY b.title
                     LIMIT %s;
@@ -461,7 +470,7 @@ def search_simple(term):
                     "has_results": len(results) > 0,
                     "titles": [r['title'] for r in results],
                     "authors": [r['author'] for r in results],
-                    "book_ids": [r['id'] for r in results],
+                    "book_ids": [r['book_id'] for r in results],
                     "first_title": results[0]['title'] if results else None,
                     "first_author": results[0]['author'] if results else None,
                     "shortcuts_optimized": True
@@ -491,14 +500,14 @@ def book_summary(book_id):
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
                 cur.execute("""
                     SELECT b.title, b.author, b.subject, b.publication_date,
-                           COUNT(c.id) as chunk_count,
+                           COUNT(c.chunk_id) as chunk_count,
                            MIN(LENGTH(c.content)) as min_chunk_length,
                            MAX(LENGTH(c.content)) as max_chunk_length,
                            AVG(LENGTH(c.content)) as avg_chunk_length
                     FROM books b
-                    LEFT JOIN chunks c ON b.id = c.book_id
-                    WHERE b.id = %s
-                    GROUP BY b.id, b.title, b.author, b.subject, b.publication_date;
+                    LEFT JOIN chunks c ON b.book_id = c.book_id
+                    WHERE b.book_id = %s
+                    GROUP BY b.book_id, b.title, b.author, b.subject, b.publication_date;
                 """, (book_id,))
                 
                 result = cur.fetchone()
@@ -544,11 +553,11 @@ def book_construct_overview(book_id):
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
                 # Get book info and chunk count
                 cur.execute("""
-                    SELECT b.title, b.author, b.subject, COUNT(c.id) as total_pages
+                    SELECT b.title, b.author, b.subject, COUNT(c.chunk_id) as total_pages
                     FROM books b
-                    LEFT JOIN chunks c ON b.id = c.book_id
-                    WHERE b.id = %s
-                    GROUP BY b.id, b.title, b.author, b.subject;
+                    LEFT JOIN chunks c ON b.book_id = c.book_id
+                    WHERE b.book_id = %s
+                    GROUP BY b.book_id, b.title, b.author, b.subject;
                 """, (book_id,))
                 
                 book_info = cur.fetchone()
@@ -589,7 +598,7 @@ def book_page(book_id, page_num):
             with get_db() as conn:
                 with conn.cursor() as cur:
                     cur.execute("""
-                        SELECT chunk_index FROM chunks 
+                        SELECT chunk_id FROM chunks 
                         WHERE book_id = %s 
                         ORDER BY RANDOM() LIMIT 1;
                     """, (book_id,))
@@ -598,18 +607,19 @@ def book_page(book_id, page_num):
                         page_num = result[0]
                     else:
                         return jsonify({"error": "No pages found"}), 404
-        
-        page_num = int(page_num)
+        else:
+            # Convert integer page to chunk_id format
+            page_num = f"{book_id}_chapter_{page_num}"
         
         with get_db() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
                 # Get current page
                 cur.execute("""
-                    SELECT c.text, c.chunk_index, b.title, b.author,
-                           (SELECT MAX(chunk_index) FROM chunks WHERE book_id = %s) as max_page
+                    SELECT c.content, c.chunk_id, b.title, b.author,
+                           (SELECT COUNT(*) FROM chunks WHERE book_id = %s) as max_page
                     FROM chunks c
-                    JOIN books b ON c.book_id = b.id
-                    WHERE c.book_id = %s AND c.chunk_index = %s;
+                    JOIN books b ON c.book_id = b.book_id
+                    WHERE c.book_id = %s AND c.chunk_id = %s;
                 """, (book_id, book_id, page_num))
                 
                 page_data = cur.fetchone()
@@ -617,17 +627,18 @@ def book_page(book_id, page_num):
                 if not page_data:
                     return jsonify({"error": "Page not found"}), 404
                 
-                # Create navigation
-                prev_page = page_num - 1 if page_num > 1 else None
-                next_page = page_num + 1 if page_num < page_data['max_page'] else None
+                # Create navigation - extract chapter number from chunk_id
+                current_chapter = int(page_data['chunk_id'].split('_chapter_')[1]) if '_chapter_' in page_data['chunk_id'] else 1
+                prev_page = current_chapter - 1 if current_chapter > 1 else None
+                next_page = current_chapter + 1 if current_chapter < page_data['max_page'] else None
                 
                 page_response = {
                     "book_id": book_id,
                     "title": page_data['title'],
                     "author": page_data['author'],
-                    "current_page": page_num,
+                    "current_page": current_chapter,
                     "total_pages": page_data['max_page'],
-                    "page_content": page_data['text'],
+                    "page_content": page_data['content'],
                     "navigation": {
                         "previous_page_url": f"/api/shortcuts/books/{book_id}/page/{prev_page}" if prev_page else None,
                         "next_page_url": f"/api/shortcuts/books/{book_id}/page/{next_page}" if next_page else None,
@@ -658,12 +669,12 @@ def book_table_of_contents(book_id):
                 # Get book title and chunks with preview
                 cur.execute("""
                     SELECT b.title, b.author,
-                           c.chunk_index, 
-                           LEFT(c.text, 100) as preview
+                           c.chunk_id, 
+                           LEFT(c.content, 100) as preview
                     FROM books b
-                    JOIN chunks c ON b.id = c.book_id
-                    WHERE b.id = %s
-                    ORDER BY c.chunk_index
+                    JOIN chunks c ON b.book_id = c.book_id
+                    WHERE b.book_id = %s
+                    ORDER BY c.chunk_id
                     LIMIT %s;
                 """, (book_id, limit))
                 
@@ -678,9 +689,9 @@ def book_table_of_contents(book_id):
                     "author": results[0]['author'],
                     "chapters": [
                         {
-                            "page_number": row['chunk_index'],
+                            "page_number": row['chunk_id'],
                             "preview": row['preview'] + "...",
-                            "page_url": f"/api/shortcuts/books/{book_id}/page/{row['chunk_index']}"
+                            "page_url": f"/api/shortcuts/books/{book_id}/page/{row['chunk_id']}"
                         }
                         for row in results
                     ],
@@ -706,9 +717,9 @@ def serendipity_random_passage():
         with get_db() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
                 cur.execute("""
-                    SELECT b.title, b.author, c.text, c.chunk_index
+                    SELECT b.title, b.author, c.content, c.chunk_id
                     FROM chunks c
-                    JOIN books b ON c.book_id = b.id
+                    JOIN books b ON c.book_id = b.book_id
                     WHERE LENGTH(c.content) > 200
                     ORDER BY RANDOM()
                     LIMIT 1;
@@ -720,8 +731,8 @@ def serendipity_random_passage():
                     passage = {
                         "title": result['title'],
                         "author": result['author'],
-                        "passage": result['text'],
-                        "page_number": result['chunk_index'],
+                        "passage": result['content'],
+                        "page_number": result['chunk_id'],
                         "chatgpt_prompt_ready": True,
                         "story_seed": f"Based on this passage from '{result['title']}' by {result['author']}, write a story...",
                         "serendipity_type": "random_passage"
@@ -744,9 +755,9 @@ def serendipity_mixed_authors():
         with get_db() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
                 cur.execute("""
-                    SELECT DISTINCT b.author, b.title, c.text, c.chunk_index
+                    SELECT b.author, b.title, c.content, c.chunk_id
                     FROM chunks c
-                    JOIN books b ON c.book_id = b.id
+                    JOIN books b ON c.book_id = b.book_id
                     WHERE LENGTH(c.content) > 150 AND b.author IS NOT NULL
                     ORDER BY RANDOM()
                     LIMIT %s;
@@ -760,8 +771,8 @@ def serendipity_mixed_authors():
                             {
                                 "author": row['author'],
                                 "title": row['title'],
-                                "passage": row['text'][:300] + "..." if len(row['text']) > 300 else row['text'],
-                                "page_number": row['chunk_index']
+                                "passage": row['content'][:300] + "..." if len(row['content']) > 300 else row['content'],
+                                "page_number": row['chunk_id']
                             }
                             for row in results
                         ],
@@ -789,9 +800,9 @@ def serendipity_theme_blend(theme):
         with get_db() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
                 cur.execute("""
-                    SELECT b.title, b.author, c.text, c.chunk_index
+                    SELECT b.title, b.author, c.content, c.chunk_id
                     FROM chunks c
-                    JOIN books b ON c.book_id = b.id
+                    JOIN books b ON c.book_id = b.book_id
                     WHERE c.content ILIKE %s AND LENGTH(c.content) > 100
                     ORDER BY RANDOM()
                     LIMIT %s;
@@ -806,8 +817,8 @@ def serendipity_theme_blend(theme):
                             {
                                 "title": row['title'],
                                 "author": row['author'],
-                                "passage": row['text'][:400] + "..." if len(row['text']) > 400 else row['text'],
-                                "page_number": row['chunk_index']
+                                "passage": row['content'][:400] + "..." if len(row['content']) > 400 else row['content'],
+                                "page_number": row['chunk_id']
                             }
                             for row in results
                         ],
@@ -838,9 +849,9 @@ def serendipity_story_starter():
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
                 # Get random elements for story construction
                 cur.execute("""
-                    SELECT b.title, b.author, c.text
+                    SELECT b.title, b.author, c.content
                     FROM chunks c
-                    JOIN books b ON c.book_id = b.id
+                    JOIN books b ON c.book_id = b.book_id
                     WHERE LENGTH(c.content) BETWEEN 200 AND 600
                     ORDER BY RANDOM()
                     LIMIT 3;
@@ -850,7 +861,7 @@ def serendipity_story_starter():
                 
                 # Get random character names from different books
                 cur.execute("""
-                    SELECT DISTINCT b.author
+                    SELECT b.author
                     FROM books b
                     WHERE b.author IS NOT NULL
                     ORDER BY RANDOM()
@@ -863,7 +874,7 @@ def serendipity_story_starter():
                         "inspiration_passages": [
                             {
                                 "source": f"{passage['title']} by {passage['author']}",
-                                "text": passage['text'][:300] + "..."
+                                "text": passage['content'][:300] + "..."
                             }
                             for passage in passages
                         ],
@@ -871,13 +882,13 @@ def serendipity_story_starter():
                         "chatgpt_complete_prompt": f"""Create an original short story that blends elements from these three passages:
 
 1. From "{passages[0]['title']}" by {passages[0]['author']}:
-{passages[0]['text'][:200]}...
+{passages[0]['content'][:200]}...
 
 2. From "{passages[1]['title']}" by {passages[1]['author']}:
-{passages[1]['text'][:200]}...
+{passages[1]['content'][:200]}...
 
 3. From "{passages[2]['title']}" by {passages[2]['author']}:
-{passages[2]['text'][:200]}...
+{passages[2]['content'][:200]}...
 
 Write in a style that combines influences from {', '.join(authors[:3])}.
 Make it approximately 500-800 words.""",
@@ -950,4 +961,4 @@ if __name__ == "__main__":
     # For testing purposes
     app = Flask(__name__)
     register_shortcuts_blueprint(app)
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)
