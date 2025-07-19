@@ -79,13 +79,33 @@ chown -R your-user:your-group babel-backend/
 
 ## 🚀 **Production Deployment**
 
+### **🚨 CRITICAL SECURITY PROTOCOL: MANDATORY LOCAL TESTING**
+
+**GOLDEN RULE: DO NOT DEPLOY UNTIL LOCAL TESTING IS COMPLETE**
+
+Before ANY production deployment:
+1. ✅ **LOCAL TESTING FIRST** - All changes MUST work locally
+2. ✅ **COMPREHENSIVE LOCAL VERIFICATION** - Test all endpoints on localhost
+3. ✅ **DATABASE FIXES VERIFIED LOCALLY** - Run test suites locally
+4. ✅ **PAGINATION CONFIRMED LOCALLY** - Verify Page 1 ≠ Page 2 locally
+5. ✅ **ONLY THEN** → Proceed to production deployment
+
+**This prevents:**
+- Production failures
+- Security vulnerabilities from untested code
+- Broken deployments
+- Wasted time debugging in production
+
+### **Secure Deployment Standards**
+
 The production system is designed to be secure by default:
+- **MANDATORY local testing before deployment**
 - No hardcoded secrets in source code
 - Environment-based configuration
 - Secure defaults for all settings
 - Proper error handling without information disclosure
 
-**Remember: Security through obscurity is not security. Use proper authentication, authorization, and monitoring.**
+**Remember: Security through obscurity is not security. Use proper authentication, authorization, and monitoring. NEVER deploy untested code.**
 <!-- Agent Commentary -->
 ---
 
