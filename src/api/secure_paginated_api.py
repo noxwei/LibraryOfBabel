@@ -59,7 +59,17 @@ try:
     print("✅ MCP blueprint registered successfully")
 except Exception as e:
     print(f"⚠️  MCP blueprint not available: {e}")
-    # Create basic MCP endpoints manually
+
+# Try to import Shortcuts blueprint (Dr. Elena Rodriguez iOS Shortcuts API)
+try:
+    from shortcuts_api import shortcuts_bp
+    app.register_blueprint(shortcuts_bp)
+    print("✅ 🎯 Dr. Elena Rodriguez iOS Shortcuts API registered successfully")
+except Exception as e:
+    print(f"⚠️  Shortcuts API not available: {e}")
+
+# Create basic MCP endpoints manually if MCP blueprint failed
+if 'mcp_blueprint' not in locals():
     @app.route('/mcp/health', methods=['GET'])
     def mcp_health_basic():
         return jsonify({
