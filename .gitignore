@@ -2,6 +2,9 @@
 # Protects personal data while preserving shareable architecture
 
 # === PERSONAL IDENTITY PROTECTION ===
+# Hidden agents folder (contains sensitive agent data)
+.agents/
+
 # Specific personal identifiers
 *weixiangzhang*
 *wei_maybe_foucault*
@@ -75,6 +78,16 @@ __pycache__/
 .env.local
 .env.production
 .env.*
+
+# Additional security patterns
+*private_key*
+*certificate*
+*ssl_config*
+*credential*
+*secret*
+*password*
+*token*
+*key*
 
 # API Keys and tokens (files containing actual keys)
 *api_key*.txt
