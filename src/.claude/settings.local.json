@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip3 install:*)",
+      "Bash(python3:*)",
+      "Bash(source:*)",
+      "Bash(pip install:*)",
+      "Bash(ls:*)",
+      "Bash(chmod:*)",
+      "Bash(./startup/start_linda_hr.sh:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": []
+  }
+}

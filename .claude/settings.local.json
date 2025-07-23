@@ -31,8 +31,8 @@
       "Bash(gh run watch:*)",
       "Bash(gh run view:*)",
       "Bash(kill:*)",
-      "Bash(export API_KEY=\"babel_secure_LKi-NkGfNRI3-plfVA3ud8vG8v-SzbTSbhl34LW5QzE\")",
-      "Bash(API_KEY=babel_secure_LKi-NkGfNRI3-plfVA3ud8vG8v-SzbTSbhl34LW5QzE python3 src/api/secure_paginated_api.py)",
+      "Bash(export API_KEY=\"YOUR_API_KEY_HERE\")",
+      "Bash(API_KEY=YOUR_API_KEY_HERE python3 src/api/secure_paginated_api.py)",
       "Bash(sudo fuser:*)",
       "Bash(launchctl:*)",
       "Bash(ls:*)",
@@ -85,7 +85,8 @@
       "Bash(say:*)",
       "Bash(pwdx:*)",
       "Bash(cat:*)",
-      "Bash(pip3 list:*)"
+      "Bash(pip3 list:*)",
+      "Bash(nslookup:*)"
     ],
     "deny": []
   }
