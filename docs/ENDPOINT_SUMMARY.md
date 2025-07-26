@@ -1,7 +1,8 @@
-# 🚀 LibraryOfBabel Unified API - Endpoint Summary
+# 🚀 LibraryOfBabel iOS Shortcuts API - Endpoint Summary
 
-**Base URL**: `https://api.ashortstayinhell.com:5562`  
-**Version**: Unified (consolidates former v2 + v3)
+**Base URL**: `https://api.ashortstayinhell.com:5562/api/shortcuts/`  
+**Version**: iOS Shortcuts API (mobile-first design)  
+**Designer**: Dr. Elena Rodriguez (IAV) - Information Architecture Validator
 
 ## 📋 Quick Reference - All Available Endpoints
 
@@ -13,21 +14,42 @@
 ### 📚 Books & Content
 | Endpoint | Method | Auth | Description |
 |----------|--------|------|-------------|
-| `/books` | GET | ✅ | List all books with pagination |
-| `/books/{book_id}` | GET | ✅ | Get specific book details |
-| `/books/{book_id}/chunks` | GET | ✅ | Get book chunks with chunking levels |
-| `/chunks/{chunk_id}` | GET | ✅ | Get full chunk content |
+| `/books/count` | GET | ✅ | Get total book count (2,730) |
+| `/books/title-list` | GET | ✅ | Get list of all book titles |
+| `/books/author-list` | GET | ✅ | Get list of all authors |
+| `/books/{book_id}/summary` | GET | ✅ | Get specific book details |
+| `/books/{book_id}/construct` | GET | ✅ | Get complete book structure |
+| `/books/{book_id}/page/{num}` | GET | ✅ | Get specific page content |
+| `/books/{book_id}/toc` | GET | ✅ | Get table of contents |
 
-### 🔍 Search (Traditional)
+### 🎲 Random Content
 | Endpoint | Method | Auth | Description |
 |----------|--------|------|-------------|
-| `/search` | GET | ✅ | Search across all books (keyword/semantic) |
-| `/books/{book_id}/search` | GET | ✅ | 🆕 Search within specific book |
+| `/random/title` | GET | ✅ | Get random book title |
+| `/random/author` | GET | ✅ | Get random author name |
+| `/random/citation` | GET | ✅ | Get random book citation |
+| `/random/share-text` | GET | ✅ | Get random shareable text |
 
-### 🧠 Fuzzy Search (NEW)
+### 🔍 Search Functions
 | Endpoint | Method | Auth | Description |
 |----------|--------|------|-------------|
-| `/fuzzy-search` | GET | ✅ | 🆕 Advanced fuzzy search with vector embeddings |
+| `/search/{term}/count` | GET | ✅ | Get count of matching books |
+| `/search/{term}/has-results` | GET | ✅ | Check if search has results |
+| `/search/{term}/titles` | GET | ✅ | Get titles of matching books |
+| `/search/{term}/summary` | GET | ✅ | Get search summary |
+| `/search/{term}/simple` | GET | ✅ | Get simplified search results |
+
+### 📊 Statistics & Dashboard
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/stats/dashboard` | GET | ✅ | Get comprehensive library stats |
+| `/user/reading-progress` | GET | ✅ | Get user reading metrics |
+
+### 🎭 Serendipity Features
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/serendipity/random-passage` | GET | ✅ | Get random passage for inspiration |
+| `/serendipity/story-starter` | GET | ✅ | Get complete story starter package |
 
 ### 🔗 Legacy V3 Compatibility
 | Endpoint | Method | Auth | Description |
@@ -62,50 +84,55 @@ The new `/fuzzy-search` endpoint supports multiple search algorithms:
 
 ## 📊 Current Data
 
-- **📚 Books**: 838 total
-- **📝 Chunks**: 25,067 total
-- **🧠 Embeddings**: 18,363 vector embeddings
-- **⚡ Performance**: 50-600ms response times
+- **📚 Books**: 2,730 total (verified production count)
+- **📝 Chunks**: 79,054 total
+- **👥 Authors**: 2,152 unique authors
+- **⚡ Performance**: Mobile-optimized response times
+- **📱 Optimized For**: iOS Shortcuts, Data Jar, Mobile Workflows
 
 ## 🆕 What's New
 
-### ✅ Unified API
-- Single endpoint (port 5562) instead of separate v2/v3
-- All functionality consolidated
-- Backwards compatibility maintained
+### ✅ iOS Shortcuts API
+- Mobile-first design by Dr. Elena Rodriguez (IAV)
+- Single-value responses perfect for iOS Shortcuts
+- Data Jar integration ready
+- Mobile workflows streamlined
 
-### ✅ New Search Features
-- **In-book search**: `/books/{book_id}/search`
-- **Fuzzy search**: `/fuzzy-search` with multiple algorithms
-- **Vector embeddings**: Semantic similarity search
-- **Hybrid search**: Weighted combination of multiple algorithms
+### ✅ Serendipity Features
+- **Random passage generation**: `/serendipity/random-passage`
+- **Story starter packages**: `/serendipity/story-starter`
+- **Creative inspiration**: Theme blending across books
+- **Mixed author combinations**: Diverse perspectives
 
-### ✅ Enhanced Capabilities
-- Configurable chunking levels (small/medium/large)
-- Custom search weights in hybrid mode
-- Performance optimizations
-- Comprehensive error handling
+### ✅ Enhanced Navigation
+- **Book construction**: Complete structure with navigation
+- **Page-by-page reading**: With next/prev links
+- **Table of contents**: Easy chapter navigation
+- **Reading progress**: User metrics tracking
 
 ## 🚀 Quick Examples
 
 ```bash
 # Health check
-curl "https://api.ashortstayinhell.com:5562/health"
+curl "https://api.ashortstayinhell.com:5562/api/shortcuts/health"
 
-# List books
-curl "https://api.ashortstayinhell.com:5562/books?api_key=***REMOVED***&page_size=5"
+# Get book count
+curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=***REMOVED***"
 
-# Traditional search
-curl "https://api.ashortstayinhell.com:5562/search?api_key=***REMOVED***&q=Foucault"
+# Get random title
+curl "https://api.ashortstayinhell.com:5562/api/shortcuts/random/title?api_key=***REMOVED***"
 
-# NEW: In-book search
-curl "https://api.ashortstayinhell.com:5562/books/1099/search?api_key=***REMOVED***&q=discourse"
+# Search for books
+curl "https://api.ashortstayinhell.com:5562/api/shortcuts/search/philosophy/count?api_key=***REMOVED***"
 
-# NEW: Semantic fuzzy search
-curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=***REMOVED***&q=artificial%20intelligence&type=semantic&limit=5"
+# Get book details
+curl "https://api.ashortstayinhell.com:5562/api/shortcuts/books/1099/summary?api_key=***REMOVED***"
 
-# NEW: Hybrid search with custom weights
-curl "https://api.ashortstayinhell.com:5562/fuzzy-search?api_key=***REMOVED***&q=democracy&type=hybrid&semantic_weight=0.6&fuzzy_weight=0.3&keyword_weight=0.1"
+# Get serendipity inspiration
+curl "https://api.ashortstayinhell.com:5562/api/shortcuts/serendipity/random-passage?api_key=***REMOVED***"
+
+# Get story starter
+curl "https://api.ashortstayinhell.com:5562/api/shortcuts/serendipity/story-starter?api_key=***REMOVED***"
 ```
 
 ---

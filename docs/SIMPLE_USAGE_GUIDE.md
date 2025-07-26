@@ -16,10 +16,10 @@
 ### ⚡ Quick Health Check - PRODUCTION READY!
 ```bash
 # Test LIVE production server (VALIDATED ✅)
-curl -k -s https://api.ashortstayinhell.com:5562/api/v3/health
+curl -k -s https://api.ashortstayinhell.com:5562/api/shortcuts/health
 
 # Expected result:
-{"components":{"api":"healthy","database":"healthy"},"status":"healthy","timestamp":"2025-07-11T03:13:29.050827"}
+{"status":"healthy","namespace":"shortcuts","designed_by":"Dr. Elena Rodriguez (IAV)","optimized_for":["iOS Shortcuts","Data Jar","Mobile Workflows"],"philosophy":"Information architecture makes complex knowledge feel simple"}
 ```
 
 **✅ If you see this**: **PRODUCTION IS LIVE! 🚀**  
@@ -32,10 +32,10 @@ curl -k -s https://api.ashortstayinhell.com:5562/api/v3/health
 ### 🌐 **Current Working Servers**
 ```bash
 # Production server - LIVE AND VALIDATED ✅
-https://api.ashortstayinhell.com:5562
+https://api.ashortstayinhell.com:5562/api/shortcuts/
 
 # Local production server (when running locally)
-https://localhost:5562
+https://localhost:5562/api/shortcuts/
 
 # Legacy test server (still works)
 http://localhost:9002
@@ -56,28 +56,24 @@ http://localhost:9002
 
 #### Health Check
 ```bash
-GET http://localhost:9002/api/v3/health
+GET https://api.ashortstayinhell.com:5562/api/shortcuts/health
 
 # Returns:
 {
   "status": "healthy",
-  "service": "LibraryOfBabel API v3.0",
-  "timestamp": "2025-07-10T04:00:00Z"
+  "namespace": "shortcuts",
+  "designed_by": "Dr. Elena Rodriguez (IAV)",
+  "optimized_for": ["iOS Shortcuts", "Data Jar", "Mobile Workflows"],
+  "philosophy": "Information architecture makes complex knowledge feel simple"
 }
 ```
 
-#### API Information
+#### Book Count
 ```bash
-GET http://localhost:9002/api/v3/info
+GET https://api.ashortstayinhell.com:5562/api/shortcuts/books/count?api_key=***REMOVED***
 
 # Returns:
-{
-  "service": "LibraryOfBabel API",
-  "version": "3.0",
-  "books": 360,
-  "total_words": 34236988,
-  "endpoints": ["/api/v3/health", "/api/v3/info", "/api/v3/lexi/chat", "/api/v3/ollama/chat", "/api/v3/search"]
-}
+2730
 ```
 
 ### 🔒 **Authenticated Endpoints (API Key Required)**
@@ -223,11 +219,12 @@ ps aux | grep -E "(production_api|test_api_endpoints)" | grep -v grep
 ## 📊 DATABASE & KNOWLEDGE BASE
 
 ### **Current Stats (Validated ✅)**
-- **Books**: 360 processed and indexed
-- **Total Words**: 34,236,988 searchable
-- **Chunks**: 10,514+ text segments
+- **Books**: 2,730 processed and indexed
+- **Total Chunks**: 79,054 searchable segments
+- **Unique Authors**: 2,152 authors
 - **Database**: PostgreSQL knowledge_base
-- **Processing Success**: 85%+ success rate
+- **API Type**: iOS Shortcuts API (mobile-first design)
+- **Designer**: Dr. Elena Rodriguez (IAV)
 
 ### **Sample Books in Database**
 - Being and Time - Martin Heidegger

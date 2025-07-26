@@ -1,25 +1,25 @@
-# 📚 LibraryOfBabel API Reference - UNIFIED
+# 📚 LibraryOfBabel API Reference - iOS Shortcuts API
 
-**🎉 IMPORTANT UPDATE: API has been consolidated!**
+**🎉 IMPORTANT UPDATE: API has been redesigned for mobile-first use!**
 
-This API has been **unified** - there is no longer a separation between v2 and v3 endpoints. All functionality is now available through a single, consolidated API.
+This API has been **redesigned** by Dr. Elena Rodriguez (IAV) for iOS Shortcuts, Data Jar, and mobile workflows. All functionality is now optimized for mobile use with single-value responses and simple arrays.
 
 **👉 For complete updated documentation, see: [API-Reference-Unified.md](API-Reference-Unified.md)**
 
 ## 🚨 Migration Notice
 
-- **Single endpoint**: All functionality now on port 5562
-- **No more v2/v3**: Unified API with backwards compatibility
-- **New features**: Fuzzy search, vector embeddings, in-book search
+- **iOS Shortcuts API**: All functionality now on `/api/shortcuts/` namespace
+- **Mobile-first design**: Optimized for iOS Shortcuts and Data Jar
+- **New features**: Serendipity features, creative inspiration, story starters
 - **Legacy support**: V3 format endpoints available for backwards compatibility
 
 ---
 
-This API provides authenticated access to 838 real books with advanced pagination, chunking, search capabilities, and new fuzzy search with vector embeddings.
+This API provides authenticated access to 2,730 real books with iOS Shortcuts optimization, serendipity features, and mobile workflows.
 
 ## 🌐 Production Endpoint
 
-**Base URL**: `https://api.example.com:5562`
+**Base URL**: `https://api.ashortstayinhell.com:5562/api/shortcuts/`
 
 ## 🔐 Authentication
 

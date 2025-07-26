@@ -62,8 +62,9 @@ logs/vector_optimization_*.log
 logs/vector_daemon_*.log
 scripts/optimization_status*.json
 
-# Archive directories (cleanup results)
+# Archive directories (cleanup results) - Protects organized archives
 archive/
+qa_fixes_report.json
 
 # === STANDARD DEVELOPMENT EXCLUDES ===
 # Python

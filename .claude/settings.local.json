@@ -86,7 +86,11 @@
       "Bash(pwdx:*)",
       "Bash(cat:*)",
       "Bash(pip3 list:*)",
-      "Bash(nslookup:*)"
+      "Bash(nslookup:*)",
+      "WebFetch(domain:localhost)",
+      "WebFetch(domain:localhost)",
+      "WebFetch(domain:localhost)",
+      "Bash(./start_daemon.sh:*)"
     ],
     "deny": []
   }
