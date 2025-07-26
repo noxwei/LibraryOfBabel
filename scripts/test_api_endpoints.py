@@ -22,16 +22,16 @@ def check_api_key():
     provided_key = request.headers.get('API-Key') or request.args.get('api_key')
     return provided_key == API_KEY
 
-@app.route('/api/v3/health')
+@app.route('/api/v4/health')
 def health():
     """Health check endpoint"""
     return jsonify({
         "status": "healthy",
-        "service": "LibraryOfBabel API v3.0",
+        "service": "LibraryOfBabel API v4.0 - Query Parameter Edition",
         "timestamp": "2025-07-10T04:00:00Z"
     })
 
-@app.route('/api/v3/info')
+@app.route('/api/v4/info')
 def info():
     """API info endpoint"""
     return jsonify({

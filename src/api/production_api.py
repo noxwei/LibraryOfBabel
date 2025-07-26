@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-LibraryOfBabel Production API v3.0
-==================================
+LibraryOfBabel Production API v4.0 - RESTful Query Parameter Edition
+==================================================================
 
-Simplified production-ready API for immediate deployment
-Consolidates core functionality without complex dependencies
+Modern REST API with query parameter navigation (no forward slash paths)
+Eliminated forward slash URL navigation per user feedback
+Optimized for iOS Shortcuts and mobile applications
 """
 
 from flask import Flask, request, jsonify, g, Response
@@ -35,15 +36,15 @@ sys.path.append(os.path.join(src_dir, 'agents'))
 from ollama_url_generator import OllamaUrlGeneratorAgent
 from ios_shortcuts_handler import IOSShortcutsHandler
 # from remote_mcp_server import mcp_blueprint  # Disabled for production
-from shortcuts_api import shortcuts_bp
+from shortcuts_api import shortcuts_v2_bp
 
 app = Flask(__name__)
 
 # Register MCP blueprint
 # app.register_blueprint(mcp_blueprint)  # Disabled for production
 
-# Register iOS Shortcuts blueprint
-app.register_blueprint(shortcuts_bp)
+# Register iOS Shortcuts blueprint v2.0
+app.register_blueprint(shortcuts_v2_bp)
 
 # Configure logging
 logging.basicConfig(
@@ -167,7 +168,7 @@ def after_request(response):
 # PUBLIC ENDPOINTS
 # ================================
 
-@app.route('/api/v3/info')
+@app.route('/api/v4/info')
 def api_info():
     """Public API information endpoint"""
     return jsonify({
@@ -185,17 +186,17 @@ def api_info():
                 'comprehensive_analytics'
             ],
             'endpoints': {
-                'public': ['/api/v3/info', '/api/v3/health'],
-                'secured': ['/api/v3/search', '/api/v3/books', '/api/v3/upload', '/api/v3/stats', '/api/v3/agents/feed'],
-                'lexi': ['/api/v3/lexi', '/api/v3/lexi/health'],
+                'public': ['/api/v4/info', '/api/v4/health'],
+                'secured': ['/api/v4/search', '/api/v4/books', '/api/v4/upload', '/api/v4/stats', '/api/v4/agents/feed'],
+                'lexi': ['/api/v4/lexi', '/api/v4/lexi/health'],
                 'note': 'All secured and Lexi endpoints require API key authentication'
             },
             'lexi': {
                 'name': 'Lexi',
                 'full_name': 'Lexi - LibraryOfBabel Official Mascot',
                 'personality': 'reddit_bibliophile_scholar',
-                'primary_endpoint': '/api/v3/lexi',
-                'health_endpoint': '/api/v3/lexi/health',
+                'primary_endpoint': '/api/v4/lexi',
+                'health_endpoint': '/api/v4/lexi/health',
                 'powered_by': 'Ollama Llama3 7B + RAG with 363 books',
                 'description': 'THE official LibraryOfBabel mascot - not just a mascot, but THE mascot'
             },
@@ -207,7 +208,7 @@ def api_info():
         'timestamp': datetime.now().isoformat()
     })
 
-@app.route('/api/v3/health')
+@app.route('/api/v4/health')
 def health_check():
     """Public health check endpoint"""
     health_status = {
@@ -239,9 +240,41 @@ def health_check():
 # BOOK SEARCH & NAVIGATION
 # ================================
 
-@app.route('/api/v3/books')
+@app.route('/api/v4/books')
 @require_auth
-def list_books():
+def books_endpoint():
+    """
+    Universal books endpoint with query parameters
+    Examples:
+    - /books?action=list (default: list all books)
+    - /books?id=288&action=details (get book details)
+    - /books?id=288&action=search&q=philosophy (search within book)
+    - /books?id=288&action=content&chapter=1 (get chapter content)
+    """
+    book_id = request.args.get('id', type=int)
+    action = request.args.get('action', 'list')
+    
+    if action == 'list':
+        return _list_books()
+    elif action == 'details' and book_id:
+        return _get_book_details(book_id)
+    elif action == 'search' and book_id:
+        return _search_within_book(book_id)
+    elif action == 'content' and book_id:
+        return _get_book_content(book_id)
+    else:
+        return jsonify({
+            'success': False, 
+            'error': 'Invalid action or missing required parameters',
+            'valid_actions': ['list', 'details', 'search', 'content'],
+            'required_params': {
+                'details': ['id'],
+                'search': ['id', 'q'],
+                'content': ['id']
+            }
+        }), 400
+
+def _list_books():
     """List all available books with metadata"""
     try:
         with get_db() as conn:
@@ -267,9 +300,7 @@ def list_books():
         logger.error(f"Error listing books: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/v3/books/<int:book_id>')
-@require_auth
-def get_book_details(book_id):
+def _get_book_details(book_id):
     """Get detailed information about a specific book"""
     try:
         with get_db() as conn:
@@ -307,9 +338,7 @@ def get_book_details(book_id):
         logger.error(f"Error getting book details: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/v3/books/<int:book_id>/search')
-@require_auth
-def search_within_book(book_id):
+def _search_within_book(book_id):
     """Search within a specific book with highlighting"""
     query = request.args.get('q', '').strip()
     if not query:
@@ -361,19 +390,138 @@ def search_within_book(book_id):
         logger.error(f"Error searching within book: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+def _get_book_content(book_id):
+    """Get book content by chapter or section"""
+    chapter = request.args.get('chapter', type=int)
+    section = request.args.get('section', type=int)
+    limit = min(int(request.args.get('limit', 50)), 200)
+    
+    try:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                # Get book info
+                cur.execute("SELECT title, author FROM books WHERE book_id = %s", (book_id,))
+                book = cur.fetchone()
+                
+                if not book:
+                    return jsonify({'success': False, 'error': 'Book not found'}), 404
+                
+                # Build query based on parameters
+                if chapter and section:
+                    cur.execute("""
+                        SELECT chunk_id, chapter_number, section_number, content, word_count, chunk_type
+                        FROM chunks 
+                        WHERE book_id = %s AND chapter_number = %s AND section_number = %s
+                        ORDER BY chunk_id
+                    """, (book_id, chapter, section))
+                elif chapter:
+                    cur.execute("""
+                        SELECT chunk_id, chapter_number, section_number, content, word_count, chunk_type
+                        FROM chunks 
+                        WHERE book_id = %s AND chapter_number = %s
+                        ORDER BY section_number, chunk_id
+                        LIMIT %s
+                    """, (book_id, chapter, limit))
+                else:
+                    cur.execute("""
+                        SELECT chunk_id, chapter_number, section_number, content, word_count, chunk_type
+                        FROM chunks 
+                        WHERE book_id = %s
+                        ORDER BY chapter_number, section_number, chunk_id
+                        LIMIT %s
+                    """, (book_id, limit))
+                
+                content = cur.fetchall()
+                
+                return jsonify({
+                    'success': True,
+                    'data': {
+                        'book': dict(book),
+                        'book_id': book_id,
+                        'content': [dict(chunk) for chunk in content],
+                        'total_chunks': len(content),
+                        'filters': {
+                            'chapter': chapter,
+                            'section': section,
+                            'limit': limit
+                        }
+                    }
+                })
+    except Exception as e:
+        logger.error(f"Error getting book content: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 # ================================
 # MULTI-TYPE SEARCH
 # ================================
 
-@app.route('/api/v3/search')
+@app.route('/api/v4/search')
 @require_auth
-def multi_search():
-    """Comprehensive multi-type search endpoint"""
+def search_endpoint():
+    """
+    Universal search endpoint with query parameters
+    Examples:
+    - /search?q=philosophy&type=content (default: content search)
+    - /search?q=Nietzsche&type=author (author search)
+    - /search?term=Democracy&action=count (search count)
+    - /search?q=artificial&type=cross_reference (cross-book search)
+    """
     query = request.args.get('q', '').strip()
+    term = request.args.get('term', '').strip()  # Alternative parameter name for iOS compatibility
+    search_term = query or term
+    
     search_type = request.args.get('type', 'content')  # content, author, title, cross_reference
+    action = request.args.get('action', 'search')  # search, count
     limit = min(int(request.args.get('limit', 20)), 100)
     
-    if not query:
+    if action == 'count':
+        return _search_count(search_term, search_type)
+    else:
+        return _multi_search(search_term, search_type, limit)
+
+def _search_count(search_term, search_type='content'):
+    """Get count of search results for iOS Shortcuts optimization"""
+    if not search_term:
+        return jsonify({'count': 0})
+    
+    try:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                if search_type == 'content':
+                    cur.execute("""
+                        SELECT COUNT(*) 
+                        FROM chunks c
+                        WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
+                    """, (search_term,))
+                elif search_type == 'author':
+                    cur.execute("""
+                        SELECT COUNT(DISTINCT book_id) 
+                        FROM books 
+                        WHERE LOWER(author) LIKE LOWER(%s)
+                    """, (f'%{search_term}%',))
+                elif search_type == 'title':
+                    cur.execute("""
+                        SELECT COUNT(DISTINCT book_id) 
+                        FROM books 
+                        WHERE to_tsvector('english', title) @@ plainto_tsquery('english', %s)
+                    """, (search_term,))
+                else:
+                    cur.execute("""
+                        SELECT COUNT(*) 
+                        FROM chunks c
+                        WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
+                    """, (search_term,))
+                
+                count = cur.fetchone()[0]
+                return jsonify({'count': count})
+    except Exception as e:
+        logger.error(f"Error getting search count: {e}")
+        return jsonify({'count': 0})
+
+def _multi_search(search_term, search_type, limit):
+    """Comprehensive multi-type search implementation"""
+    
+    if not search_term:
         return jsonify({'success': False, 'error': 'Query parameter required'}), 400
     
     try:
@@ -393,7 +541,7 @@ def multi_search():
                         WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
                         ORDER BY relevance DESC
                         LIMIT %s
-                    """, (query, query, limit))
+                    """, (search_term, search_term, limit))
                 
                 elif search_type == 'author':
                     # Author-based search
@@ -405,7 +553,7 @@ def multi_search():
                         WHERE LOWER(b.author) LIKE LOWER(%s)
                         ORDER BY b.title
                         LIMIT %s
-                    """, (f'%{query}%', limit))
+                    """, (f'%{search_term}%', limit))
                 
                 elif search_type == 'title':
                     # Title-based search
@@ -417,7 +565,7 @@ def multi_search():
                         WHERE to_tsvector('english', b.title) @@ plainto_tsquery('english', %s)
                         ORDER BY b.title
                         LIMIT %s
-                    """, (query, limit))
+                    """, (search_term, limit))
                 
                 elif search_type == 'cross_reference':
                     # Cross-book reference search
@@ -433,7 +581,7 @@ def multi_search():
                         WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
                         ORDER BY book_match_count DESC, relevance DESC
                         LIMIT %s
-                    """, (query, query, limit))
+                    """, (search_term, search_term, limit))
                 
                 else:
                     return jsonify({'success': False, 'error': f'Invalid search type: {search_type}'}), 400
@@ -447,7 +595,7 @@ def multi_search():
                         result_dict = dict(result)
                         if 'content' in result_dict:
                             result_dict['highlighted_content'] = _highlight_text(
-                                result['content'], query, 300
+                                result['content'], search_term, 300
                             )
                         highlighted_results.append(result_dict)
                     results = highlighted_results
@@ -457,7 +605,7 @@ def multi_search():
                 return jsonify({
                     'success': True,
                     'data': {
-                        'query': query,
+                        'query': search_term,
                         'search_type': search_type,
                         'results': results,
                         'total_results': len(results),
@@ -473,7 +621,7 @@ def multi_search():
 # OLLAMA LLAMA3 7B + iOS SHORTCUTS INTEGRATION
 # ================================
 
-@app.route('/api/v3/ollama/ios/chat', methods=['POST'])
+@app.route('/api/v4/ollama/ios/chat', methods=['POST'])
 @require_auth
 def ollama_ios_chat():
     """
@@ -526,12 +674,12 @@ def ollama_ios_chat():
         return jsonify(error_response), 500
 
 # Legacy iOS endpoint (kept for backwards compatibility)
-@app.route('/api/v3/ollama/ios/chat/legacy', methods=['POST'])
+@app.route('/api/v4/ollama/ios/chat/legacy', methods=['POST'])
 @require_auth
 def ollama_ios_chat_legacy():
     """
     Legacy iOS Shortcuts endpoint - kept for backwards compatibility
-    Use /api/v3/ollama/ios/chat for new implementations
+    Use /api/v4/ollama/ios/chat for new implementations
     """
     start_time = time.time()
     
@@ -603,7 +751,7 @@ def ollama_ios_chat_legacy():
                 'success': False,
                 'search_urls': [{
                     'strategy': 'fallback_keyword',
-                    'url': f"{request.host_url.rstrip('/')}/api/v3/search?q={user_query}&limit=10&api_key={API_KEY}",
+                    'url': f"{request.host_url.rstrip('/')}/api/v4/search?q={user_query}&limit=10&api_key={API_KEY}",
                     'description': f"Keyword search for: {user_query}",
                     'priority': 1
                 }],
@@ -795,7 +943,7 @@ def _suggest_next_actions(query, search_results):
 # STATISTICS & ANALYTICS
 # ================================
 
-@app.route('/api/v3/stats')
+@app.route('/api/v4/stats')
 @require_auth
 def get_statistics():
     """Comprehensive library statistics"""
@@ -850,7 +998,7 @@ def get_statistics():
         logger.error(f"Error getting statistics: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/v3/agents/feed', methods=['GET'])
+@app.route('/api/v4/agents/feed', methods=['GET'])
 @require_auth
 def get_agent_feed():
     """Get today's agent social media feed with book discoveries"""
@@ -1046,7 +1194,7 @@ def get_client_ip():
     # Fallback to remote address
     return request.remote_addr
 
-@app.route('/api/v3/location', methods=['GET'])
+@app.route('/api/v4/location', methods=['GET'])
 def get_visitor_location():
     """Get visitor location info (IP-based only, no permission required)"""
     try:
@@ -1078,7 +1226,7 @@ def get_visitor_location():
         logger.error(f"Error getting location: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/v3/regional-books', methods=['GET'])
+@app.route('/api/v4/regional-books', methods=['GET'])
 @require_auth  
 def get_regional_book_recommendations():
     """Get book recommendations based on visitor's location"""
@@ -1191,7 +1339,7 @@ def validate_epub_file(file_path):
     except Exception as e:
         return False, f"Validation error: {str(e)}"
 
-@app.route('/api/v3/upload', methods=['POST'])
+@app.route('/api/v4/upload', methods=['POST'])
 @require_auth
 def upload_epub():
     """Upload EPUB file for processing"""
@@ -1277,7 +1425,7 @@ except Exception as e:
     logger.error(f"❌ Failed to initialize Ollama agent: {e}")
     ollama_agent = None
 
-@app.route('/api/v3/ollama/query', methods=['POST'])
+@app.route('/api/v4/ollama/query', methods=['POST'])
 @require_auth
 def ollama_natural_language_query():
     """Natural language query via Ollama integration"""
@@ -1405,7 +1553,7 @@ def ollama_natural_language_query():
             'processing_time': processing_time
         }), 500
 
-@app.route('/api/v3/ollama/health', methods=['GET'])
+@app.route('/api/v4/ollama/health', methods=['GET'])
 @require_auth
 def ollama_health_check():
     """Check Ollama integration health"""
@@ -1449,7 +1597,7 @@ def ollama_health_check():
 # LEXI - THE OFFICIAL LIBRARYBABEL MASCOT
 # ================================
 
-@app.route('/api/v3/lexi', methods=['POST'])
+@app.route('/api/v4/lexi', methods=['POST'])
 @require_auth
 def lexi_chat():
     """
@@ -1551,7 +1699,7 @@ def lexi_chat():
                 'success': False,
                 'search_urls': [{
                     'strategy': 'lexi_fallback',
-                    'url': f"{request.host_url.rstrip('/')}/api/v3/search?q={user_query}&limit=8&api_key={API_KEY}",
+                    'url': f"{request.host_url.rstrip('/')}/api/v4/search?q={user_query}&limit=8&api_key={API_KEY}",
                     'description': f"Lexi's direct search for: {user_query}",
                     'priority': 1
                 }],
@@ -1715,7 +1863,7 @@ def lexi_chat():
             'error': 'Mascot temporarily unavailable',
             'mascot': 'lexi',
             'message': 'oops! something went wrong on my end. try again? 🤖',
-            'fallback_message': 'LibraryOfBabel search is still available at /api/v3/search',
+            'fallback_message': 'LibraryOfBabel search is still available at /api/v4/search',
             'timestamp': datetime.now().isoformat()
         }
         return Response(json.dumps(error_payload, ensure_ascii=False), status=500, mimetype='application/json')
@@ -1816,7 +1964,7 @@ def _suggest_lexi_actions(query, search_results):
     
     return suggestions
 
-@app.route('/api/v3/lexi/health', methods=['GET'])
+@app.route('/api/v4/lexi/health', methods=['GET'])
 @require_auth
 def lexi_health():
     """Health check for Lexi - THE official LibraryOfBabel mascot system"""
