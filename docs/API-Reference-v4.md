@@ -360,10 +360,6 @@ A: Check that you're using query parameters, not forward slashes:
 - ❌ `/books/288/summary`
 - ✅ `/books?id=288&action=summary`
 
-**Q: Missing API key error?**  
-A: Ensure API key is included:
-- ✅ `?api_key=***REMOVED***`
-
 **Q: Slow search responses?**  
 A: Database optimization in progress. Use specific searches when possible.
 
