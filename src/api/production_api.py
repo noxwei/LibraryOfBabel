@@ -2761,9 +2761,12 @@ if __name__ == '__main__':
     ssl_cert_path = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem'
     ssl_key_path = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/privkey.pem'
     
+    # Production server configuration for external access
+    # External IP: 73.161.54.75
+    # Port forwarding: 5562 -> 10.0.0.13:5562
     app.run(
-        host='0.0.0.0',
-        port=int(os.getenv('PORT', 5562)),
+        host='0.0.0.0',  # Bind to all interfaces for external access
+        port=int(os.getenv('PORT', 5562)),  # Port 5562 is forwarded externally
         debug=False,
         ssl_context=(ssl_cert_path, ssl_key_path)
     )

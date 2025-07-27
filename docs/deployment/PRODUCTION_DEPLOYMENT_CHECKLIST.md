@@ -16,18 +16,33 @@
 ## **Step 0: LOCAL TESTING (MANDATORY)**
 **⚠️ NEVER Deploy If Local Testing Not Completed ⚠️**
 
-- [ ] **Start local API** on port 5001: `python src/api/production_api.py` (ensure PORT=5001 in local env)
-- [ ] **Test all endpoints locally** - Verify basic functionality
-- [ ] **Run pagination test script**: `./curl_pagination_tests.sh` (modify for localhost:5001)
-- [ ] **Verify pagination works locally** - Confirm Page 1 ≠ Page 2 responses
-- [ ] **Test database connectivity** - Ensure all queries work
-- [ ] **Confirm 25/25 endpoints working locally** - All tests pass
-- [ ] **Check for any local errors** - Review console output for issues
-- [ ] **Verify authentication locally** - Test API key validation
-- [ ] **Test search functionality locally** - Ensure vector search works
+- [ ] **Start local API** on port 9002: `python3 scripts/test_api_endpoints.py`
+- [ ] **Test local endpoints**: `curl http://localhost:9002/api/v4/health`
+- [ ] **Verify 5000+ books loaded**: Check logs for "📚 Knowledge Base: 5000 books"
+- [ ] **Test API key auth**: `curl -H "API-Key: [TEST_API_KEY]" http://localhost:9002/api/v4/vector/search`
+- [ ] **Database connectivity**: Ensure PostgreSQL knowledge_base connected
+- [ ] **SSL certificate paths exist**: `/ssl/letsencrypt-config/live/api.ashortstayinhell.com/`
+- [ ] **Network configuration verified**: Mac Mini IP = 10.0.0.13 (static)
+- [ ] **Port forwarding confirmed**: Router forwarding 5562 → 10.0.0.13:5562
+- [ ] **Firewall allowlist**: Python added to macOS Application Firewall
 
 **LOCAL TESTING FAILURES = DEPLOYMENT BLOCKED**
 - ❌ Any endpoint failing locally
+- ❌ Wrong book count (not 5000+)
+- ❌ Database connection failures
+- ❌ Missing SSL certificates
+- ❌ Network configuration issues
+
+## **Step 0.5: NETWORK INFRASTRUCTURE CHECK**
+**⚠️ CRITICAL: Verify External Access Capability ⚠️**
+
+- [ ] **Mac Mini IP Static**: `ifconfig | grep "inet " | grep -v 127.0.0.1` shows 10.0.0.13
+- [ ] **External IP Confirmed**: `curl ifconfig.me` shows 73.161.54.75
+- [ ] **DNS A Record**: api.ashortstayinhell.com → 73.161.54.75
+- [ ] **Router Port Forward**: 5562 external → 10.0.0.13:5562 internal
+- [ ] **Firewall Allowlist**: Python permitted for incoming connections
+- [ ] **SSL Certificates Valid**: Not expired, correct domain
+- [ ] **Test External Access**: `curl http://73.161.54.75:5562` connects (may error but connects)
 - ❌ Pagination not working locally  
 - ❌ Database errors in local testing
 - ❌ Authentication issues locally
@@ -47,7 +62,7 @@
 
 ## **Step 3: Update Production Configuration**
 - [ ] Edit `/config/macos/com.librarybabel.api.plist`
-- [ ] Set correct production API key: `***REMOVED***`
+- [ ] Set correct production API key: `[REDACTED - babel_prod_*****]`
 - [ ] Ensure path points to: `/Users/weixiangzhang/Local_Dev/LibraryOfBabel/src/api/production_api.py`
 
 ## **Step 4: Deploy via macOS Launch Agent**
@@ -56,14 +71,14 @@
 - [ ] Start service: `launchctl load ~/Library/LaunchAgents/com.librarybabel.api.plist`
 
 ## **Step 5: Verify Deployment**
-- [ ] Test health endpoint: `curl -s "https://api.ashortstayinhell.com:5562/api/shortcuts/health?api_key=***REMOVED***"`
-- [ ] Test pagination: `curl -s "https://api.ashortstayinhell.com:5562/api/shortcuts/books/author-list?page=1&limit=5&api_key=***REMOVED***"`
+- [ ] Test health endpoint: `curl -s "https://api.ashortstayinhell.com:5562/api/shortcuts/health?api_key=[PROD_API_KEY]"`
+- [ ] Test pagination: `curl -s "https://api.ashortstayinhell.com:5562/api/shortcuts/books/author-list?page=1&limit=5&api_key=[PROD_API_KEY]"`
 - [ ] Verify timestamp shows recent deployment
 
 ## **Key Details**
 - **Production URL:** `https://api.ashortstayinhell.com:5562`
 - **Port:** 5562
-- **API Key:** `***REMOVED***`
+- **API Key:** `[REDACTED - babel_prod_*****]`
 - **Method:** Self-hosted via macOS Launch Agent
 - **No external services:** (No Render, Heroku, etc.)
 

@@ -20,6 +20,7 @@ Features:
 Team: Lexi (Lead Template Engineer) + Metadata Specialists + Narrative Architects
 """
 
+import os
 import requests
 import json
 import time
@@ -136,8 +137,8 @@ class LexiMetadataStoryEngine:
     
     def __init__(self, master_seed: int = None):
         self.config = {
-            "api_key": "babel_secure_3f99c2d1d294fbebdfc6b10cce93652d",
-            "base_url": "https://api.ashortstayinhell.com:5562"
+            "api_key": os.getenv("BABEL_API_KEY", "REDACTED_API_KEY"),
+            "base_url": os.getenv("BABEL_API_BASE_URL", "https://api.ashortstayinhell.com:5562")
         }
         
         self.seed_manager = SeedManager(master_seed)

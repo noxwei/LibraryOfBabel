@@ -17,6 +17,7 @@ This will be beautifully chaotic and probably hilariously trash! 😄
 Team: RAG Engineers + Chaos Storytellers + Ollama Whisperers
 """
 
+import os
 import requests
 import json
 import time
@@ -32,8 +33,8 @@ class RAGStoryWeaver:
     
     def __init__(self):
         self.babel_config = {
-            "api_key": "babel_secure_3f99c2d1d294fbebdfc6b10cce93652d",
-            "base_url": "https://api.ashortstayinhell.com:5562"
+            "api_key": os.getenv("BABEL_API_KEY", "REDACTED_API_KEY"),
+            "base_url": os.getenv("BABEL_API_BASE_URL", "https://api.ashortstayinhell.com:5562")
         }
         self.ollama_url = "http://localhost:11434"
         self.model = "llama3.2:3b"  # Available model

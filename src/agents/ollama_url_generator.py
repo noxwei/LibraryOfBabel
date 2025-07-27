@@ -5,7 +5,7 @@ Ollama URL Generator Agent - LibraryOfBabel Integration
 
 Revolutionary natural language to search URL conversion using Ollama.
 Transforms user queries like "Find books about AI consciousness" into 
-optimized LibraryOfBabel search URLs that access 360 books with 34+ million words.
+optimized LibraryOfBabel search URLs that access 5000+ books with 515+ million words.
 
 Team Development:
 - Architecture: Reddit Bibliophile (u/DataScientistBookworm)
@@ -21,6 +21,7 @@ import os
 import re
 import time
 import requests
+import psycopg2
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from urllib.parse import urlencode, quote_plus
@@ -57,11 +58,19 @@ class OllamaUrlGeneratorAgent:
         self.query_count = 0
         self.total_response_time = 0.0
         
-        # Knowledge base info (360 books, 34M+ words)
-        self.knowledge_base_info = {
-            'total_books': 360,
-            'total_words': 34236988,
-            'total_chunks': 10514,
+        # Get dynamic knowledge base info
+        self.knowledge_base_info = self._get_dynamic_stats()
+        
+        logger.info(f"📚 Knowledge Base: {self.knowledge_base_info['total_books']} books")
+        logger.info(f"📝 Total Words: {self.knowledge_base_info['total_words']:,}")
+        logger.info(f"🔗 Ollama: {self.ollama_endpoint}")
+        
+        # Fallback static info if DB unavailable
+        if not self.knowledge_base_info['total_books']:
+            self.knowledge_base_info = {
+                'total_books': 5000,
+                'total_words': 515952060,
+                'total_chunks': 10514,
             'domains': [
                 'philosophy', 'technology', 'social_theory', 'literature',
                 'science_fiction', 'politics', 'psychology', 'economics',
@@ -71,9 +80,46 @@ class OllamaUrlGeneratorAgent:
         }
         
         logger.info(f"🤖 Ollama URL Generator Agent initialized")
-        logger.info(f"📚 Knowledge Base: {self.knowledge_base_info['total_books']} books")
-        logger.info(f"📝 Total Words: {self.knowledge_base_info['total_words']:,}")
-        logger.info(f"🔗 Ollama: {self.ollama_endpoint}")
+    
+    def _get_dynamic_stats(self) -> Dict[str, Any]:
+        """Get real-time database statistics"""
+        try:
+            conn = psycopg2.connect(
+                host='localhost',
+                database='knowledge_base', 
+                user='weixiangzhang'
+            )
+            cur = conn.cursor()
+            
+            # Get book count
+            cur.execute('SELECT COUNT(*) FROM books')
+            book_count = cur.fetchone()[0]
+            
+            # Get word count  
+            cur.execute('SELECT SUM(word_count) FROM books WHERE word_count IS NOT NULL')
+            word_count = cur.fetchone()[0] or 0
+            
+            conn.close()
+            
+            return {
+                'total_books': book_count,
+                'total_words': word_count,
+                'total_chunks': 10514,  # Static for now
+                'domains': [
+                    'philosophy', 'technology', 'social_theory', 'literature',
+                    'science_fiction', 'politics', 'psychology', 'economics',
+                    'ethics', 'ai_consciousness', 'digital_surveillance', 
+                    'climate_change', 'social_justice', 'critical_race_theory'
+                ]
+            }
+        except Exception as e:
+            logger.warning(f"Failed to get dynamic stats: {e}")
+            return {
+                'total_books': 0,
+                'total_words': 0,
+                'total_chunks': 0,
+                'domains': []
+            }
     
     async def natural_language_to_url(self, user_query: str) -> Dict[str, Any]:
         """
@@ -157,7 +203,7 @@ class OllamaUrlGeneratorAgent:
         
         knowledge_domains = ", ".join(self.knowledge_base_info['domains'])
         
-        return f"""You are a search query analyzer for a digital library with 360 books containing 34+ million words.
+        return f"""You are a search query analyzer for a digital library with 5000+ books containing 515+ million words.
 
 Knowledge base domains: {knowledge_domains}
 

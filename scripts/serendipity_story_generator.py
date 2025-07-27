@@ -20,6 +20,7 @@ Features:
 Team: Literary Alchemists + Chaos Storytellers + Serendipity Engineers
 """
 
+import os
 import requests
 import json
 import time
@@ -37,8 +38,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Story Generation Configuration
 SERENDIPITY_CONFIG = {
-    "api_key": "babel_secure_3f99c2d1d294fbebdfc6b10cce93652d",
-    "base_url": "https://api.ashortstayinhell.com:5562",
+            "api_key": os.getenv("BABEL_API_KEY", "REDACTED_API_KEY"),
+    "base_url": os.getenv("BABEL_API_BASE_URL", "https://api.ashortstayinhell.com:5562"),
     "narrative_depth": "TRANSCENDENT",
     "serendipity_level": "MAXIMUM",
     "consciousness_weaving": True,

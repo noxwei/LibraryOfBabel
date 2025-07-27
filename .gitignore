@@ -103,9 +103,15 @@ api_key.txt
 # Production API keys (specific patterns)
 babel_prod_*
 babel_secure_*
+# Specific API key patterns that must be redacted in all files
+babel_secure_*
 *_api_key*
 production_api_key*
 *.api_key
+
+# API base URLs that should be redacted
+api.ashortstayinhell.com
+*ashortstayinhell*
 
 # Allow API key management code (no actual keys)
 !*api_key_rotation*
@@ -514,3 +520,7 @@ postgresql_functions_test_results.json
 *optimization_status*.json
 scripts/optimization_status.json
 scripts/vector_optimization_daemon.py
+.claude/settings.local.json
+api_v4_test_log.txt
+config/macos/com.librarybabel.api.plist
+*.plist

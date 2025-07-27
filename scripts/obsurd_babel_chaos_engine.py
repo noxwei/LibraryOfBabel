@@ -28,6 +28,7 @@ WARNING: This script may cause:
 Team: Mad Scientists + Chaos Engineers + Literary Alchemists
 """
 
+import os
 import requests
 import json
 import time
@@ -49,8 +50,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # 🎭 CHAOS CONFIGURATION
 CHAOS_CONFIG = {
-    "api_key": "babel_secure_3f99c2d1d294fbebdfc6b10cce93652d",
-    "base_url": "https://api.ashortstayinhell.com:5562",
+            "api_key": os.getenv("BABEL_API_KEY", "REDACTED_API_KEY"),
+    "base_url": os.getenv("BABEL_API_BASE_URL", "https://api.ashortstayinhell.com:5562"),
     "chaos_level": "MAXIMUM_OVERDRIVE",
     "reality_distortion": True,
     "quantum_entanglement": True,

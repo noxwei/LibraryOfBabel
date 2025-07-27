@@ -40,8 +40,8 @@ class APIConfig:
         """Create default configuration"""
         return {
             "api": {
-                "base_url": "https://api.ashortstayinhell.com:5562",
-                "api_key": "babel_secure_3f99c2d1d294fbebdfc6b10cce93652d",
+                "base_url": os.getenv("BABEL_API_BASE_URL", "https://api.ashortstayinhell.com:5562"),
+                "api_key": os.getenv("BABEL_API_KEY", "REDACTED_API_KEY"),
                 "rate_limit": 60,
                 "timeout": 30
             },

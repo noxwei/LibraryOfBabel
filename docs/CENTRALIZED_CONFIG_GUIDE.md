@@ -32,9 +32,33 @@ scripts/
 
 ## 🔑 Current API Configuration
 
-**API Key**: `babel_secure_3f99c2d1d294fbebdfc6b10cce93652d`  
-**Base URL**: `https://api.example.com:5562`  
+**API Key**: `$BABEL_API_KEY` (Environment Variable)  
+**Base URL**: `$BABEL_API_BASE_URL` (Environment Variable)  
 **Version**: Unified (consolidates former v2 + v3)
+
+---
+
+## 🔐 Environment Setup
+
+### Set Environment Variables
+```bash
+# Set the API key (replace with your actual API key)
+export BABEL_API_KEY="YOUR_API_KEY_HERE"
+
+# Set the base URL (replace with your actual API URL)
+export BABEL_API_BASE_URL="https://your-api-domain.com:5562"
+
+# For permanent setup, add to your shell profile
+echo 'export BABEL_API_KEY="YOUR_API_KEY_HERE"' >> ~/.zshrc
+echo 'export BABEL_API_BASE_URL="https://your-api-domain.com:5562"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+### Verify Environment Variables
+```bash
+echo "API Key: $BABEL_API_KEY"
+echo "Base URL: $BABEL_API_BASE_URL"
+```
 
 ---
 
@@ -149,8 +173,8 @@ The `config/api_settings.json` file contains:
 ```json
 {
   "api": {
-    "base_url": "https://api.example.com:5562",
-    "api_key": "babel_secure_3f99c2d1d294fbebdfc6b10cce93652d",
+    "base_url": "$BABEL_API_BASE_URL",
+    "api_key": "$BABEL_API_KEY",
     "rate_limit": 60,
     "timeout": 30
   },

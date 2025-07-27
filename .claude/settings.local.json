@@ -94,7 +94,11 @@
       "Bash(sudo lsof:*)",
       "Bash(tree:*)",
       "Bash(time:*)",
-      "Bash(/Library/Frameworks/Python.framework/Versions/3.11/bin/python3:*)"
+      "Bash(/Library/Frameworks/Python.framework/Versions/3.11/bin/python3:*)",
+      "Bash(# Update the TodoWrite for security completion\necho \"\"✅ SECURITY CLEANUP COMPLETED\"\"\necho \"\"\"\"\necho \"\"🔑 NEW API KEY: babel_prod_LdycMFKcAcjoRFvtm0Mc7HmZ8LCHRc0JiqCnu5TCyfE\"\"\necho \"\"🔒 OLD KEY: Invalidated and replaced\"\"\necho \"\"📝 Security notice created\"\"\necho \"\"\"\"\necho \"\"Next steps:\"\"\necho \"\"1. ✅ API key rotated and production updated\"\"  \necho \"\"2. ✅ Security notice documented\"\"\necho \"\"3. 🔄 Test API with new key\"\"\necho \"\"4. 🚀 Resume Phase 4 development\"\")",
+      "Bash(telnet:*)",
+      "WebFetch(domain:182b35035dfc.ngrok-free.app)",
+      "Bash(sudo pkill:*)"
     ],
     "deny": []
   }
