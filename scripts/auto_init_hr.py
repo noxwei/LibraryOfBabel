@@ -18,10 +18,16 @@ project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root / "agents" / "hr"))
 
 try:
-    from hr_agent import HRAgent
+    sys.path.append(str(project_root / ".agents" / "hr"))
+    from enhanced_hr_agent_with_autosave import EnhancedHRAgent as HRAgent
+    print("🚀 Loading enhanced HR agent with auto-save...")
 except ImportError:
-    print("⚠️  HR Agent not available - skipping auto-initialization")
-    sys.exit(0)
+    try:
+        from hr_agent import HRAgent
+        print("📋 Loading standard HR agent...")
+    except ImportError:
+        print("⚠️  HR Agent not available - skipping auto-initialization")
+        sys.exit(0)
 
 class HRAutoInitializer:
     """Automatic HR system initialization for new Claude Code sessions"""

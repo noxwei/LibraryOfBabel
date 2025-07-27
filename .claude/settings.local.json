@@ -90,7 +90,11 @@
       "WebFetch(domain:localhost)",
       "WebFetch(domain:localhost)",
       "WebFetch(domain:localhost)",
-      "Bash(./start_daemon.sh:*)"
+      "Bash(./start_daemon.sh:*)",
+      "Bash(sudo lsof:*)",
+      "Bash(tree:*)",
+      "Bash(time:*)",
+      "Bash(/Library/Frameworks/Python.framework/Versions/3.11/bin/python3:*)"
     ],
     "deny": []
   }
