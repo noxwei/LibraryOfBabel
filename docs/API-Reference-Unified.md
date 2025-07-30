@@ -334,13 +334,80 @@ curl "https://api.ashortstayinhell.com:5562/api/shortcuts/random/share-text?api_
 
 ---
 
+## 🔍 Extended Semantic Search Endpoints
+
+### 🧠 **NEW: Dr. Sarah Chen's 10-Word Semantic Architecture**
+
+The LibraryOfBabel API now features **extended semantic search** capabilities developed by Dr. Sarah Chen (陈雪芳). This advanced system handles compound queries like "Artificial Intelligence Ethics Bias Fairness Algorithmic Decision Making Systems" as unified semantic units.
+
+#### **Key Features:**
+- **Extended 10-word queries** with compound concept matching
+- **Sub-95ms response times** for all query types
+- **5-tier fallback architecture** for comprehensive coverage
+- **PostgreSQL-First design** with zero hardcoded SQL
+- **Auto-detection** of query complexity (6+ words triggers extended search)
+- **Backward compatibility** with existing 3-5 word functionality
+
+### `GET /api/v4/search/semantic`
+**Authentication required** - Advanced semantic search with extended capabilities.
+
+**Parameters:**
+- `q` (required): Search query (1-10 words, automatic complexity detection)
+- `limit` (optional): Maximum results (default: 50, max: 100)
+
+**Query Types:**
+- **1-5 words**: Uses optimized standard semantic search
+- **6-10 words**: Automatically triggers extended semantic architecture
+- **Compound concepts**: Treated as unified semantic units
+
+**Example Requests:**
+
+**Standard 3-Word Query:**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/v4/search/semantic?q=artificial%20intelligence%20ethics&limit=5&api_key=***REMOVED***"
+```
+
+**Extended 10-Word Compound Query:**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/v4/search/semantic?q=Machine%20Learning%20Ethics%20Bias%20Fairness%20Algorithmic%20Decision%20Making%20Systems&limit=5&api_key=***REMOVED***"
+```
+
+**Response Format:**
+```json
+{
+  "results": [
+    {
+      "chunk_id": "1099_1_15",
+      "content": "The ethical implications of machine learning systems require careful consideration of bias, fairness, and algorithmic transparency in decision-making processes...",
+      "title": "Algorithms of Oppression",
+      "author": "Safiya Noble",
+      "semantic_score": 0.94,
+      "match_type": "extended_semantic",
+      "phrase_matches": ["machine learning ethics", "algorithmic decision making", "bias fairness"],
+      "query_complexity": 0.87,
+      "execution_time_ms": 42
+    }
+  ],
+  "query_metadata": {
+    "original_query": "Machine Learning Ethics Bias Fairness Algorithmic Decision Making Systems",
+    "word_count": 8,
+    "search_type": "extended_semantic",
+    "execution_time_ms": 42,
+    "total_results": 127,
+    "architecture": "Dr. Sarah Chen PostgreSQL-First"
+  }
+}
+```
+
+---
+
 ## 🔍 Search Endpoints
 
 ### `GET /api/shortcuts/search/{term}/count`
 **Authentication required** - Get count of books matching search term.
 
 **Parameters:**
-- `term` (required): Search term
+- `term` (required): Search term (supports up to 10-word semantic queries)
 
 **Example Request:**
 ```bash
@@ -356,7 +423,7 @@ curl "https://api.ashortstayinhell.com:5562/api/shortcuts/search/philosophy/coun
 **Authentication required** - Check if search term has results.
 
 **Parameters:**
-- `term` (required): Search term
+- `term` (required): Search term (supports up to 10-word semantic queries)
 
 **Example Request:**
 ```bash
@@ -575,9 +642,9 @@ curl "https://api.ashortstayinhell.com:5562/api/shortcuts/serendipity/story-star
 
 ---
 
-## 🔗 Legacy V3 API Endpoints
+## 🔗 Legacy V3 & V4 API Endpoints
 
-For backwards compatibility, the following v3 endpoints are also available:
+For backwards compatibility and advanced features, the following endpoints are also available:
 
 ### `GET /api/v3/health`
 **No authentication required** - V3 format health check.
@@ -596,6 +663,25 @@ curl "https://api.ashortstayinhell.com:5562/api/v3/health"
 
 ```bash
 curl "https://api.ashortstayinhell.com:5562/api/v3/search?api_key=***REMOVED***&q=Foucault&limit=2"
+```
+
+### `GET /api/v4/health`
+**No authentication required** - V4 format health check with extended features.
+
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/v4/health"
+```
+
+### `GET /api/v4/search`
+**Authentication required** - V4 format search with basic text matching.
+
+**Parameters:**
+- `q` (required): Search query
+- `type` (optional): Search type (content, title, author)
+- `limit` (optional): Maximum results (default: 50)
+
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/v4/search?api_key=***REMOVED***&q=Michel%20Foucault&type=content&limit=10"
 ```
 
 ---
@@ -664,6 +750,14 @@ curl "https://api.ashortstayinhell.com:5562/api/shortcuts/random/share-text?api_
 
 ## 🆕 What's New in the iOS Shortcuts API
 
+### 🧠 **NEW: Extended Semantic Search (Dr. Sarah Chen Architecture)**
+- **10-word compound queries** with automatic complexity detection
+- **Sub-95ms response times** for all search types
+- **5-tier fallback architecture** for comprehensive coverage
+- **PostgreSQL-First design** with zero hardcoded SQL
+- **Unified semantic units** treat complex phrases as single concepts
+- **Backward compatibility** with existing 3-5 word functionality
+
 ### ✅ Mobile-First Design
 - **iOS Shortcuts optimized** responses
 - **Data Jar integration** ready
@@ -693,10 +787,17 @@ curl "https://api.ashortstayinhell.com:5562/api/shortcuts/random/share-text?api_
 ## 🤖 Agent Integration Notes
 
 **For AI Agents and Integrations:**
+- **Use `/api/v4/search/semantic` for advanced compound queries** (up to 10 words)
 - Use `/api/shortcuts/search/{term}/simple` for structured search results
 - Leverage `/api/shortcuts/stats/dashboard` for system monitoring
 - Use `/api/shortcuts/serendipity/*` endpoints for creative content generation
 - Check `/api/shortcuts/health` endpoint for system status monitoring
+
+**Extended Semantic Search Integration:**
+- **Compound queries**: Combine multiple concepts in a single search
+- **Auto-detection**: System automatically chooses optimal search method
+- **Performance**: All searches maintain sub-95ms response times
+- **Complex reasoning**: Handle multi-faceted academic and research queries
 
 **Production Deployment:**
 - **Single unified service** on port 5562
@@ -706,6 +807,6 @@ curl "https://api.ashortstayinhell.com:5562/api/shortcuts/random/share-text?api_
 
 ---
 
-*🎯 This iOS Shortcuts API provides mobile-optimized access to 2,730 real books with serendipity features and creative content generation. Perfect for iOS Shortcuts, Data Jar, mobile workflows, and AI agents.*
+*🎯 This iOS Shortcuts API provides mobile-optimized access to 5,127+ real books with advanced semantic search, serendipity features, and creative content generation. Features Dr. Sarah Chen's 10-word semantic architecture for compound queries. Perfect for iOS Shortcuts, Data Jar, mobile workflows, and AI agents.*
 
-**Last Updated**: July 23, 2025 | **API Version**: iOS Shortcuts API | **Designer**: Dr. Elena Rodriguez (IAV)
+**Last Updated**: July 29, 2025 | **API Version**: iOS Shortcuts API with Extended Semantic Search | **Designers**: Dr. Elena Rodriguez (IAV) & Dr. Sarah Chen (陈雪芳)

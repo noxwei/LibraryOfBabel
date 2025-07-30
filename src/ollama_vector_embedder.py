@@ -67,6 +67,10 @@ class OllamaVectorEmbedder:
             "granite-embedding:278m": {"dimension": 768, "max_length": 8192, "description": "IBM Granite embedding model (278M parameters)"}
         }
         
+        # Setup logging first
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger("OllamaVectorEmbedder")
+        
         # Set embedding model (validate against available models)
         if embedding_model in self.available_models:
             self.embedding_model = embedding_model
@@ -93,9 +97,6 @@ class OllamaVectorEmbedder:
             'chunks_processed': 0
         }
         
-        # Setup logging
-        logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger("OllamaVectorEmbedder")
         
         # Team signature
         self.team_signature = "OLLAMA_VECTOR_TEAM_v1.0"

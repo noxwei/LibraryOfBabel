@@ -1,0 +1,56 @@
+{
+  "timestamp": "2025-07-30T03:26:04.233690",
+  "removed_books": [
+    {
+      "id": 7,
+      "title": "Feeling Seen Reconnecting in a Disconnected World",
+      "reason": "Unknown author",
+      "metadata": "Title               : Feeling Seen Reconnecting in a Disconnected World\nTitle sort          : Feeling Seen Reconnecting in a Disconnected World\nAuthor(s)           : Unknown\nTimestamp           : 2024-11-14T02:28:09+00:00\nPublished           : 0101-01-01T00:00:00+00:00"
+    },
+    {
+      "id": 9,
+      "title": "Maame by Jessica George",
+      "reason": "Unknown author",
+      "metadata": "Title               : Maame by Jessica George\nTitle sort          : Maame by Jessica George\nAuthor(s)           : Unknown\nTimestamp           : 2024-11-14T02:28:34+00:00\nPublished           : 0101-01-01T00:00:00+00:00"
+    },
+    {
+      "id": 218,
+      "title": "Jacques the Fatalist",
+      "reason": "Unknown author",
+      "metadata": "Title               : Jacques the Fatalist\nTitle sort          : Jacques the Fatalist\nAuthor(s)           : Unknown\nTags                : By Denis Diderot\nLanguages           : eng\nTimestamp           : 2025-07-30T04:53:46+00:00\nPublished           : 0101-01-01T00:00:00+00:00\nIdentifiers         : isbn:2940015990065"
+    },
+    {
+      "id": 455,
+      "title": "1915-something fresh",
+      "reason": "Unknown author",
+      "metadata": "Title               : 1915-something fresh\nTitle sort          : 1915-something fresh\nAuthor(s)           : Unknown\nLanguages           : eng\nTimestamp           : 2025-07-30T05:19:23+00:00\nPublished           : 0101-01-01T00:00:00+00:00"
+    },
+    {
+      "id": 456,
+      "title": "1933-heavy weather",
+      "reason": "Unknown author",
+      "metadata": "Title               : 1933-heavy weather\nTitle sort          : 1933-heavy weather\nAuthor(s)           : Unknown\nLanguages           : eng\nTimestamp           : 2025-07-30T05:19:24+00:00\nPublished           : 0101-01-01T00:00:00+00:00"
+    },
+    {
+      "id": 1097,
+      "title": "A Scanner Darkly Script",
+      "reason": "Unknown author",
+      "metadata": "Title               : A Scanner Darkly Script\nTitle sort          : Scanner Darkly Script, A\nAuthor(s)           : Unknown Author [Author, Unknown]\nLanguages           : eng\nTimestamp           : 2025-07-30T06:37:43+00:00\nPublished           : 0101-01-01T00:00:00+00:00"
+    },
+    {
+      "id": 1424,
+      "title": "Orientalism",
+      "reason": "Unknown author",
+      "metadata": "Title               : Orientalism\nTitle sort          : Orientalism\nAuthor(s)           : Unknown Author [Author, Unknown]\nLanguages           : eng\nTimestamp           : 2025-07-30T06:47:09+00:00\nPublished           : 2014-08-31T04:00:00+00:00"
+    },
+    {
+      "id": 1452,
+      "title": "The Secret Destiny of America by Manly Palmer Hall",
+      "reason": "Unknown author",
+      "metadata": "Title               : The Secret Destiny of America by Manly Palmer Hall\nTitle sort          : Secret Destiny of America by Manly Palmer Hall, The\nAuthor(s)           : Unknown Author [Author, Unknown]\nLanguages           : eng\nTimestamp           : 2025-07-30T06:47:55+00:00\nPublished           : 0101-01-01T00:00:00+00:00"
+    }
+  ],
+  "failed_removals": [],
+  "total_removed": 8,
+  "errors": []
+}

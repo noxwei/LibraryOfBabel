@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-07-30T19:15:20.683774",
+  "stats": {
+    "import_start_time": "2025-07-30T19:02:39.473416",
+    "total_books_to_import": 3513,
+    "books_imported": 600,
+    "import_errors": 0,
+    "batches_completed": 24,
+    "current_batch": 24,
+    "estimated_completion": null
+  },
+  "runtime_minutes": 12.686839266666668
+}

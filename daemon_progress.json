@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-07-30T03:11:53.033829",
+  "enhanced_books": 2309,
+  "total_books": 2664,
+  "progress_percent": 86.67417417417418,
+  "books_processed_this_session": 0,
+  "successful_this_session": 0,
+  "failed_this_session": 0,
+  "books_per_hour": 0,
+  "estimated_remaining_hours": 0,
+  "runtime_hours": 1.5319775266666669
+}

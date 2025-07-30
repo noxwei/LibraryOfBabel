@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-07-30T12:24:12.342205",
+  "stats": {
+    "daemon_start_time": "2025-07-30T11:48:58.167443",
+    "total_calibre_books_found": 2236,
+    "linkages_created": 1010,
+    "linkages_updated": 2,
+    "processing_errors": 1112,
+    "batches_completed": 112,
+    "last_batch_time": "2025-07-30T12:24:12.341738"
+  },
+  "runtime_minutes": 35.236246066666666
+}
