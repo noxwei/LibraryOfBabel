@@ -397,6 +397,14 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 
+# === HIDDEN FILES & FOLDERS (COMPREHENSIVE) ===
+# All hidden files and directories (starts with .)
+.*
+!.gitignore
+!.github/
+!.gitkeep
+!.env.example
+
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -405,6 +413,21 @@ __pycache__/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# macOS specific hidden files
+.fseventsd/
+.TemporaryItems/
+.DocumentRevisions-V100/
+.PKInstallSandboxManager/
+.PKInstallSandboxManager-SystemSoftware/
+
+# Windows hidden files
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux hidden files
+.directory
+.Trash-*/
 
 # IDE and editor files
 .vscode/
@@ -524,3 +547,78 @@ scripts/vector_optimization_daemon.py
 api_v4_test_log.txt
 config/macos/com.librarybabel.api.plist
 *.plist
+
+# === ARCHIVE DIRECTORIES (Cleanup 2025-07-30) ===
+# Archived redundant agents, old scripts, and cleaned files
+archive/agents_redundant_20250730/
+archive/scripts_deprecated_20250730/
+archive/logs_old_20250730/
+archive/root_cleanup_20250730/
+archive/scripts_old_20250730/
+
+# === SECURITY: Files with exposed API keys ===
+# Documentation files containing real API keys
+CALIBRE_DAEMON_GUIDE.md
+*DAEMON_GUIDE*.md
+
+# === SECURITY: Files with hardcoded database passwords ===
+# Test and verification scripts with hardcoded credentials
+verify_downloads_simple.py
+verify_downloads_processed.py
+quick_endpoint_test.py
+test_new_endpoints.py
+test_download_endpoints.py
+unified_calibre_migration_pipeline.py
+*test*endpoint*.py
+*verify_downloads*.py
+
+# === CRITICAL SECURITY: Files with exposed API keys ===
+# Configuration files with actual API keys
+.claude/
+config/macos/com.librarybabel.api.plist
+.env.readonly
+.env*
+
+# Log files with API keys in URLs
+temp_cleanup/
+archive/
+logs/
+**/logs/
+*.log
+*api*.log
+
+# All cleanup directories (contain logs with keys)
+temp_cleanup/
+*_cleanup/
+
+# === SECURITY - Files with API keys ===
+# (Covered above in CRITICAL SECURITY section)
+scripts/endpoint_qa_instructions.md
+docs/endpoint_qa_instructions.md
+scripts/performance_benchmark.py
+docs/test_results_*.json
+scripts/test_*endpoints*.py
+backups/calibre_cleanup_20250730_032135/current_books_list.txt
+backups/calibre_cleanup_20250730_032135/library_structure_before.txt
+*.pgdump
+calibre_cleanup_log_20250730_032508.json
+CLAUDE.local.md
+.claude/settings.local.json
+/.claude
+/config/macos
+/config
+/config/macos
+/config
+*.db-shm
+/database
+docs/CHATGPT_CUSTOM_ACTIONS_SCHEMA.md
+docs/PHONETIC_SEARCH_API_GUIDE.md
+/temp_cleanup
+docs/10_Word_Semantic_Architecture_Implementation_Guide.md
+daemons/calibre_checkpoint_100.json
+daemons/calibre_checkpoint_200.json
+daemons/calibre_checkpoint_300.json
+daemons/calibre_checkpoint_400.json
+daemons/calibre_checkpoint_500.json
+calibre_batch_import_progress.json
+calibre_batch_import_progress.json

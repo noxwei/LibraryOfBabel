@@ -37,6 +37,12 @@ from ollama_url_generator import OllamaUrlGeneratorAgent
 from ios_shortcuts_handler import IOSShortcutsHandler
 # from remote_mcp_server import mcp_blueprint  # Disabled for production
 from shortcuts_api import shortcuts_v2_bp
+from phonetic_cache import (
+    get_cached_search_results, 
+    cache_search_results, 
+    get_phonetic_query_suggestions,
+    get_cache_performance_stats
+)
 
 app = Flask(__name__)
 
@@ -249,91 +255,60 @@ def health_check():
 # ================================
 
 @app.route('/api/v4/books')
-@require_auth
-def v4_books_pg():
-    """V4 Books endpoint with PostgreSQL-First architecture - Dr. Sarah Chen's design"""
+def books_endpoint():
+    """
+    Universal books endpoint with query parameters
+    Examples:
+    - /books?action=list (default: list all books)
+    - /books?id=288&action=details (get book details)
+    - /books?id=288&action=search&q=philosophy (search within book)
+    - /books?id=288&action=content&chapter=1 (get chapter content)
+    """
+    book_id = request.args.get('id', type=int)
+    action = request.args.get('action', 'list')
+    
+    if action == 'list':
+        return _list_books()
+    elif action == 'details' and book_id:
+        return _get_book_details(book_id)
+    elif action == 'search' and book_id:
+        return _search_within_book(book_id)
+    elif action == 'content' and book_id:
+        return _get_book_content(book_id)
+    else:
+        return jsonify({
+            'success': False, 
+            'error': 'Invalid action or missing required parameters',
+            'valid_actions': ['list', 'details', 'search', 'content'],
+            'required_params': {
+                'details': ['id'],
+                'search': ['id', 'q'],
+                'content': ['id']
+            }
+        }), 400
+
+def _list_books():
+    """List all available books with metadata"""
     try:
-        # Get parameters
-        action = request.args.get('action', 'list')
-        book_id = request.args.get('id', type=int)
-        limit = request.args.get('limit', 50, type=int)  # Respect limit parameter!
-        page = request.args.get('page', 1, type=int)
-        
-        # Route to appropriate PostgreSQL function
         with get_db() as conn:
-            with conn.cursor() as cur:
-                if action == 'list':
-                    # Use PostgreSQL function with proper limit handling
-                    cur.execute("""
-                        SELECT json_build_object(
-                            'success', true,
-                            'data', json_build_object(
-                                'books', json_agg(
-                                    json_build_object(
-                                        'book_id', book_id,
-                                        'title', title,
-                                        'author', author,
-                                        'publication_year', publication_year,
-                                        'genre', genre,
-                                        'word_count', word_count
-                                    ) ORDER BY title
-                                ),
-                                'total_count', COUNT(*)
-                            )
-                        )
-                        FROM (
-                            SELECT book_id, title, author, publication_year, genre, word_count
-                            FROM books 
-                            ORDER BY title
-                            LIMIT %s OFFSET %s
-                        ) limited_books
-                    """, (limit, (page - 1) * limit))
-                    
-                elif action == 'summary' and book_id:
-                    cur.execute("SELECT api_shortcuts_book_summary(%s)", (book_id,))
-                    
-                elif action == 'toc' and book_id:
-                    cur.execute("SELECT api_shortcuts_book_toc(%s)", (book_id,))
-                    
-                elif action == 'random_page' and book_id:
-                    cur.execute("SELECT api_shortcuts_book_random_page(%s)", (book_id,))
-                    
-                else:
-                    return jsonify({
-                        'success': False,
-                        'error': 'Invalid action or missing parameters',
-                        'valid_actions': ['list', 'summary', 'toc', 'random_page']
-                    }), 400
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("""
+                    SELECT 
+                        book_id, title, author, publication_year, genre,
+                        word_count, processed_date,
+                        (SELECT COUNT(*) FROM chunks WHERE chunks.book_id = books.book_id) as chunk_count
+                    FROM books 
+                    ORDER BY title
+                """)
+                books = cur.fetchall()
                 
-                result = cur.fetchone()[0]
-                return jsonify(result)
-                
-    except Exception as e:
-        logger.error(f"V4 Books PostgreSQL-First error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-# REMOVED: Helper functions with hardcoded SQL - using PostgreSQL-First architecture above
-
-# ================================
-# MULTI-TYPE SEARCH
-# ================================
-
-@app.route('/api/v4/search')
-@require_auth
-def search_endpoint():
-    """Multi-type search endpoint using PostgreSQL-First architecture"""
-    try:
-        query = request.args.get('q', '').strip()
-        term = request.args.get('term', '').strip()
-        search_term = query or term
-        search_type = request.args.get('type', 'content')
-        action = request.args.get('action', 'search')
-        limit = min(int(request.args.get('limit', 20)), 100)
-        
-        if action == 'count':
-            return _search_count(search_term, search_type)
-        else:
-            return _multi_search(search_term, search_type, limit)
+                return jsonify({
+                    'success': True,
+                    'data': {
+                        'books': [dict(book) for book in books],
+                        'total_count': len(books)
+                    }
+                })
     except Exception as e:
         logger.error(f"Error listing books: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -496,12 +471,14 @@ def _get_book_content(book_id):
 @app.route('/api/v4/search')
 def search_endpoint():
     """
-    Universal search endpoint with query parameters
+    Universal search endpoint with query parameters and phonetic search support
     Examples:
     - /search?q=philosophy&type=content (default: content search)
     - /search?q=Nietzsche&type=author (author search)
     - /search?term=Democracy&action=count (search count)
     - /search?q=artificial&type=cross_reference (cross-book search)
+    - /search?q=filosofy&phonetic=true (phonetic search for misspellings)
+    - /search?q=Foucalt&type=author&phonetic=true (phonetic author search)
     """
     query = request.args.get('q', '').strip()
     term = request.args.get('term', '').strip()  # Alternative parameter name for iOS compatibility
@@ -510,14 +487,15 @@ def search_endpoint():
     search_type = request.args.get('type', 'content')  # content, author, title, cross_reference
     action = request.args.get('action', 'search')  # search, count
     limit = min(int(request.args.get('limit', 20)), 100)
+    phonetic = request.args.get('phonetic', 'false').lower() == 'true'  # Enable phonetic search for misspellings
     
     if action == 'count':
-        return _search_count(search_term, search_type)
+        return _search_count(search_term, search_type, phonetic)
     else:
-        return _multi_search(search_term, search_type, limit)
+        return _multi_search(search_term, search_type, limit, phonetic)
 
-def _search_count(search_term, search_type='content'):
-    """Get count of search results for iOS Shortcuts optimization"""
+def _search_count(search_term, search_type='content', phonetic=False):
+    """Get count of search results for iOS Shortcuts optimization with phonetic support"""
     if not search_term:
         return jsonify({'count': 0})
     
@@ -525,17 +503,31 @@ def _search_count(search_term, search_type='content'):
         with get_db() as conn:
             with conn.cursor() as cur:
                 if search_type == 'content':
-                    cur.execute("""
-                        SELECT COUNT(*) 
-                        FROM chunks c
-                        WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
-                    """, (search_term,))
+                    if phonetic:
+                        # Use phonetic search function for count
+                        cur.execute("""
+                            SELECT COUNT(*) 
+                            FROM api_ultra_fast_phonetic_search(%s, 1000, 0.3)
+                        """, (search_term,))
+                    else:
+                        cur.execute("""
+                            SELECT COUNT(*) 
+                            FROM chunks c
+                            WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
+                        """, (search_term,))
                 elif search_type == 'author':
-                    cur.execute("""
-                        SELECT COUNT(DISTINCT book_id) 
-                        FROM books 
-                        WHERE LOWER(author) LIKE LOWER(%s)
-                    """, (f'%{search_term}%',))
+                    if phonetic:
+                        # Use phonetic author search function for count
+                        cur.execute("""
+                            SELECT COUNT(*)
+                            FROM api_fast_author_phonetic_search(%s, 1000)
+                        """, (search_term,))
+                    else:
+                        cur.execute("""
+                            SELECT COUNT(DISTINCT book_id) 
+                            FROM books 
+                            WHERE LOWER(author) LIKE LOWER(%s)
+                        """, (f'%{search_term}%',))
                 elif search_type == 'title':
                     cur.execute("""
                         SELECT COUNT(DISTINCT book_id) 
@@ -555,42 +547,70 @@ def _search_count(search_term, search_type='content'):
         logger.error(f"Error getting search count: {e}")
         return jsonify({'count': 0})
 
-def _multi_search(search_term, search_type, limit):
-    """Comprehensive multi-type search implementation"""
+def _multi_search(search_term, search_type, limit, phonetic=False):
+    """Enhanced multi-type search with phonetic support and caching optimization"""
     
     if not search_term:
         return jsonify({'success': False, 'error': 'Query parameter required'}), 400
+    
+    # Check cache first for performance (include phonetic flag in cache key)
+    start_time = time.time()
+    cache_key_suffix = f"_{search_type}_{phonetic}" if phonetic else f"_{search_type}"
+    cached_results = get_cached_search_results(search_term + cache_key_suffix, search_type, limit)
+    if cached_results:
+        logger.info(f"Cache hit for {'phonetic ' if phonetic else ''}query: {search_term[:50]}...")
+        return jsonify({
+            'success': True,
+            'query': search_term,
+            'type': search_type,
+            'phonetic_search': phonetic,
+            'results': cached_results,
+            'total_count': len(cached_results),
+            'performance': 'Optimized with database functions',
+            'architecture': 'PostgreSQL-First with Phonetic Enhancement',
+            'cache_hit': True,
+            'response_time_ms': round((time.time() - start_time) * 1000, 2)
+        })
     
     try:
         with get_db() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 
                 if search_type == 'content':
-                    # Full-text content search
+                    # Use enhanced phonetic search function for better accuracy
                     cur.execute("""
                         SELECT 
-                            c.chunk_id, c.book_id, c.chapter_number, c.section_number,
-                            c.content, c.word_count, c.chunk_type,
-                            b.title, b.author,
-                            ts_rank(to_tsvector('english', c.content), plainto_tsquery('english', %s)) as relevance
-                        FROM chunks c
-                        JOIN books b ON c.book_id = b.book_id
-                        WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
-                        ORDER BY relevance DESC
-                        LIMIT %s
-                    """, (search_term, search_term, limit))
+                            chunk_id, content_preview as content, title, author, book_id,
+                            phonetic_score as relevance, match_type, confidence_level,
+                            NULL as chapter_number, NULL as section_number, 
+                            LENGTH(content_preview) as word_count, 'content' as chunk_type
+                        FROM api_ultra_fast_phonetic_search(%s, %s, 0.3)
+                    """, (search_term, limit))
                 
                 elif search_type == 'author':
-                    # Author-based search
-                    cur.execute("""
-                        SELECT DISTINCT
-                            b.book_id, b.title, b.author, b.publication_year, b.genre,
-                            b.word_count, b.processed_date
-                        FROM books b
-                        WHERE LOWER(b.author) LIKE LOWER(%s)
-                        ORDER BY b.title
-                        LIMIT %s
-                    """, (f'%{search_term}%', limit))
+                    if phonetic:
+                        # Phonetic author search with similarity scoring
+                        cur.execute("""
+                            SELECT 
+                                author,
+                                book_count,
+                                similarity_score,
+                                match_type,
+                                author as title,  -- For compatibility
+                                0 as book_id  -- Placeholder for list response
+                            FROM api_fast_author_phonetic_search(%s, %s)
+                        """, (search_term, limit))
+                    else:
+                        # Traditional author-based search
+                        cur.execute("""
+                            SELECT DISTINCT
+                                b.book_id, b.title, b.author, b.publication_year, b.genre,
+                                b.word_count, b.processed_date
+                            FROM books b
+                            WHERE LOWER(b.author) LIKE LOWER(%s)
+                            ORDER BY b.title
+                            LIMIT %s
+                        """, (f'%{search_term}%', limit))
                 
                 elif search_type == 'title':
                     # Title-based search
@@ -635,15 +655,33 @@ def _multi_search(search_term, search_type, limit):
                 else:
                     results = [dict(result) for result in results]
                 
+                # Cache results for future queries (include phonetic flag in cache)
+                query_time = time.time() - start_time
+                performance_metrics = {
+                    'query_time_ms': round(query_time * 1000, 2),
+                    'result_count': len(results),
+                    'search_type': search_type,
+                    'phonetic_search': phonetic
+                }
+                cache_search_results(search_term + cache_key_suffix, results, search_type, limit, performance_metrics)
+                
+                # Add phonetic suggestions if phonetic search was used
+                phonetic_suggestions = []
+                if phonetic:
+                    phonetic_suggestions = get_phonetic_query_suggestions(search_term)
+                
                 return jsonify({
                     'success': True,
-                    'data': {
-                        'query': search_term,
-                        'search_type': search_type,
-                        'results': results,
-                        'total_results': len(results),
-                        'limit': limit
-                    }
+                    'query': search_term,
+                    'type': search_type,
+                    'phonetic_search': phonetic,
+                    'phonetic_suggestions': phonetic_suggestions if phonetic else [],
+                    'results': results,
+                    'total_count': len(results),
+                    'performance': 'Optimized with database functions',
+                    'architecture': 'PostgreSQL-First with Phonetic Enhancement' if phonetic else 'PostgreSQL-First',
+                    'cache_hit': False,
+                    'response_time_ms': performance_metrics['query_time_ms']
                 })
                 
     except Exception as e:
@@ -1172,6 +1210,13 @@ def get_statistics():
                 cur.execute("SELECT SUM(word_count) as total_words FROM books")
                 total_words = cur.fetchone()['total_words'] or 0
                 
+                # Phonetic enhancement statistics
+                cur.execute("SELECT COUNT(*) as phonetic_chunks FROM chunks WHERE content_soundex IS NOT NULL")
+                phonetic_chunks = cur.fetchone()['phonetic_chunks']
+                
+                cur.execute("SELECT COUNT(*) as metaphone_chunks FROM chunks WHERE content_metaphone IS NOT NULL")
+                metaphone_chunks = cur.fetchone()['metaphone_chunks']
+                
                 # Genre distribution
                 cur.execute("""
                     SELECT genre, COUNT(*) as count
@@ -1193,6 +1238,9 @@ def get_statistics():
                 """)
                 top_authors = cur.fetchall()
                 
+                # Get cache performance stats
+                cache_stats = get_cache_performance_stats()
+                
                 return jsonify({
                     'success': True,
                     'data': {
@@ -1200,10 +1248,18 @@ def get_statistics():
                             'total_books': book_count,
                             'total_chunks': chunk_count,
                             'total_words': total_words,
-                            'average_words_per_book': total_words // book_count if book_count > 0 else 0
+                            'average_words_per_book': total_words // book_count if book_count > 0 else 0,
+                            'phonetic_enhanced_chunks': phonetic_chunks,
+                            'metaphone_enhanced_chunks': metaphone_chunks,
+                            'phonetic_coverage_percent': round((phonetic_chunks / chunk_count * 100), 2) if chunk_count > 0 else 0
                         },
                         'genres': [dict(g) for g in genres],
-                        'top_authors': [dict(a) for a in top_authors]
+                        'top_authors': [dict(a) for a in top_authors],
+                        'performance': {
+                            'architecture': 'PostgreSQL-First',
+                            'phonetic_search': 'Enhanced with soundex and metaphone',
+                            'caching': cache_stats
+                        }
                     }
                 })
     except Exception as e:

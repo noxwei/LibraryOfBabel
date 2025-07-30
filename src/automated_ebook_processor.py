@@ -36,9 +36,9 @@ from epub_processor import EPUBProcessor
 from batch_processor import BatchProcessor
 from database_ingestion import DatabaseIngestor
 from deduplication_layer import DeduplicationLayer  # DBA Team deduplication system
-from advanced_semantic_chunker import AdvancedSemanticChunker  # Dr. Sarah Chen's semantic chunker
-from multimodal_embedding_pipeline import MultiModalEmbeddingPipeline  # Dr. Sarah Chen's multi-modal embeddings
-from advanced_genre_classifier import AdvancedGenreClassifier  # Enhanced classification with HTML cleaning
+# from advanced_semantic_chunker import AdvancedSemanticChunker  # Dr. Sarah Chen's semantic chunker - disabled due to spacy dependency
+# from multimodal_embedding_pipeline import MultiModalEmbeddingPipeline  # Dr. Sarah Chen's multi-modal embeddings - disabled
+# from advanced_genre_classifier import AdvancedGenreClassifier  # Enhanced classification with HTML cleaning - disabled
 # from frictionless_ebook_harvester import FrictionlessEbookHarvester  # Removed MAM dependency
 
 class AutomatedEbookProcessor:
@@ -70,12 +70,12 @@ class AutomatedEbookProcessor:
         # DBA Team deduplication system
         self.deduplication_layer = DeduplicationLayer(self.db_config)
         
-        # Dr. Sarah Chen's advanced processing systems
-        self.semantic_chunker = AdvancedSemanticChunker(self.db_config)
-        self.embedding_pipeline = MultiModalEmbeddingPipeline(self.db_config)
+        # Dr. Sarah Chen's advanced processing systems - disabled due to dependencies
+        # self.semantic_chunker = AdvancedSemanticChunker(self.db_config)
+        # self.embedding_pipeline = MultiModalEmbeddingPipeline(self.db_config)
         
-        # Enhanced genre classification with HTML cleaning and description enhancement
-        self.genre_classifier = AdvancedGenreClassifier(self.db_config)
+        # Enhanced genre classification with HTML cleaning and description enhancement - disabled
+        # self.genre_classifier = AdvancedGenreClassifier(self.db_config)
         
         # Enhanced classification system
         self.ollama_url = "http://localhost:11434/api/generate"

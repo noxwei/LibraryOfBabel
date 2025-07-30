@@ -69,7 +69,7 @@ DB_CONFIG = {
 }
 
 # API Key for authentication - Optional for localhost testing
-API_KEY = os.getenv('API_KEY', 'localhost_testing_key')
+API_KEY = os.getenv('BABEL_API_KEY', os.getenv('API_KEY', 'localhost_testing_key'))
 if API_KEY == 'localhost_testing_key':
     logger.info("🔓 Running in localhost testing mode - no API key required")
 else:
@@ -249,91 +249,60 @@ def health_check():
 # ================================
 
 @app.route('/api/v4/books')
-@require_auth
-def v4_books_pg():
-    """V4 Books endpoint with PostgreSQL-First architecture - Dr. Sarah Chen's design"""
+def books_endpoint():
+    """
+    Universal books endpoint with query parameters
+    Examples:
+    - /books?action=list (default: list all books)
+    - /books?id=288&action=details (get book details)
+    - /books?id=288&action=search&q=philosophy (search within book)
+    - /books?id=288&action=content&chapter=1 (get chapter content)
+    """
+    book_id = request.args.get('id', type=int)
+    action = request.args.get('action', 'list')
+    
+    if action == 'list':
+        return _list_books()
+    elif action == 'details' and book_id:
+        return _get_book_details(book_id)
+    elif action == 'search' and book_id:
+        return _search_within_book(book_id)
+    elif action == 'content' and book_id:
+        return _get_book_content(book_id)
+    else:
+        return jsonify({
+            'success': False, 
+            'error': 'Invalid action or missing required parameters',
+            'valid_actions': ['list', 'details', 'search', 'content'],
+            'required_params': {
+                'details': ['id'],
+                'search': ['id', 'q'],
+                'content': ['id']
+            }
+        }), 400
+
+def _list_books():
+    """List all available books with metadata"""
     try:
-        # Get parameters
-        action = request.args.get('action', 'list')
-        book_id = request.args.get('id', type=int)
-        limit = request.args.get('limit', 50, type=int)  # Respect limit parameter!
-        page = request.args.get('page', 1, type=int)
-        
-        # Route to appropriate PostgreSQL function
         with get_db() as conn:
-            with conn.cursor() as cur:
-                if action == 'list':
-                    # Use PostgreSQL function with proper limit handling
-                    cur.execute("""
-                        SELECT json_build_object(
-                            'success', true,
-                            'data', json_build_object(
-                                'books', json_agg(
-                                    json_build_object(
-                                        'book_id', book_id,
-                                        'title', title,
-                                        'author', author,
-                                        'publication_year', publication_year,
-                                        'genre', genre,
-                                        'word_count', word_count
-                                    ) ORDER BY title
-                                ),
-                                'total_count', COUNT(*)
-                            )
-                        )
-                        FROM (
-                            SELECT book_id, title, author, publication_year, genre, word_count
-                            FROM books 
-                            ORDER BY title
-                            LIMIT %s OFFSET %s
-                        ) limited_books
-                    """, (limit, (page - 1) * limit))
-                    
-                elif action == 'summary' and book_id:
-                    cur.execute("SELECT api_shortcuts_book_summary(%s)", (book_id,))
-                    
-                elif action == 'toc' and book_id:
-                    cur.execute("SELECT api_shortcuts_book_toc(%s)", (book_id,))
-                    
-                elif action == 'random_page' and book_id:
-                    cur.execute("SELECT api_shortcuts_book_random_page(%s)", (book_id,))
-                    
-                else:
-                    return jsonify({
-                        'success': False,
-                        'error': 'Invalid action or missing parameters',
-                        'valid_actions': ['list', 'summary', 'toc', 'random_page']
-                    }), 400
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("""
+                    SELECT 
+                        book_id, title, author, publication_year, genre,
+                        word_count, processed_date,
+                        (SELECT COUNT(*) FROM chunks WHERE chunks.book_id = books.book_id) as chunk_count
+                    FROM books 
+                    ORDER BY title
+                """)
+                books = cur.fetchall()
                 
-                result = cur.fetchone()[0]
-                return jsonify(result)
-                
-    except Exception as e:
-        logger.error(f"V4 Books PostgreSQL-First error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-# REMOVED: Helper functions with hardcoded SQL - using PostgreSQL-First architecture above
-
-# ================================
-# MULTI-TYPE SEARCH
-# ================================
-
-@app.route('/api/v4/search')
-@require_auth
-def search_endpoint():
-    """Multi-type search endpoint using PostgreSQL-First architecture"""
-    try:
-        query = request.args.get('q', '').strip()
-        term = request.args.get('term', '').strip()
-        search_term = query or term
-        search_type = request.args.get('type', 'content')
-        action = request.args.get('action', 'search')
-        limit = min(int(request.args.get('limit', 20)), 100)
-        
-        if action == 'count':
-            return _search_count(search_term, search_type)
-        else:
-            return _multi_search(search_term, search_type, limit)
+                return jsonify({
+                    'success': True,
+                    'data': {
+                        'books': [dict(book) for book in books],
+                        'total_count': len(books)
+                    }
+                })
     except Exception as e:
         logger.error(f"Error listing books: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500

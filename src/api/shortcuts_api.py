@@ -1206,6 +1206,268 @@ def get_collection_health():
         return jsonify({"error": "Collection health unavailable"}), 500
 
 # ================================
+# POSTGRESQL-FIRST SHORTCUTS ENDPOINTS
+# ================================
+
+@shortcuts_v2_bp.route('/search_pg')
+@require_auth
+def search_postgresql_endpoint():
+    """
+    PostgreSQL-First search endpoint
+    
+    Examples:
+    - /search_pg?term=philosophy&action=count
+    - /search_pg?term=philosophy&action=has_results
+    - /search_pg?term=philosophy&fields=title&limit=10
+    - /search_pg?term=philosophy&format=simple&limit=20
+    """
+    term = request.args.get('term', '').strip()
+    action = request.args.get('action')
+    fields = request.args.get('fields')
+    format_type = request.args.get('format', 'simple')
+    limit = min(int(request.args.get('limit', 10)), 100)
+    
+    if not term:
+        return jsonify({"error": "Missing required parameter: term"}), 400
+    
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify({"error": "Database connection failed"}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            if action == 'count':
+                cur.execute("SELECT api_shortcuts_search_count(%s) as count", (term,))
+                result = cur.fetchone()['count']
+                return str(result), 200, {'Content-Type': 'text/plain'}
+            
+            elif action == 'has_results':
+                cur.execute("SELECT api_shortcuts_search_has_results(%s) as has_results", (term,))
+                result = cur.fetchone()['has_results']
+                return str(1 if result else 0), 200, {'Content-Type': 'text/plain'}
+            
+            elif fields == 'title':
+                cur.execute("SELECT api_shortcuts_search_titles(%s, %s) as titles", (term, limit))
+                result = cur.fetchone()['titles']
+                return jsonify(result or [])
+            
+            elif fields == 'author':
+                # Use books search for authors
+                cur.execute("""
+                    SELECT DISTINCT author 
+                    FROM books 
+                    WHERE LOWER(author) LIKE LOWER(%s) 
+                    LIMIT %s
+                """, (f'%{term}%', limit))
+                results = [row['author'] for row in cur.fetchall()]
+                return jsonify(results)
+            
+            else:
+                cur.execute("SELECT * FROM api_shortcuts_search_simple(%s, %s)", (term, limit))
+                result = dict(cur.fetchone())
+                return jsonify(result)
+                
+    except Exception as e:
+        logger.error(f"Search endpoint error: {e}")
+        return jsonify({"error": "Search endpoint unavailable"}), 500
+
+@shortcuts_v2_bp.route('/lists_pg')
+@require_auth
+def lists_postgresql_endpoint():
+    """
+    Lists endpoint with PostgreSQL functions
+    
+    Examples:
+    - /lists_pg?type=titles&limit=100
+    - /lists_pg?type=authors&limit=500
+    """
+    list_type = request.args.get('type', 'titles')
+    limit = min(int(request.args.get('limit', 100)), 500)
+    page = int(request.args.get('page', 1))
+    
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify({"error": "Database connection failed"}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            if list_type == 'titles':
+                cur.execute("SELECT api_shortcuts_list_titles(%s, %s) as titles", (limit, page))
+                result = cur.fetchone()['titles']
+                return jsonify(result or [])
+            
+            elif list_type == 'authors':
+                cur.execute("SELECT api_shortcuts_list_authors(%s, %s) as authors", (limit, page))
+                result = cur.fetchone()['authors']
+                return jsonify(result or [])
+            
+            else:
+                return jsonify({"error": f"Invalid list type: {list_type}"}), 400
+                
+    except Exception as e:
+        logger.error(f"Lists endpoint error: {e}")
+        return jsonify({"error": "Lists endpoint unavailable"}), 500
+
+@shortcuts_v2_bp.route('/random_pg')
+@require_auth
+def random_postgresql_endpoint():
+    """
+    Random content endpoint with PostgreSQL functions
+    
+    Examples:
+    - /random_pg?type=title
+    - /random_pg?type=author
+    - /random_pg?type=citation
+    - /random_pg?type=share_text
+    """
+    random_type = request.args.get('type', 'title')
+    include_metadata = request.args.get('include_metadata', 'false').lower() == 'true'
+    
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify({"error": "Database connection failed"}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            if random_type == 'title':
+                cur.execute("SELECT api_shortcuts_random_title() as data")
+                result = cur.fetchone()['data']
+                if include_metadata:
+                    return jsonify(result)
+                return result['title'], 200, {'Content-Type': 'text/plain'}
+            
+            elif random_type == 'author':
+                cur.execute("SELECT api_shortcuts_random_author() as data")
+                result = cur.fetchone()['data']
+                if include_metadata:
+                    return jsonify(result)
+                return result['author'], 200, {'Content-Type': 'text/plain'}
+            
+            elif random_type == 'citation':
+                cur.execute("SELECT api_shortcuts_random_citation() as data")
+                result = cur.fetchone()['data']
+                if include_metadata:
+                    return jsonify(result)
+                return result['citation'], 200, {'Content-Type': 'text/plain'}
+            
+            elif random_type == 'share_text':
+                cur.execute("SELECT api_shortcuts_random_share_text() as data")
+                result = cur.fetchone()['data']
+                if include_metadata:
+                    return jsonify(result)
+                return result['share_text'], 200, {'Content-Type': 'text/plain'}
+                
+            else:
+                return jsonify({"error": f"Invalid random type: {random_type}"}), 400
+                
+    except Exception as e:
+        logger.error(f"Random endpoint error: {e}")
+        return jsonify({"error": "Random endpoint unavailable"}), 500
+
+# Update books endpoint to use PostgreSQL functions
+@shortcuts_v2_bp.route('/books_pg')
+@require_auth
+def books_postgresql_endpoint():
+    """
+    Books endpoint using PostgreSQL functions
+    
+    Examples:
+    - /books_pg?id=288&action=summary
+    - /books_pg?id=288&action=construct
+    - /books_pg?id=288&action=toc
+    - /books_pg?id=288&page=1
+    - /books_pg?id=288&page=random
+    """
+    book_id = request.args.get('id', type=int)
+    action = request.args.get('action', 'summary')
+    page = request.args.get('page')
+    
+    if not book_id:
+        return jsonify({"error": "Missing required parameter: id"}), 400
+    
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify({"error": "Database connection failed"}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            if action == 'summary':
+                cur.execute("SELECT * FROM api_shortcuts_book_summary(%s)", (book_id,))
+                result = dict(cur.fetchone())
+                return jsonify(result)
+            
+            elif action == 'construct':
+                cur.execute("SELECT * FROM api_shortcuts_book_construct(%s)", (book_id,))
+                result = dict(cur.fetchone())
+                return jsonify(result)
+            
+            elif action == 'toc':
+                cur.execute("SELECT * FROM api_shortcuts_book_toc(%s)", (book_id,))
+                result = dict(cur.fetchone())
+                return jsonify(result)
+            
+            elif page:
+                if page == 'random':
+                    cur.execute("SELECT * FROM api_shortcuts_book_random_page(%s)", (book_id,))
+                else:
+                    page_num = int(page)
+                    cur.execute("SELECT * FROM api_shortcuts_book_page(%s, %s)", (book_id, page_num))
+                
+                result = dict(cur.fetchone())
+                return jsonify(result)
+            
+            else:
+                return jsonify({"error": "Invalid action or missing page parameter"}), 400
+                
+    except Exception as e:
+        logger.error(f"Books PostgreSQL endpoint error: {e}")
+        return jsonify({"error": "Books endpoint unavailable"}), 500
+
+# Update stats endpoint to use PostgreSQL functions
+@shortcuts_v2_bp.route('/stats_pg')
+@require_auth
+def stats_postgresql_endpoint():
+    """
+    Stats endpoint using PostgreSQL functions
+    
+    Examples:
+    - /stats_pg?metric=book_count
+    - /stats_pg?metric=collection_health
+    - /stats_pg?type=dashboard&include_gaps=true
+    """
+    metric = request.args.get('metric')
+    stats_type = request.args.get('type', 'dashboard')
+    include_gaps = request.args.get('include_gaps', 'false').lower() == 'true'
+    
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify({"error": "Database connection failed"}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            if metric == 'book_count':
+                cur.execute("SELECT api_shortcuts_book_count() as count")
+                result = cur.fetchone()['count']
+                return str(result), 200, {'Content-Type': 'text/plain'}
+            
+            elif metric == 'collection_health':
+                cur.execute("SELECT * FROM api_shortcuts_collection_health()")
+                result = dict(cur.fetchone())
+                return jsonify(result)
+            
+            elif stats_type == 'dashboard':
+                cur.execute("SELECT * FROM api_shortcuts_dashboard(%s)", (include_gaps,))
+                result = dict(cur.fetchone())
+                return jsonify(result)
+            
+            else:
+                return jsonify({"error": f"Invalid metric or type"}), 400
+                
+    except Exception as e:
+        logger.error(f"Stats PostgreSQL endpoint error: {e}")
+        return jsonify({"error": "Stats endpoint unavailable"}), 500
+
+# ================================
 # HEALTH CHECK AND DEPRECATION NOTICES
 # ================================
 

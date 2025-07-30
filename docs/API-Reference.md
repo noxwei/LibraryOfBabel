@@ -1,21 +1,22 @@
 # 📚 LibraryOfBabel API Reference - iOS Shortcuts API
 
-**🎉 IMPORTANT UPDATE: API has been redesigned for mobile-first use!**
+**🎉 IMPORTANT UPDATE: API has been redesigned for mobile-first use with extended semantic search!**
 
-This API has been **redesigned** by Dr. Elena Rodriguez (IAV) for iOS Shortcuts, Data Jar, and mobile workflows. All functionality is now optimized for mobile use with single-value responses and simple arrays.
+This API has been **redesigned** by Dr. Elena Rodriguez (IAV) for iOS Shortcuts, Data Jar, and mobile workflows, and enhanced with Dr. Sarah Chen's (陈雪芳) 10-word semantic architecture. All functionality is now optimized for mobile use with single-value responses, simple arrays, and advanced compound query capabilities.
 
 **👉 For complete updated documentation, see: [API-Reference-Unified.md](API-Reference-Unified.md)**
 
 ## 🚨 Migration Notice
 
 - **iOS Shortcuts API**: All functionality now on `/api/shortcuts/` namespace
+- **Extended Semantic Search**: New `/api/v4/search/semantic` endpoint for 10-word compound queries
 - **Mobile-first design**: Optimized for iOS Shortcuts and Data Jar
-- **New features**: Serendipity features, creative inspiration, story starters
-- **Legacy support**: V3 format endpoints available for backwards compatibility
+- **New features**: Serendipity features, creative inspiration, story starters, advanced semantic search
+- **Legacy support**: V3 and V4 format endpoints available for backwards compatibility
 
 ---
 
-This API provides authenticated access to 2,730 real books with iOS Shortcuts optimization, serendipity features, and mobile workflows.
+This API provides authenticated access to 5,127+ real books with iOS Shortcuts optimization, extended semantic search, serendipity features, and mobile workflows.
 
 ## 🌐 Production Endpoint
 
@@ -502,6 +503,6 @@ curl "https://api.example.com:5562/books/611/chunks?api_key=YOUR_API_KEY&chunk_l
 
 ---
 
-*🎯 This API provides secure, paginated access to 838 real books with advanced chunking capabilities. Perfect for AI agents, research tools, and knowledge discovery applications.*
+*🎯 This API provides secure, paginated access to 5,127+ real books with extended semantic search, advanced chunking capabilities, and 10-word compound query support. Perfect for AI agents, research tools, knowledge discovery applications, and iOS Shortcuts workflows.*
 
-**Last Updated**: July 14, 2025 | **API Version**: 2.0-secure-paginated
+**Last Updated**: July 29, 2025 | **API Version**: 2.0-secure-paginated with Extended Semantic Search | **Enhanced by**: Dr. Sarah Chen (陈雪芳)
