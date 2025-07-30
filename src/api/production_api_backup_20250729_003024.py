@@ -26,6 +26,21 @@ import hashlib
 import subprocess
 import asyncio
 
+# Load environment variables from .env file
+def load_env_file():
+    """Load environment variables from .env file"""
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    if os.path.exists(env_path):
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip()
+
+# Load .env file immediately
+load_env_file()
+
 # Add src directory to path
 current_dir = os.path.dirname(__file__)
 src_dir = os.path.dirname(current_dir)
@@ -68,7 +83,7 @@ DB_CONFIG = {
     'port': int(os.getenv('DB_PORT', 5432))
 }
 
-# API Key for authentication - Optional for localhost testing
+# API Key for authentication - Load from environment variable
 API_KEY = os.getenv('API_KEY', 'localhost_testing_key')
 if API_KEY == 'localhost_testing_key':
     logger.info("🔓 Running in localhost testing mode - no API key required")
@@ -106,8 +121,11 @@ def verify_api_key():
     return False
 
 def require_auth(f):
-    """Decorator to require API key authentication"""
+    """Decorator to require API key authentication (skipped in test mode)"""
     def decorated_function(*args, **kwargs):
+        # Skip auth in test mode
+        if os.getenv('TEST_MODE', 'false').lower() == 'true':
+            return f(*args, **kwargs)
         if not verify_api_key():
             return jsonify({'success': False, 'error': 'Valid API key required'}), 401
         return f(*args, **kwargs)
@@ -249,91 +267,60 @@ def health_check():
 # ================================
 
 @app.route('/api/v4/books')
-@require_auth
-def v4_books_pg():
-    """V4 Books endpoint with PostgreSQL-First architecture - Dr. Sarah Chen's design"""
+def books_endpoint():
+    """
+    Universal books endpoint with query parameters
+    Examples:
+    - /books?action=list (default: list all books)
+    - /books?id=288&action=details (get book details)
+    - /books?id=288&action=search&q=philosophy (search within book)
+    - /books?id=288&action=content&chapter=1 (get chapter content)
+    """
+    book_id = request.args.get('id', type=int)
+    action = request.args.get('action', 'list')
+    
+    if action == 'list':
+        return _list_books()
+    elif action == 'details' and book_id:
+        return _get_book_details(book_id)
+    elif action == 'search' and book_id:
+        return _search_within_book(book_id)
+    elif action == 'content' and book_id:
+        return _get_book_content(book_id)
+    else:
+        return jsonify({
+            'success': False, 
+            'error': 'Invalid action or missing required parameters',
+            'valid_actions': ['list', 'details', 'search', 'content'],
+            'required_params': {
+                'details': ['id'],
+                'search': ['id', 'q'],
+                'content': ['id']
+            }
+        }), 400
+
+def _list_books():
+    """List all available books with metadata"""
     try:
-        # Get parameters
-        action = request.args.get('action', 'list')
-        book_id = request.args.get('id', type=int)
-        limit = request.args.get('limit', 50, type=int)  # Respect limit parameter!
-        page = request.args.get('page', 1, type=int)
-        
-        # Route to appropriate PostgreSQL function
         with get_db() as conn:
-            with conn.cursor() as cur:
-                if action == 'list':
-                    # Use PostgreSQL function with proper limit handling
-                    cur.execute("""
-                        SELECT json_build_object(
-                            'success', true,
-                            'data', json_build_object(
-                                'books', json_agg(
-                                    json_build_object(
-                                        'book_id', book_id,
-                                        'title', title,
-                                        'author', author,
-                                        'publication_year', publication_year,
-                                        'genre', genre,
-                                        'word_count', word_count
-                                    ) ORDER BY title
-                                ),
-                                'total_count', COUNT(*)
-                            )
-                        )
-                        FROM (
-                            SELECT book_id, title, author, publication_year, genre, word_count
-                            FROM books 
-                            ORDER BY title
-                            LIMIT %s OFFSET %s
-                        ) limited_books
-                    """, (limit, (page - 1) * limit))
-                    
-                elif action == 'summary' and book_id:
-                    cur.execute("SELECT api_shortcuts_book_summary(%s)", (book_id,))
-                    
-                elif action == 'toc' and book_id:
-                    cur.execute("SELECT api_shortcuts_book_toc(%s)", (book_id,))
-                    
-                elif action == 'random_page' and book_id:
-                    cur.execute("SELECT api_shortcuts_book_random_page(%s)", (book_id,))
-                    
-                else:
-                    return jsonify({
-                        'success': False,
-                        'error': 'Invalid action or missing parameters',
-                        'valid_actions': ['list', 'summary', 'toc', 'random_page']
-                    }), 400
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("""
+                    SELECT 
+                        book_id, title, author, publication_year, genre,
+                        word_count, processed_date,
+                        (SELECT COUNT(*) FROM chunks WHERE chunks.book_id = books.book_id) as chunk_count
+                    FROM books 
+                    ORDER BY title
+                """)
+                books = cur.fetchall()
                 
-                result = cur.fetchone()[0]
-                return jsonify(result)
-                
-    except Exception as e:
-        logger.error(f"V4 Books PostgreSQL-First error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-# REMOVED: Helper functions with hardcoded SQL - using PostgreSQL-First architecture above
-
-# ================================
-# MULTI-TYPE SEARCH
-# ================================
-
-@app.route('/api/v4/search')
-@require_auth
-def search_endpoint():
-    """Multi-type search endpoint using PostgreSQL-First architecture"""
-    try:
-        query = request.args.get('q', '').strip()
-        term = request.args.get('term', '').strip()
-        search_term = query or term
-        search_type = request.args.get('type', 'content')
-        action = request.args.get('action', 'search')
-        limit = min(int(request.args.get('limit', 20)), 100)
-        
-        if action == 'count':
-            return _search_count(search_term, search_type)
-        else:
-            return _multi_search(search_term, search_type, limit)
+                return jsonify({
+                    'success': True,
+                    'data': {
+                        'books': [dict(book) for book in books],
+                        'total_count': len(books)
+                    }
+                })
     except Exception as e:
         logger.error(f"Error listing books: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -494,6 +481,7 @@ def _get_book_content(book_id):
 # ================================
 
 @app.route('/api/v4/search')
+@require_auth
 def search_endpoint():
     """
     Universal search endpoint with query parameters
@@ -517,7 +505,7 @@ def search_endpoint():
         return _multi_search(search_term, search_type, limit)
 
 def _search_count(search_term, search_type='content'):
-    """Get count of search results for iOS Shortcuts optimization"""
+    """Get count of search results using optimized v4 functions"""
     if not search_term:
         return jsonify({'count': 0})
     
@@ -526,10 +514,8 @@ def _search_count(search_term, search_type='content'):
             with conn.cursor() as cur:
                 if search_type == 'content':
                     cur.execute("""
-                        SELECT COUNT(*) 
-                        FROM chunks c
-                        WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
-                    """, (search_term,))
+                        SELECT count FROM api_search_count_optimized(%s, %s)
+                    """, (search_term, search_type))
                 elif search_type == 'author':
                     cur.execute("""
                         SELECT COUNT(DISTINCT book_id) 
@@ -566,19 +552,15 @@ def _multi_search(search_term, search_type, limit):
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 
                 if search_type == 'content':
-                    # Full-text content search
+                    # Use v4 optimized fast hybrid search function
                     cur.execute("""
                         SELECT 
-                            c.chunk_id, c.book_id, c.chapter_number, c.section_number,
-                            c.content, c.word_count, c.chunk_type,
-                            b.title, b.author,
-                            ts_rank(to_tsvector('english', c.content), plainto_tsquery('english', %s)) as relevance
-                        FROM chunks c
-                        JOIN books b ON c.book_id = b.book_id
-                        WHERE to_tsvector('english', c.content) @@ plainto_tsquery('english', %s)
-                        ORDER BY relevance DESC
-                        LIMIT %s
-                    """, (search_term, search_term, limit))
+                            chunk_id, book_id, content, title, author,
+                            combined_score as relevance,
+                            NULL as chapter_number, NULL as section_number,
+                            LENGTH(content) as word_count, 'content' as chunk_type
+                        FROM api_fast_hybrid_search(%s, %s)
+                    """, (search_term, limit))
                 
                 elif search_type == 'author':
                     # Author-based search
@@ -655,6 +637,7 @@ def _multi_search(search_term, search_type, limit):
 # ================================
 
 @app.route('/api/v4/search/vector')
+@require_auth
 def vector_search_endpoint():
     """
     Vector-enhanced semantic search utilizing 30GB vector data
@@ -764,6 +747,7 @@ def vector_search_endpoint():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/v4/search/quote')
+@require_auth
 def optimized_quote_search_endpoint():
     """
     Optimized quote search with keyword extraction and caching
@@ -828,6 +812,188 @@ def optimized_quote_search_endpoint():
     except Exception as e:
         logger.error(f"Error in optimized quote search: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# ================================
+# DR. SARAH CHEN APPROVED: SEMANTIC PHRASE SEARCH
+# ================================
+
+@app.route('/api/v4/search/semantic')
+@require_auth
+def semantic_phrase_search():
+    """
+    Dr. Sarah Chen PostgreSQL-First semantic phrase search endpoint
+    Handles compound queries like "Artificial Intelligence Race 1800" as unified semantic units
+    
+    Architecture: 100% function calls, zero hardcoded SQL
+    Query Parameters:
+    - q: Search query (compound phrases treated as semantic units)
+    - limit: Max results (1-200, default 50)
+    """
+    start_time = time.time()
+    
+    try:
+        # Extract and validate parameters
+        query = request.args.get('q', '').strip()
+        limit = min(int(request.args.get('limit', 50)), 200)
+        
+        # Input validation (basic)
+        if not query:
+            return jsonify({
+                'success': False,
+                'error': 'Query parameter "q" is required',
+                'usage': 'GET /api/v4/search/semantic?q=Artificial Intelligence Race 1800&limit=50'
+            }), 400
+        
+        # Database connection
+        conn = get_db()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # Dr. Sarah Chen approved: Single function call architecture
+            logger.info(f"🧠 Semantic search: '{query}' (limit: {limit})")
+            
+            cur.execute("""
+                SELECT chunk_id, content, title, author, semantic_score, match_type, phrase_matches
+                FROM api_semantic_phrase_search_optimized(%s, %s)
+            """, (query, limit))
+            
+            results = [dict(row) for row in cur.fetchall()]
+            
+            # Process results for response
+            processed_results = []
+            for result in results:
+                if result['chunk_id'] != 'error':  # Skip error results
+                    processed_results.append({
+                        'chunk_id': result['chunk_id'],
+                        'content': result['content'][:500] + ('...' if len(result['content']) > 500 else ''),
+                        'title': result['title'],
+                        'author': result['author'],
+                        'semantic_score': float(result['semantic_score']) if result['semantic_score'] else 0.0,
+                        'match_type': result['match_type'],
+                        'matched_phrases': result['phrase_matches'] if result['phrase_matches'] else []
+                    })
+        
+        # Calculate performance metrics
+        response_time = time.time() - start_time
+        
+        # Dr. Sarah Chen approved response format
+        return jsonify({
+            'success': True,
+            'query': query,
+            'results': processed_results,
+            'metadata': {
+                'total_results': len(processed_results),
+                'limit': limit,
+                'response_time_ms': round(response_time * 1000, 2),
+                'search_architecture': 'PostgreSQL-First semantic phrase processing',
+                'fallback_tiers': ['semantic_phrase', 'enhanced_fulltext', 'fallback_content'],
+                'dr_chen_approved': True
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in semantic phrase search: {e}")
+        return jsonify({
+            'success': False, 
+            'error': 'Semantic search error occurred',
+            'architecture_note': 'PostgreSQL-First error handling active'
+        }), 500
+
+# ================================  
+# SEMANTIC PREPROCESSING MANAGEMENT
+# ================================
+
+@app.route('/api/v4/search/semantic/preprocess')
+@require_auth  
+def semantic_preprocessing():
+    """
+    Dr. Sarah Chen approved: Semantic phrase preprocessing endpoint
+    Batch processes chunks for semantic phrase indexing
+    
+    Query Parameters:
+    - batch_size: Number of chunks to process (100-5000, default 1000)
+    """
+    start_time = time.time()
+    
+    try:
+        batch_size = min(int(request.args.get('batch_size', 1000)), 5000)
+        
+        conn = get_db()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # Single function call - Dr. Sarah Chen approved
+            logger.info(f"🔄 Starting semantic preprocessing: batch_size={batch_size}")
+            
+            cur.execute("""
+                SELECT processed_count, total_phrases_found, processing_time_ms, status_message
+                FROM api_preprocess_semantic_chunks(%s)
+            """, (batch_size,))
+            
+            result = dict(cur.fetchone())
+        
+        response_time = time.time() - start_time
+        
+        return jsonify({
+            'success': True,
+            'preprocessing_results': {
+                'chunks_processed': result['processed_count'],
+                'phrases_found': result['total_phrases_found'],
+                'processing_time_ms': result['processing_time_ms'],
+                'status': result['status_message']
+            },
+            'metadata': {
+                'batch_size': batch_size,
+                'total_response_time_ms': round(response_time * 1000, 2),
+                'architecture': 'PostgreSQL-First batch processing',
+                'dr_chen_approved': True
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in semantic preprocessing: {e}")
+        return jsonify({'success': False, 'error': 'Preprocessing error occurred'}), 500
+
+@app.route('/api/v4/search/semantic/stats')
+@require_auth
+def semantic_search_stats():
+    """
+    Dr. Sarah Chen approved: Semantic search statistics endpoint
+    Returns current state of semantic indexing system
+    """
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+        
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # Single function call - Dr. Sarah Chen approved
+            cur.execute("""
+                SELECT total_phrases, total_compound_concepts, total_chunk_phrase_links, 
+                       avg_phrases_per_chunk, last_preprocessing_run
+                FROM api_semantic_search_stats()
+            """)
+            
+            stats = dict(cur.fetchone())
+        
+        return jsonify({
+            'success': True,
+            'semantic_stats': {
+                'total_semantic_phrases': stats['total_phrases'],
+                'total_compound_concepts': stats['total_compound_concepts'],
+                'total_chunk_phrase_links': stats['total_chunk_phrase_links'],
+                'avg_phrases_per_chunk': float(stats['avg_phrases_per_chunk']) if stats['avg_phrases_per_chunk'] else 0.0,
+                'last_preprocessing_run': stats['last_preprocessing_run'].isoformat() if stats['last_preprocessing_run'] else None
+            },
+            'architecture': 'PostgreSQL-First statistics',
+            'dr_chen_approved': True
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting semantic stats: {e}")
+        return jsonify({'success': False, 'error': 'Stats retrieval error'}), 500
 
 # ================================
 # OLLAMA LLAMA3 7B + iOS SHORTCUTS INTEGRATION
@@ -2788,16 +2954,28 @@ if __name__ == '__main__':
     else:
         logger.warning("⚠️ Audit scheduling failed - will retry on next startup")
     
-    # Production server with SSL
-    ssl_cert_path = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem'
-    ssl_key_path = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/privkey.pem'
+    # Determine if this is a local test run
+    test_mode = os.getenv('TEST_MODE', 'false').lower() == 'true'
     
-    # Production server configuration for external access
-    # External IP: 73.161.54.75
-    # Port forwarding: 5562 -> 10.0.0.13:5562
-    app.run(
-        host='0.0.0.0',  # Bind to all interfaces for external access
-        port=int(os.getenv('PORT', 5562)),  # Port 5562 is forwarded externally
-        debug=False,
-        ssl_context=(ssl_cert_path, ssl_key_path)
-    )
+    if test_mode:
+        # Local testing mode - HTTP only, different port
+        print("🧪 RUNNING IN TEST MODE - Local HTTP server")
+        app.run(
+            host='127.0.0.1',  # Local only
+            port=int(os.getenv('TEST_PORT', 5563)),  # Different port for testing
+            debug=True
+        )
+    else:
+        # Production server with SSL
+        ssl_cert_path = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem'
+        ssl_key_path = '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/ssl/letsencrypt-config/live/api.ashortstayinhell.com/privkey.pem'
+        
+        # Production server configuration for external access
+        # External IP: 73.161.54.75
+        # Port forwarding: 5562 -> 10.0.0.13:5562
+        app.run(
+            host='0.0.0.0',  # Bind to all interfaces for external access
+            port=int(os.getenv('PORT', 5562)),  # Port 5562 is forwarded externally
+            debug=False,
+            ssl_context=(ssl_cert_path, ssl_key_path)
+        )

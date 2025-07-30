@@ -524,3 +524,20 @@ scripts/vector_optimization_daemon.py
 api_v4_test_log.txt
 config/macos/com.librarybabel.api.plist
 *.plist
+
+# === ARCHIVE DIRECTORIES (Cleanup 2025-07-30) ===
+# Archived redundant agents, old scripts, and cleaned files
+archive/agents_redundant_20250730/
+archive/scripts_deprecated_20250730/
+archive/logs_old_20250730/
+archive/root_cleanup_20250730/
+archive/scripts_old_20250730/
+
+# === SECURITY - Files with API keys ===
+.claude/settings.local.json
+config/macos/com.librarybabel.api.plist
+scripts/endpoint_qa_instructions.md
+docs/endpoint_qa_instructions.md
+scripts/performance_benchmark.py
+docs/test_results_*.json
+scripts/test_*endpoints*.py
