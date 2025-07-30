@@ -59,11 +59,11 @@ class MultiEmbeddingEnhancer:
                 "column": "embedding_bge"
             },
             "technical": {
-                "name": "snowflake-arctic-embed:latest",
-                "dimensions": 1024,
-                "context_length": 512, 
+                "name": "granite-embedding:278m",
+                "dimensions": 768,
+                "context_length": 8192, 
                 "use_case": "technical_domain_specific",
-                "column": "embedding_arctic"
+                "column": "embedding_granite"
             }
         }
         
