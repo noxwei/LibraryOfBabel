@@ -621,4 +621,11 @@ daemons/calibre_checkpoint_300.json
 daemons/calibre_checkpoint_400.json
 daemons/calibre_checkpoint_500.json
 calibre_batch_import_progress.json
+
+# === MONITORING & DOCKER SECURITY ===
+# Docker compose files with hardcoded credentials
+monitoring/docker/docker-compose.yml
+*docker-compose*.yml
+monitoring/config/
+monitoring/data/
 calibre_batch_import_progress.json

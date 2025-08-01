@@ -1,0 +1,491 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "LibraryOfBabel System Health - AI Agent Command Center",
+    "tags": ["libraryofbabel", "system", "health", "ai-monitoring", "observability"],
+    "style": "dark",
+    "timezone": "browser",
+    "editable": true,
+    "hideControls": false,
+    "graphTooltip": 1,
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m"],
+      "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d"]
+    },
+    "refresh": "10s",
+    "annotations": {
+      "list": [
+        {
+          "name": "System Health Events",
+          "datasource": "Loki",
+          "enable": true,
+          "expr": "{job=\"libraryofbabel\"} |~ \"health|status|availability\" | json",
+          "iconColor": "blue",
+          "textFormat": "{{ ai_system_context }}",
+          "titleFormat": "System Health Event"
+        },
+        {
+          "name": "AI Agent Alerts",
+          "datasource": "Loki",
+          "enable": true,
+          "expr": "{ai_alert_priority=~\"high|critical\"} | json",
+          "iconColor": "red",
+          "textFormat": "{{ ai_alert_context }}",
+          "titleFormat": "AI Alert"
+        }
+      ]
+    },
+    "description": "AI Agent Ready system health monitoring for LibraryOfBabel infrastructure. Designed for conversational queries and proactive system intelligence.",
+    "panels": [
+      {
+        "id": 1,
+        "title": "🤖 AI System Health Overview",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"libraryofbabel-exporter\"}",
+            "legendFormat": "Exporter Status",
+            "refId": "A",
+            "datasource": "Prometheus"
+          },
+          {
+            "expr": "up{job=\"libraryofbabel-node-exporter\"}",
+            "legendFormat": "Node Status",
+            "refId": "B",
+            "datasource": "Prometheus"
+          },
+          {
+            "expr": "libraryofbabel_daemon_runtime_seconds",
+            "legendFormat": "Runtime",
+            "refId": "C",
+            "datasource": "Prometheus"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "displayMode": "gradient",
+              "orientation": "horizontal"
+            },
+            "mappings": [
+              {
+                "type": "value",
+                "value": "1",
+                "text": "Healthy"
+              },
+              {
+                "type": "value",
+                "value": "0",
+                "text": "Down"
+              }
+            ],
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "green",
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "justifyMode": "center",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "text": {
+            "titleSize": 16,
+            "valueSize": 20
+          },
+          "textMode": "auto"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "description": "AI Agent Health Summary: LibraryOfBabel system components status. Query: 'Is the system healthy?' Answer: All components {{ status }}."
+      },
+      {
+        "id": 2,
+        "title": "💾 Resource Utilization Intelligence",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "100 - (avg(irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+            "legendFormat": "CPU Usage %",
+            "refId": "A",
+            "datasource": "Prometheus"
+          },
+          {
+            "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100",
+            "legendFormat": "Memory Usage %",
+            "refId": "B",
+            "datasource": "Prometheus"
+          },
+          {
+            "expr": "100 - ((node_filesystem_avail_bytes{mountpoint=\"/\"} * 100) / node_filesystem_size_bytes{mountpoint=\"/\"})",
+            "legendFormat": "Disk Usage %",
+            "refId": "C",
+            "datasource": "Prometheus"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              }
+            },
+            "mappings": [],
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        },
+        "options": {
+          "pieType": "donut",
+          "tooltip": {
+            "mode": "single"
+          },
+          "legend": {
+            "displayMode": "visible",
+            "placement": "right"
+          },
+          "displayLabels": ["name", "value"]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "description": "AI Agent Resource Intelligence: System resource utilization breakdown. Ask: 'How are system resources?' CPU: {{ cpu }}%, Memory: {{ memory }}%, Disk: {{ disk }}%"
+      },
+      {
+        "id": 3,
+        "title": "🔄 Service Availability Matrix - AI Monitored",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "up",
+            "legendFormat": "{{ job }}",
+            "refId": "A",
+            "datasource": "Prometheus",
+            "instant": true
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "__name__": true,
+                "instance": true
+              },
+              "indexByName": {},
+              "renameByName": {
+                "job": "Service",
+                "Value": "Status"
+              }
+            }
+          },
+          {
+            "id": "fieldLookup",
+            "options": {
+              "lookupField": "Status",
+              "outputField": "Health",
+              "mapping": {
+                "1": "🟢 Healthy",
+                "0": "🔴 Down"
+              }
+            }
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "center",
+              "displayMode": "color-background"
+            },
+            "mappings": [
+              {
+                "type": "value",
+                "value": "1",
+                "text": "🟢 Healthy",
+                "color": "green"
+              },
+              {
+                "type": "value",
+                "value": "0",
+                "text": "🔴 Down",
+                "color": "red"
+              }
+            ],
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "green",
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 8
+        },
+        "description": "AI Agent Service Matrix: Real-time service availability status. Query: 'Which services are running?' All LibraryOfBabel services monitored."
+      },
+      {
+        "id": 4,
+        "title": "📊 Performance Metrics Timeline - AI Analytics",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(libraryofbabel_chunks_processed_total[5m])",
+            "legendFormat": "Processing Rate",
+            "refId": "A",
+            "datasource": "Prometheus"
+          },
+          {
+            "expr": "libraryofbabel_success_rate",
+            "legendFormat": "Success Rate %",
+            "refId": "B",
+            "datasource": "Prometheus"
+          },
+          {
+            "expr": "rate(libraryofbabel_file_watch_events_total[5m])",
+            "legendFormat": "File Events/sec",
+            "refId": "C",
+            "datasource": "Prometheus"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Rate",
+            "min": 0
+          },
+          {
+            "label": "Percentage",
+            "min": 90,
+            "max": 100
+          }
+        ],
+        "xAxis": {
+          "show": true
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 17
+        },
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "legend": {
+          "alignAsTable": true,
+          "avg": true,
+          "current": true,
+          "max": true,
+          "min": true,
+          "show": true,
+          "total": false,
+          "values": true
+        },
+        "description": "AI Agent Performance Analytics: System performance metrics over time. Natural language query: 'How is system performance trending?'"
+      },
+      {
+        "id": 5,
+        "title": "🚨 AI Alert Intelligence Center",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=\"libraryofbabel\"} |~ \"ERROR|CRITICAL|WARN\" | json | line_format \"🤖 {{.ai_log_summary}}\"",
+            "refId": "A",
+            "datasource": "Loki"
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "prettifyLogMessage": true,
+          "enableLogDetails": true,
+          "dedupStrategy": "none",
+          "sortOrder": "Descending"
+        },
+        "gridPos": {
+          "h": 12,
+          "w": 12,
+          "x": 0,
+          "y": 26
+        },
+        "description": "AI Agent Alert Intelligence: Automated analysis of system alerts with AI-enhanced summaries. Query: 'Are there any alerts I should know about?'"
+      },
+      {
+        "id": 6,
+        "title": "⚡ System Response Times - AI Performance",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(libraryofbabel_ai_response_time_seconds_bucket[5m]))",
+            "legendFormat": "95th percentile",
+            "refId": "A",
+            "datasource": "Prometheus"
+          }
+        ],
+        "gridPos": {
+          "h": 12,
+          "w": 12,
+          "x": 12,
+          "y": 26
+        },
+        "description": "AI Agent Performance Heatmap: System response time analysis for AI agent interactions and processing pipeline."
+      },
+      {
+        "id": 7,
+        "title": "🔍 AI Query Activity Monitor",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(libraryofbabel_ai_queries_total[5m])",
+            "legendFormat": "{{ query_type }}",
+            "refId": "A",
+            "datasource": "Prometheus"
+          },
+          {
+            "expr": "rate(libraryofbabel_natural_language_queries_total[5m])",
+            "legendFormat": "Natural Language Queries",
+            "refId": "B",
+            "datasource": "Prometheus"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Queries/sec",
+            "min": 0
+          },
+          {
+            "show": false
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 38
+        },
+        "description": "AI Agent Activity: Monitor AI agent query patterns and natural language processing activity."
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "monitoring_mode",
+          "type": "custom",
+          "options": [
+            {
+              "text": "AI Agent View",
+              "value": "ai_agent"
+            },
+            {
+              "text": "Technical Detail",
+              "value": "technical"
+            },
+            {
+              "text": "Executive Summary",
+              "value": "executive"
+            }
+          ],
+          "current": {
+            "text": "AI Agent View",
+            "value": "ai_agent"
+          },
+          "description": "AI Agent Monitoring Mode"
+        },
+        {
+          "name": "alert_severity",
+          "type": "custom",
+          "options": [
+            {
+              "text": "All Alerts",
+              "value": ".*"
+            },
+            {
+              "text": "Critical Only",
+              "value": "critical"
+            },
+            {
+              "text": "High Priority",
+              "value": "high|critical"
+            }
+          ],
+          "current": {
+            "text": "All Alerts",
+            "value": ".*"
+          },
+          "description": "AI Agent Alert Filter"
+        }
+      ]
+    },
+    "links": [
+      {
+        "title": "AI Agent Health Check",
+        "url": "http://localhost:8080/health",
+        "type": "link",
+        "icon": "cloud",
+        "tags": ["health", "ai-agent"]
+      },
+      {
+        "title": "System Context API",
+        "url": "http://localhost:8080/api/v1/ai/context",
+        "type": "link",
+        "icon": "external link",
+        "tags": ["api", "context"]
+      },
+      {
+        "title": "Natural Language Queries",
+        "url": "http://localhost:8080/api/v1/ai/query",
+        "type": "link",
+        "icon": "question",
+        "tags": ["natural-language", "ai"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+# AI Agent Gateway Requirements
+# LibraryOfBabel Agentic AI-Ready Monitoring
+
+# Web framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# HTTP client for external APIs
+httpx==0.25.2
+requests==2.31.0
+
+# JSON and data processing
+pydantic==2.4.2
+python-multipart==0.0.6
+
+# Monitoring and observability
+prometheus-client==0.19.0
+structlog==23.1.0
+
+# AI/ML integration
+openai==1.3.7
+langchain==0.0.335
+
+# Time and date handling
+python-dateutil==2.8.2
+
+# Configuration management
+python-dotenv==1.0.0
+
+# Security
+cryptography==41.0.7
+
+# Database connectivity (for future enhancements)
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+
+# Natural language processing (for AI agent queries)
+nltk==3.8.1
+spacy==3.7.2
+
+# API documentation
+swagger-ui-bundle==0.0.9
