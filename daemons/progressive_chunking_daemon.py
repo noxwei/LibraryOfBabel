@@ -162,10 +162,10 @@ class MultiGranularChunkingDaemon:
             )
         }
         
-        # Processing configuration
-        self.batch_size = 10  # Books per batch
+        # Processing configuration - TURBO MODE ACTIVATED!
+        self.batch_size = 50  # Books per batch (5x increase for performance)
         self.retry_attempts = 3
-        self.save_interval = 50  # Save state every 50 chunks
+        self.save_interval = 100  # Save state every 100 chunks (reduce I/O)
         
         # Logging setup
         self.setup_logging()
@@ -227,7 +227,7 @@ class MultiGranularChunkingDaemon:
                 'host': os.environ.get('DB_HOST', 'postgres-service'),
                 'port': int(os.environ.get('DB_PORT', 5432)),
                 'database': os.environ.get('DB_NAME', 'knowledge_base'), 
-                'user': os.environ.get('DB_USER', 'postgres'),
+                'user': os.environ.get('DB_USER', 'weixiangzhang'),
                 'password': os.environ.get('DB_PASSWORD')
             }
         elif self.environment == "docker":
@@ -235,7 +235,7 @@ class MultiGranularChunkingDaemon:
                 'host': os.environ.get('DB_HOST', 'host.docker.internal'),
                 'port': int(os.environ.get('DB_PORT', 5432)),
                 'database': os.environ.get('DB_NAME', 'knowledge_base'),
-                'user': os.environ.get('DB_USER', 'postgres'), 
+                'user': os.environ.get('DB_USER', 'weixiangzhang'), 
                 'password': os.environ.get('DB_PASSWORD')
             }
         else:
@@ -243,7 +243,7 @@ class MultiGranularChunkingDaemon:
                 'host': 'localhost',
                 'port': 5432,
                 'database': 'knowledge_base',
-                'user': os.environ.get('DB_USER', 'postgres'),
+                'user': os.environ.get('DB_USER', 'weixiangzhang'),
                 'password': os.environ.get('DB_PASSWORD')
             }
             
@@ -645,29 +645,32 @@ class MultiGranularChunkingDaemon:
             with self.get_db_connection() as conn:
                 with conn.cursor() as cur:
                     # Insert sentence chunks
-                    for chunk in sentence_chunks:
+                    for i, chunk in enumerate(sentence_chunks):
+                        chunk_id = f"{book_id}_sentence_{chapter_id}_{i}"
                         cur.execute("""
-                            INSERT INTO chunks (book_id, content, chunk_type, parent_chunk_id, word_count, created_at)
-                            VALUES (%s, %s, %s, %s, %s, NOW())
-                        """, (book_id, chunk.content, chunk.chunk_type, str(chunk.parent_chunk_id), 
+                            INSERT INTO chunks (chunk_id, book_id, content, chunk_type, parent_chunk_id, word_count, created_at)
+                            VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                        """, (chunk_id, book_id, chunk.content, chunk.chunk_type, str(chunk.parent_chunk_id), 
                               len(chunk.content.split())))
                     results["sentence"] = len(sentence_chunks)
                     
                     # Insert paragraph chunks
-                    for chunk in paragraph_chunks:
+                    for i, chunk in enumerate(paragraph_chunks):
+                        chunk_id = f"{book_id}_paragraph_{chapter_id}_{i}"
                         cur.execute("""
-                            INSERT INTO chunks (book_id, content, chunk_type, parent_chunk_id, word_count, created_at)
-                            VALUES (%s, %s, %s, %s, %s, NOW())
-                        """, (book_id, chunk.content, chunk.chunk_type, str(chunk.parent_chunk_id),
+                            INSERT INTO chunks (chunk_id, book_id, content, chunk_type, parent_chunk_id, word_count, created_at)
+                            VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                        """, (chunk_id, book_id, chunk.content, chunk.chunk_type, str(chunk.parent_chunk_id),
                               len(chunk.content.split())))
                     results["paragraph"] = len(paragraph_chunks)
                     
                     # Insert section chunks
-                    for chunk in section_chunks:
+                    for i, chunk in enumerate(section_chunks):
+                        chunk_id = f"{book_id}_section_{chapter_id}_{i}"
                         cur.execute("""
-                            INSERT INTO chunks (book_id, content, chunk_type, parent_chunk_id, word_count, created_at)
-                            VALUES (%s, %s, %s, %s, %s, NOW())
-                        """, (book_id, chunk.content, chunk.chunk_type, str(chunk.parent_chunk_id),
+                            INSERT INTO chunks (chunk_id, book_id, content, chunk_type, parent_chunk_id, word_count, created_at)
+                            VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                        """, (chunk_id, book_id, chunk.content, chunk.chunk_type, str(chunk.parent_chunk_id),
                               len(chunk.content.split())))
                     results["section"] = len(section_chunks)
                     
@@ -769,14 +772,16 @@ class MultiGranularChunkingDaemon:
                                    f"{self.stats.total_granular_chunks()} granular chunks "
                                    f"(expansion: {expansion_ratio:.1f}x)")
                     
-                    # Brief pause between chapters
-                    time.sleep(0.5)
+                    # TURBO: Removed artificial delay for maximum performance
+                    # time.sleep(0.5)  # Disabled for speed
                 
                 # Save state after each batch
                 self.save_granular_metrics()
                 
                 if self.running and chapters:
-                    time.sleep(2)  # Brief pause between batches
+                    # TURBO: Removed batch delay for maximum throughput
+                    # time.sleep(2)  # Disabled for speed
+                    pass  # Continue processing without delay
                 
         except KeyboardInterrupt:
             logger.info("🛑 Daemon stopped by user")

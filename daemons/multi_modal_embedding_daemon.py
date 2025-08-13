@@ -84,7 +84,7 @@ class MultiModalEmbeddingDaemon:
         self.db_config = {
             'host': 'localhost',
             'database': 'knowledge_base', 
-            'user': os.environ.get('DB_USER', 'postgres'),
+            'user': os.environ.get('DB_USER', 'weixiangzhang'),
             'password': os.environ.get('DB_PASSWORD')
         }
         
@@ -145,7 +145,7 @@ class MultiModalEmbeddingDaemon:
         self.logger.info(f"📊 Models available: {list(self.embedding_models.keys())}")
         
     def load_state(self):
-        """Load daemon state from previous session"""
+        """Load daemon state from previous session with granite->arctic migration"""
         if self.state_file.exists():
             try:
                 with open(self.state_file, 'r') as f:
@@ -154,12 +154,33 @@ class MultiModalEmbeddingDaemon:
                     self.stats.chunks_successful = state.get('chunks_successful', 0)
                     self.stats.chunks_failed = state.get('chunks_failed', 0) 
                     self.stats.books_processed = state.get('books_processed', 0)
-                    self.stats.model_usage = state.get('model_usage', {"nomic": 0, "mxbai": 0, "bge": 0, "arctic": 0})
+                    
+                    # Handle legacy granite->arctic migration
+                    loaded_model_usage = state.get('model_usage', {"nomic": 0, "mxbai": 0, "bge": 0, "arctic": 0})
+                    if 'granite' in loaded_model_usage and 'arctic' not in loaded_model_usage:
+                        # Migrate granite stats to arctic
+                        loaded_model_usage['arctic'] = loaded_model_usage.pop('granite')
+                        self.logger.info(f"🔄 Migrated granite model stats to arctic: {loaded_model_usage['arctic']} chunks")
+                    elif 'granite' in loaded_model_usage and 'arctic' in loaded_model_usage:
+                        # Merge granite into arctic and remove granite
+                        loaded_model_usage['arctic'] += loaded_model_usage.pop('granite')
+                        self.logger.info(f"🔄 Merged granite->arctic model stats: {loaded_model_usage['arctic']} chunks")
+                    
+                    # Ensure all expected models are present
+                    expected_models = {"nomic": 0, "mxbai": 0, "bge": 0, "arctic": 0}
+                    for model in expected_models:
+                        if model not in loaded_model_usage:
+                            loaded_model_usage[model] = 0
+                    
+                    self.stats.model_usage = loaded_model_usage
                     self.stats.total_processing_time = state.get('total_processing_time', 0.0)
                     
                     self.logger.info(f"📁 Loaded state: {self.stats.chunks_processed} chunks processed")
+                    self.logger.info(f"📊 Model usage: {dict(self.stats.model_usage)}")
             except Exception as e:
                 self.logger.error(f"Failed to load state: {e}")
+                # Reset to safe defaults on load failure
+                self.stats.model_usage = {"nomic": 0, "mxbai": 0, "bge": 0, "arctic": 0}
                 
     def save_state(self):
         """Save current daemon state"""
@@ -272,8 +293,9 @@ class MultiModalEmbeddingDaemon:
         
         return optimal_model
         
-    def generate_embedding(self, text: str, model_key: str) -> Optional[List[float]]:
-        """Generate embedding using specified Ollama model"""
+    def generate_embedding(self, text: str, model_key: str, use_fallback: bool = True) -> Optional[Tuple[List[float], str]]:
+        """Generate embedding using specified Ollama model with robust error handling and fallback
+        Returns: (embedding, actual_model_used)"""
         
         model_config = self.embedding_models[model_key]
         
@@ -291,20 +313,45 @@ class MultiModalEmbeddingDaemon:
                 if response.status_code == 200:
                     embedding = response.json().get('embedding')
                     if embedding and len(embedding) == model_config["dimensions"]:
-                        return embedding
+                        return (embedding, model_key)
                     else:
-                        self.logger.warning(f"Invalid embedding dimensions from {model_key}")
+                        self.logger.warning(f"Invalid embedding dimensions from {model_key}: expected {model_config['dimensions']}, got {len(embedding) if embedding else 'None'}")
+                elif response.status_code == 500:
+                    self.logger.warning(f"500 Server error from {model_key}, attempt {attempt + 1}: {response.text[:200]}")
                 else:
-                    self.logger.warning(f"API error from {model_key}: {response.status_code}")
+                    self.logger.warning(f"API error from {model_key}: {response.status_code}, response: {response.text[:200]}")
                     
             except requests.exceptions.Timeout:
-                self.logger.warning(f"Timeout from {model_key}, attempt {attempt + 1}")
+                self.logger.warning(f"Timeout from {model_key}, attempt {attempt + 1} (60s limit exceeded)")
             except Exception as e:
-                self.logger.warning(f"Error from {model_key}: {e}, attempt {attempt + 1}")
+                self.logger.warning(f"Unexpected error from {model_key}: {e}, attempt {attempt + 1}")
                 
             if attempt < self.retry_attempts - 1:
-                time.sleep(5)
-                
+                # Progressive backoff: 2s, 5s, 10s
+                sleep_time = 2 ** (attempt + 1)
+                self.logger.info(f"Waiting {sleep_time}s before retry {attempt + 2}...")
+                time.sleep(sleep_time)
+        
+        # If primary model failed and fallback is enabled, try alternative models
+        if use_fallback and model_key != "nomic":
+            self.logger.warning(f"Primary model {model_key} failed after {self.retry_attempts} attempts, trying fallback...")
+            
+            # Try nomic as universal fallback (most reliable model)
+            fallback_result = self.generate_embedding(text, "nomic", use_fallback=False)
+            if fallback_result:
+                self.logger.info(f"Fallback successful: {model_key} -> nomic")
+                return fallback_result
+            
+            # If nomic also fails, try other models in order of reliability
+            fallback_order = ["bge", "mxbai"] if model_key != "bge" else ["mxbai"]
+            for fallback_model in fallback_order:
+                if fallback_model != model_key:
+                    self.logger.info(f"Trying secondary fallback: {model_key} -> {fallback_model}")
+                    fallback_result = self.generate_embedding(text, fallback_model, use_fallback=False)
+                    if fallback_result:
+                        self.logger.info(f"Secondary fallback successful: {model_key} -> {fallback_model}")
+                        return fallback_result
+                        
         return None
         
     def process_chunk_batch(self) -> int:
@@ -316,17 +363,25 @@ class MultiModalEmbeddingDaemon:
                     return 0
                     
                 with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                    # Get chunks that need multi-modal embedding (any missing embedding)
+                    # Get chunks that need multi-modal embedding (prioritize higher-level chunks)
                     cur.execute("""
-                        SELECT c.chunk_id, c.content, c.book_id, b.title, b.genre
+                        SELECT c.chunk_id, c.content, c.book_id, b.title, b.genre, c.chunk_type
                         FROM chunks c
                         JOIN books b ON c.book_id = b.book_id  
                         WHERE c.content IS NOT NULL 
+                        AND c.chunk_type IN ('chapter', 'section', 'paragraph')  -- Skip sentence-level
                         AND (c.embedding_nomic IS NULL 
                              OR c.embedding_mxbai IS NULL 
                              OR c.embedding_bge IS NULL 
                              OR c.embedding_arctic IS NULL)
-                        ORDER BY RANDOM()  -- Randomize for balanced processing
+                        ORDER BY 
+                            CASE c.chunk_type 
+                                WHEN 'chapter' THEN 1
+                                WHEN 'section' THEN 2  
+                                WHEN 'paragraph' THEN 3
+                                ELSE 4
+                            END,
+                            RANDOM()  -- Randomize within priority level
                         LIMIT %s
                     """, (self.batch_size,))
                     
@@ -353,13 +408,20 @@ class MultiModalEmbeddingDaemon:
                         # Select optimal model
                         optimal_model = self.select_optimal_model(content_type)
                         
-                        # Generate embedding
-                        embedding = self.generate_embedding(chunk['content'], optimal_model)
+                        # Generate embedding with improved error handling
+                        embedding_result = self.generate_embedding(chunk['content'], optimal_model)
                         
-                        if embedding:
-                            # Update chunk with new embedding
-                            model_config = self.embedding_models[optimal_model]
-                            column_name = f"embedding_{optimal_model}"
+                        if embedding_result:
+                            embedding, actual_model = embedding_result
+                            
+                            # Update chunk with new embedding using actual model that was used
+                            if actual_model not in self.embedding_models:
+                                self.logger.error(f"Invalid model key: {actual_model}. Available: {list(self.embedding_models.keys())}")
+                                self.stats.chunks_failed += 1
+                                continue
+                                
+                            model_config = self.embedding_models[actual_model]
+                            column_name = f"embedding_{actual_model}"
                             
                             cur.execute(f"""
                                 UPDATE chunks SET 
@@ -371,18 +433,27 @@ class MultiModalEmbeddingDaemon:
                             """, (
                                 embedding,
                                 content_type,
-                                f"Phase3-{optimal_model}-{model_config['specialization']}",
-                                optimal_model,
+                                f"Phase3-{optimal_model}-{model_config['specialization']}-robust",
+                                actual_model,
                                 chunk['chunk_id']
                             ))
                             
                             self.stats.chunks_successful += 1
-                            self.stats.model_usage[optimal_model] += 1
+                            # Ensure model key exists in stats before incrementing
+                            if actual_model not in self.stats.model_usage:
+                                self.stats.model_usage[actual_model] = 0
+                            self.stats.model_usage[actual_model] += 1
                             processed_count += 1
+                            
+                            self.logger.debug(f"✅ Successfully processed chunk {chunk['chunk_id']} with {actual_model} model")
                             
                         else:
                             self.stats.chunks_failed += 1
-                            self.logger.error(f"Failed embedding for chunk {chunk['chunk_id']}")
+                            self.logger.error(f"❌ COMPLETE FAILURE: All models failed for chunk {chunk['chunk_id']} (optimal: {optimal_model}, length: {len(chunk['content'])} chars)")
+                            
+                            # Log failure details for debugging
+                            self.logger.debug(f"Failed chunk preview: {chunk['content'][:200]}...")
+                            self.logger.debug(f"Book: {chunk.get('title', 'Unknown')} | Genre: {chunk.get('genre', 'Unknown')}")
                             
                         # Update timing stats
                         processing_time = time.time() - start_time
