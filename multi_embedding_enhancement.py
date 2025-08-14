@@ -125,7 +125,7 @@ class MultiEmbeddingEnhancer:
                 host='localhost',
                 database='knowledge_base',
                 user='weixiangzhang',
-                password=os.environ.get('DB_PASSWORD', 'Weixiang135!')
+                password=os.environ.get('DB_PASSWORD')
             )
             
             with conn.cursor() as cur:
@@ -192,7 +192,7 @@ class MultiEmbeddingEnhancer:
                 host='localhost',
                 database='knowledge_base', 
                 user='weixiangzhang',
-                password=os.environ.get('DB_PASSWORD', 'Weixiang135!')
+                password=os.environ.get('DB_PASSWORD')
             )
             
             with conn.cursor() as cur:
@@ -316,7 +316,7 @@ class MultiEmbeddingEnhancer:
                 host='localhost',
                 database='knowledge_base',
                 user='weixiangzhang', 
-                password=os.environ.get('DB_PASSWORD', 'Weixiang135!')
+                password=os.environ.get('DB_PASSWORD')
             )
             
             with conn.cursor() as cur:

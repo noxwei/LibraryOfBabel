@@ -55,7 +55,7 @@ class Phase2DatabaseEnhancer:
                 host='localhost',
                 database='knowledge_base',
                 user='weixiangzhang',
-                password=os.environ.get('DB_PASSWORD', 'Weixiang135!')
+                password=os.environ.get('DB_PASSWORD')
             )
         except Exception as e:
             logger.error(f"Database connection failed: {e}")
