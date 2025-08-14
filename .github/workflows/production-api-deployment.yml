@@ -16,7 +16,7 @@ on:
 env:
   PYTHON_VERSION: '3.11'
   NODE_VERSION: '18'
-  API_PORT: 5565
+  API_PORT: 5562
   CONTAINER_REGISTRY: ghcr.io
   IMAGE_NAME: libraryofbabel-api
 
@@ -246,9 +246,9 @@ jobs:
           docker run -d \
             --name libraryofbabel-api \
             --restart unless-stopped \
-            -p 5565:5565 \
+            -p 5562:5562 \
             -e API_HOST=0.0.0.0 \
-            -e API_PORT=5565 \
+            -e API_PORT=5562 \
             -e RUNNING_IN_CONTAINER=true \
             -e FLASK_DEBUG=false \
             -e API_KEY=$API_KEY \
@@ -269,10 +269,10 @@ jobs:
         sleep 30
         
         # Test health endpoint
-        curl -f "https://api.ashortstayinhell.com:5565/health" || exit 1
+        curl -f "https://api.ashortstayinhell.com:5562/health" || exit 1
         
         # Test API functionality
-        curl -f "https://api.ashortstayinhell.com:5565/api/books?action=list&limit=1" \
+        curl -f "https://api.ashortstayinhell.com:5562/api/books?action=list&limit=1" \
           -H "Authorization: Bearer ${{ secrets.BABEL_API_KEY }}" || exit 1
         
         echo "✅ Production health check passed"
@@ -295,7 +295,7 @@ jobs:
         total_count=${#endpoints[@]}
         
         for endpoint in "${endpoints[@]}"; do
-          if curl -s -f "https://api.ashortstayinhell.com:5565$endpoint" \
+          if curl -s -f "https://api.ashortstayinhell.com:5562$endpoint" \
              -H "Authorization: Bearer ${{ secrets.BABEL_API_KEY }}" > /dev/null; then
             echo "✅ $endpoint"
             ((success_count++))
@@ -339,7 +339,7 @@ jobs:
         {
           "title": "LibraryOfBabel Standardized Production API",
           "version": "v5.0-standardized",
-          "baseUrl": "https://api.ashortstayinhell.com:5565",
+          "baseUrl": "https://api.ashortstayinhell.com:5562",
           "successRate": "93.2%",
           "endpoints": {
             "books": {
@@ -424,6 +424,6 @@ jobs:
         echo "- Actor: ${{ github.actor }}"
         echo ""
         echo "✅ **STATUS: DEPLOYMENT COMPLETE**"
-        echo "🌐 API Available: https://api.ashortstayinhell.com:5565"
+        echo "🌐 API Available: https://api.ashortstayinhell.com:5562"
         echo "📚 Documentation: Updated with latest endpoints"
         echo "📱 iOS Shortcuts: Ready for integration"
