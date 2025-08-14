@@ -32,7 +32,10 @@ from modules.standardized_mobile import standardized_mobile_bp
 # Configure container-aware logging
 def get_log_path():
     """Get container-aware log file path"""
-    log_dir = os.getenv('LOG_PATH', '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs')
+    if os.getenv('RUNNING_IN_CONTAINER') == 'true':
+        log_dir = '/app/logs'
+    else:
+        log_dir = os.getenv('LOG_PATH', './logs')
     os.makedirs(log_dir, exist_ok=True)
     return os.path.join(log_dir, 'standardized_api.log')
 

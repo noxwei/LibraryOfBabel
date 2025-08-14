@@ -61,7 +61,7 @@ jobs:
       run: |
         echo "🔒 Running security scans..."
         bandit -r src/api/ -f json -o security-report.json || true
-        safety check --json --output safety-report.json || true
+        safety check --json > safety-report.json || true
         echo "✅ Security scan completed"
     
     - name: 🗄️ Setup Test Database
