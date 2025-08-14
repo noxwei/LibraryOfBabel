@@ -129,6 +129,96 @@ def dashboard():
         return jsonify({'error': 'Failed to get dashboard data'}), 500
 
 
+# iOS Shortcuts Search - STANDARDIZED PARAMETERS
+@shortcuts_bp.route('/api/shortcuts/search')
+@require_auth
+def shortcuts_search():
+    """iOS Shortcuts search with standardized parameters (q= and term= both supported)"""
+    try:
+        # Support both q= (standard) and term= (legacy) for backwards compatibility
+        query = request.args.get('q', '').strip()
+        term = request.args.get('term', '').strip()
+        search_term = query or term  # Use q= if provided, fallback to term=
+        
+        action = request.args.get('action', 'simple')
+        limit = min(int(request.args.get('limit', 10)), 50)
+        
+        if not search_term:
+            return jsonify({
+                'success': False,
+                'error': 'Search term required',
+                'usage': '/api/shortcuts/search?q=philosophy&action=simple (or use term= for legacy)',
+                'supported_actions': ['simple', 'count', 'has_results', 'titles']
+            }), 400
+            
+        if action == 'count':
+            count = execute_pg_function('api_shortcuts_search_count', search_term)
+            return jsonify(count)  # Return simple integer for iOS Shortcuts
+            
+        elif action == 'has_results':
+            has_results = execute_pg_function('api_shortcuts_search_has_results', search_term)
+            return jsonify(has_results)  # Return simple boolean
+            
+        elif action == 'titles':
+            titles = execute_pg_function('api_shortcuts_search_titles', search_term, limit)
+            return jsonify(titles)  # Return simple array
+            
+        else:  # simple search
+            result = execute_pg_function('api_shortcuts_search_simple', search_term, limit)
+            return jsonify(result)
+            
+    except Exception as e:
+        logger.error(f"Shortcuts search error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# Missing Shortcuts Routes - Add the endpoints that tests expect
+@shortcuts_bp.route('/api/shortcuts/random')
+@require_auth
+def shortcuts_random_fallback():
+    """Fallback for /api/shortcuts/random - redirect to random title"""
+    try:
+        # Default to random title if no specific type requested
+        result = execute_pg_function('api_shortcuts_random_title')
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Random fallback error: {e}")
+        return jsonify({'error': 'Failed to get random content'}), 500
+
+
+@shortcuts_bp.route('/api/shortcuts/stats')
+@require_auth
+def shortcuts_stats_fallback():
+    """Fallback for /api/shortcuts/stats - redirect to collection health"""
+    try:
+        health = execute_pg_function('api_shortcuts_collection_health')
+        return jsonify(health)
+    except Exception as e:
+        logger.error(f"Stats fallback error: {e}")
+        return jsonify({'error': 'Failed to get stats'}), 500
+
+
+@shortcuts_bp.route('/api/shortcuts/lists')
+@require_auth
+def shortcuts_lists_fallback():
+    """Fallback for /api/shortcuts/lists - provide list options"""
+    try:
+        action = request.args.get('action', 'titles')
+        limit = min(int(request.args.get('limit', 100)), 500)
+        page = max(int(request.args.get('page', 1)), 1)
+        
+        if action == 'authors':
+            authors = execute_pg_function('api_shortcuts_list_authors', limit, page)
+            return jsonify(authors)
+        else:  # default to titles
+            titles = execute_pg_function('api_shortcuts_list_titles', limit, page)
+            return jsonify(titles)
+            
+    except Exception as e:
+        logger.error(f"Lists fallback error: {e}")
+        return jsonify({'error': 'Failed to get lists'}), 500
+
+
 # Legacy V3 shortcuts endpoints for backwards compatibility
 @shortcuts_bp.route('/api/v3/search')
 @require_auth

@@ -1,0 +1,155 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "LibraryOfBabel - Multi-Granular Chunking & Embedding System",
+    "tags": ["libraryofbabel", "chunking", "nlp", "granular", "embeddings", "ai"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "📏 Granular Chunks Created",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "multi_granular_sentences_created",
+            "legendFormat": "Sentences"
+          },
+          {
+            "expr": "multi_granular_paragraphs_created", 
+            "legendFormat": "Paragraphs"
+          },
+          {
+            "expr": "multi_granular_sections_created",
+            "legendFormat": "Sections"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "displayMode": "list",
+              "orientation": "horizontal"
+            },
+            "mappings": [],
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 1000},
+                {"color": "green", "value": 10000}
+              ]
+            },
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "📊 Granularity Expansion Ratio",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "multi_granular_expansion_ratio",
+            "legendFormat": "Expansion Factor"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 50},
+                {"color": "green", "value": 150}
+              ]
+            },
+            "unit": "short",
+            "min": 0,
+            "max": 250
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "⚡ Processing Performance",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "multi_granular_processing_rate_chunks_per_second",
+            "legendFormat": "Chunks/Second"
+          },
+          {
+            "expr": "multi_granular_books_processed",
+            "legendFormat": "Books Processed"
+          }
+        ],
+        "yAxes": [
+          {"label": "Rate", "min": 0},
+          {"label": "Count", "min": 0}
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "🎯 Quality & Success Metrics", 
+        "type": "singlestat",
+        "targets": [
+          {
+            "expr": "multi_granular_success_rate_percent",
+            "legendFormat": "Success Rate %"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 8, "x": 0, "y": 16}
+      },
+      {
+        "id": 5,
+        "title": "🖥️ System Resources",
+        "type": "graph", 
+        "targets": [
+          {
+            "expr": "multi_granular_memory_usage_mb",
+            "legendFormat": "Memory (MB)"
+          },
+          {
+            "expr": "multi_granular_daemon_uptime_seconds",
+            "legendFormat": "Uptime (s)"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 16, "x": 8, "y": 16}
+      },
+      {
+        "id": 6,
+        "title": "📈 Chunking Progress Timeline",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "multi_granular_chapters_processed",
+            "legendFormat": "Chapters Processed"
+          },
+          {
+            "expr": "multi_granular_total_chunks",
+            "legendFormat": "Total Granular Chunks"
+          }
+        ],
+        "yAxes": [
+          {"label": "Count", "min": 0},
+          {"label": "Total", "min": 0}
+        ],
+        "gridPos": {"h": 6, "w": 24, "x": 0, "y": 20}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s",
+    "schemaVersion": 27,
+    "version": 1
+  }
+}
