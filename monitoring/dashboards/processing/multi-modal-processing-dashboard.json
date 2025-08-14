@@ -1,0 +1,369 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "LibraryOfBabel Multi-Modal Processing - AI Agent Ready",
+    "tags": ["libraryofbabel", "processing", "ai-agent-ready", "multi-modal"],
+    "style": "dark",
+    "timezone": "browser",
+    "editable": true,
+    "hideControls": false,
+    "graphTooltip": 1,
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+      "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+    },
+    "refresh": "30s",
+    "annotations": {
+      "list": [
+        {
+          "name": "AI Agent Annotations",
+          "datasource": "Loki",
+          "enable": true,
+          "expr": "{job=\"libraryofbabel\", ai_agent_ready=\"true\"} |~ \"AI.*Alert|Critical|Error\"",
+          "iconColor": "red",
+          "textFormat": "{{ ai_summary }}",
+          "titleFormat": "AI Agent Alert"
+        }
+      ]
+    },
+    "description": "AI Agent Ready dashboard for LibraryOfBabel multi-modal processing pipeline monitoring. Compatible with Grafana Assistant and conversational queries.",
+    "panels": [
+      {
+        "id": 1,
+        "title": "🤖 AI Agent Overview - Processing Summary",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "libraryofbabel_chunks_processed_total",
+            "legendFormat": "Total Chunks",
+            "refId": "A",
+            "datasource": "Prometheus"
+          },
+          {
+            "expr": "libraryofbabel_success_rate",
+            "legendFormat": "Success Rate %",
+            "refId": "B",
+            "datasource": "Prometheus"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "displayMode": "list",
+              "orientation": "horizontal"
+            },
+            "mappings": [],
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "yellow",
+                  "value": 95
+                },
+                {
+                  "color": "green",
+                  "value": 99
+                }
+              ]
+            },
+            "unit": "short"
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "center",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "text": {},
+          "textMode": "auto"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "description": "AI Agent Summary: LibraryOfBabel is processing {{ chunks_processed }} chunks with {{ success_rate }}% accuracy using multi-modal AI models."
+      },
+      {
+        "id": 2,
+        "title": "🧠 AI Model Performance Overview",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "libraryofbabel_model_usage_total",
+            "legendFormat": "{{ model }}",
+            "refId": "A",
+            "datasource": "Prometheus"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              }
+            },
+            "mappings": []
+          }
+        },
+        "options": {
+          "pieType": "pie",
+          "tooltip": {
+            "mode": "single"
+          },
+          "legend": {
+            "displayMode": "visible",
+            "placement": "right"
+          },
+          "displayLabels": ["name", "value"]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "description": "AI Agent Context: Multi-modal models MxBai, BGE, and Nomic processing distribution. Ask: 'Which model is most active?'"
+      },
+      {
+        "id": 3,
+        "title": "📊 Processing Rate (Chunks/Second) - AI Queryable",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(libraryofbabel_chunks_processed_total[5m])",
+            "legendFormat": "Processing Rate",
+            "refId": "A",
+            "datasource": "Prometheus"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Chunks/Second",
+            "min": 0
+          },
+          {
+            "show": false
+          }
+        ],
+        "xAxis": {
+          "show": true
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 8
+        },
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "legend": {
+          "alignAsTable": true,
+          "avg": true,
+          "current": true,
+          "max": true,
+          "min": true,
+          "show": true,
+          "total": false,
+          "values": true
+        },
+        "description": "AI Agent Query: 'How fast is LibraryOfBabel processing?' Answer: Currently processing at {{ rate }} chunks per second."
+      },
+      {
+        "id": 4,
+        "title": "📈 Success Rate Trend - Conversational Analytics",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "libraryofbabel_success_rate",
+            "legendFormat": "Success Rate %",
+            "refId": "A",
+            "datasource": "Prometheus"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Percentage",
+            "min": 90,
+            "max": 100
+          },
+          {
+            "show": false
+          }
+        ],
+        "thresholds": [
+          {
+            "value": 95,
+            "colorMode": "critical",
+            "op": "lt",
+            "fill": true,
+            "line": true
+          },
+          {
+            "value": 99,
+            "colorMode": "rgba(50, 172, 45, 0.97)",
+            "op": "gt",
+            "fill": false,
+            "line": true
+          }
+        ],
+        "gridPos": {
+          "h": 9,
+          "w": 12,
+          "x": 0,
+          "y": 17
+        },
+        "description": "AI Agent Intelligence: Success rate trending analysis. Natural language query: 'Is the success rate improving?' Current: {{ success_rate }}%"
+      },
+      {
+        "id": 5,
+        "title": "⚡ Processing Time Distribution",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "rate(libraryofbabel_processing_time_seconds_bucket[5m])",
+            "legendFormat": "{{ le }}",
+            "refId": "A",
+            "datasource": "Prometheus"
+          }
+        ],
+        "gridPos": {
+          "h": 9,
+          "w": 12,
+          "x": 12,
+          "y": 17
+        },
+        "description": "AI Agent Analytics: Processing time heatmap for performance optimization insights."
+      },
+      {
+        "id": 6,
+        "title": "🔍 AI Agent Logs - Natural Language Processing",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=\"libraryofbabel\", ai_agent_ready=\"true\"} | json | line_format \"{{.ai_summary}}\"",
+            "refId": "A",
+            "datasource": "Loki"
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "prettifyLogMessage": true,
+          "enableLogDetails": true,
+          "dedupStrategy": "none",
+          "sortOrder": "Descending"
+        },
+        "gridPos": {
+          "h": 12,
+          "w": 24,
+          "x": 0,
+          "y": 26
+        },
+        "description": "AI Agent Logs: Natural language summaries of LibraryOfBabel processing events. Ask: 'What happened recently?'"
+      },
+      {
+        "id": 7,
+        "title": "🚨 AI Agent Alert Status",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "{job=\"libraryofbabel\"} |~ \"ERROR|CRITICAL|WARN\" | json",
+            "refId": "A",
+            "datasource": "Loki"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "level": "Severity",
+                "ai_log_summary": "AI Analysis",
+                "timestamp": "Time"
+              }
+            }
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 38
+        },
+        "description": "AI Agent Alert Intelligence: Automated analysis of system alerts with natural language summaries."
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "ai_query_mode",
+          "type": "custom",
+          "options": [
+            {
+              "text": "Conversational",
+              "value": "conversational"
+            },
+            {
+              "text": "Technical",
+              "value": "technical"
+            },
+            {
+              "text": "Business",
+              "value": "business"
+            }
+          ],
+          "current": {
+            "text": "Conversational",
+            "value": "conversational"
+          },
+          "description": "AI Agent Query Mode for dashboard interaction"
+        }
+      ]
+    },
+    "links": [
+      {
+        "title": "AI Agent Gateway",
+        "url": "http://localhost:8080/docs",
+        "type": "link",
+        "icon": "external link",
+        "tags": ["ai-agent"]
+      },
+      {
+        "title": "Natural Language Queries",
+        "url": "http://localhost:8080/api/v1/ai/context",
+        "type": "link",
+        "icon": "question",
+        "tags": ["help"]
+      }
+    ]
+  }
+}

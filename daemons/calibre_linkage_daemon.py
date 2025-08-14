@@ -87,7 +87,7 @@ class CalibreLinkageDaemon:
             host='localhost',
             database='knowledge_base',
             user='weixiangzhang',
-            password=os.environ.get('DB_PASSWORD', 'Weixiang135!')
+            password=os.environ.get('DB_PASSWORD')
         )
     
     def get_all_calibre_books(self):

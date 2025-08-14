@@ -621,4 +621,140 @@ daemons/calibre_checkpoint_300.json
 daemons/calibre_checkpoint_400.json
 daemons/calibre_checkpoint_500.json
 calibre_batch_import_progress.json
+
+# === MONITORING & DOCKER SECURITY ===
+# Docker compose files with hardcoded credentials
+monitoring/docker/docker-compose.yml
+*docker-compose*.yml
+monitoring/config/
+monitoring/data/
 calibre_batch_import_progress.json
+/docker
+
+# === MULTI-GRANULAR CHUNKING SYSTEM SECURITY ===
+# Multi-granular chunking daemon logs and metrics (may contain processing details)
+logs/multi_granular_chunking/
+logs/multi_modal_daemon/
+logs/progressive_chunking_daemon.log
+logs/multi_modal_embedding_restart.log
+logs/multi_granular_daemon.log
+
+# Daemon PID and state files
+pids/multi_granular_daemon.pid
+pids/multi_modal_daemon.pid
+pids/progressive_chunking_daemon.pid
+
+# Multi-granular metrics and performance data
+*granular_metrics*.json
+*multi_modal_metrics*.json
+*daemon_state*.json
+
+# Grafana dashboard exports (may contain internal metrics)
+# monitoring/grafana/*dashboard*.json  # Allow multi-granular dashboard for production
+
+# PostgreSQL optimization and performance logs
+*postgresql_optimization*.log
+*database_performance*.json
+
+# === KUBERNETES STANDARD GITIGNORE ===
+# Kubernetes configuration files with secrets
+*.kubeconfig
+kubeconfig
+kubeconfig.*
+.kube/
+kubernetes/secrets/
+k8s/secrets/
+kubernetes/config/
+k8s/config/
+
+# Helm charts and releases
+.helm/
+helm/charts/*.tgz
+*.tgz
+helm-chart/
+charts/*/charts/
+charts/*/requirements.lock
+
+# Kubernetes temporary files
+*.tmp
+*.yaml.tmp
+*.yml.tmp
+k8s-*.yaml
+k8s-*.yml
+
+# Kubernetes logs and debugging
+kubectl-*.log
+k8s-*.log
+kubernetes-*.log
+pod-*.log
+service-*.log
+
+# Kustomize
+kustomization.yaml.bak
+kustomization.yml.bak
+
+# Minikube
+.minikube/
+
+# === DOCKER STANDARD GITIGNORE ===
+# Docker files with secrets
+docker-compose.override.yml
+docker-compose.override.yaml
+docker-compose.local.yml
+docker-compose.local.yaml
+docker-compose.prod.yml
+docker-compose.prod.yaml
+docker-compose.*.yml
+docker-compose.*.yaml
+
+# Docker environment files
+.dockerenv
+docker.env
+.env.docker
+.env.local
+.env.production
+.env.staging
+
+# Docker volumes and data
+docker-volumes/
+volumes/
+data/docker/
+docker-data/
+
+# Docker logs
+docker-compose.log
+docker.log
+container-*.log
+
+# Docker build context
+.dockerignore.bak
+Dockerfile.bak
+Dockerfile.local
+Dockerfile.prod
+Dockerfile.staging
+Dockerfile.*
+
+# Docker registry and images
+*.tar
+*.tar.gz
+docker-images/
+registry/
+
+# Docker development
+docker-sync.yml
+docker-compose.dev.yml
+docker-compose.test.yml
+docker-compose.debug.yml
+
+# Docker secrets and certificates
+docker/secrets/
+docker/certs/
+docker/ssl/
+secrets/
+certs/
+ssl/
+/prompts
+*.pid
+dual_machine_transfer/chunks_data.sql
+api_critical_issues_summary.json
+API_VALIDATION_SUMMARY.json

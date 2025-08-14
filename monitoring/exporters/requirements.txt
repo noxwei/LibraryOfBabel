@@ -1,0 +1,6 @@
+prometheus_client==0.17.1
+requests==2.31.0
+flask==2.3.3
+watchdog==3.0.0
+psutil==5.9.5
+jira==3.5.0
