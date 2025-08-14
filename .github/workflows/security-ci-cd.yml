@@ -1,319 +1,37 @@
-name: 🔒 LibraryOfBabel Security CI/CD Pipeline
+name: 🔒 DEPRECATED - Use production-api-deployment.yml
+
+# This workflow has been replaced by:
+# - production-api-deployment.yml (main deployment pipeline)
+# - security-validation.yml (focused security scanning)
 
 on:
-  push:
-    branches: [ main, dev ]
-  pull_request:
-    branches: [ main, dev ]
-  schedule:
-    # Security scan every day at 2 AM
-    - cron: '0 2 * * *'
-
-env:
-  PYTHON_VERSION: '3.11'
-  NODE_VERSION: '18'
-  SECURITY_SCAN_ENABLED: true
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for running deprecated workflow'
+        required: true
 
 jobs:
-  # 🔍 Security Pre-Check (Fastest - Fails Fast)
-  security-precheck:
-    name: 🔒 Security Pre-Check
+  deprecated-notice:
+    name: ⚠️ Deprecated Workflow
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     
     steps:
-    - name: 🔍 Checkout Code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Full history for security analysis
-    
-    - name: 🚨 Secret Detection
-      uses: trufflesecurity/trufflehog@main
-      with:
-        path: ./
-        extra_args: --debug --only-verified
-    
-    - name: 🔒 API Key Leak Detection
+    - name: ⚠️ Deprecation Notice
       run: |
-        echo "🔍 Scanning for API key patterns in production code..."
-        # Only scan production code files, exclude documentation and reports
-        if grep -r "babel_secure_[0-9a-zA-Z_-]\{40,\}" --include="*.py" --include="*.js" --include="*.ts" --include="*.jsx" --include="*.tsx" --exclude-dir="docs" --exclude-dir="reports" --exclude-dir="archive" --exclude-dir="agents" --exclude="*test*" --exclude="*example*" --exclude="*deploy*" --exclude="*DEPLOYMENT*" .; then
-          echo "🚨 ERROR: Real API key found in production code!"
-          exit 1
-        fi
-        echo "✅ No production API key leaks detected"
-    
-    - name: 🛡️ Environment File Check
-      run: |
-        echo "🔍 Checking for committed environment files..."
-        # Only check files that are actually tracked by git (not just local files)
-        if git ls-files | grep -E "\.env($|\..*)" | grep -v -E "\.(example|template|sample)$"; then
-          echo "🚨 ERROR: Real environment files found in git repository!"
-          echo "💡 Tip: Use .env.example, .env.template, or .env.sample for examples"
-          echo "Found tracked environment files:"
-          git ls-files | grep -E "\.env($|\..*)" | grep -v -E "\.(example|template|sample)$"
-          exit 1
-        fi
-        echo "✅ No real environment files committed to git (local .env files are OK)"
-
-  # 🧪 Code Quality & Testing
-  code-quality:
-    name: 🧪 Code Quality & Testing
-    runs-on: ubuntu-latest
-    needs: security-precheck
-    timeout-minutes: 20
-    
-    strategy:
-      matrix:
-        component: [backend, frontend, agents]
-    
-    steps:
-    - name: 🔍 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🐍 Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-    
-    - name: 📦 Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install bandit safety pytest pytest-cov
-    
-    - name: 🔒 Python Security Scan (Bandit)
-      run: |
-        echo "🔍 Running Python security analysis..."
-        bandit -r . -f json -o security-report.json || true
-        bandit -r . -ll || true
-        echo "✅ Security scan completed (issues logged but not blocking)"
-    
-    - name: 🛡️ Dependency Vulnerability Check
-      run: |
-        echo "🔍 Checking for vulnerable dependencies..."
-        safety check --json --output safety-report.json || true
-        safety check || true
-        echo "✅ Dependency scan completed (issues logged but not blocking)"
-    
-    - name: 🧪 Run Tests
-      run: |
-        echo "🧪 Running test suite..."
-        pytest tests/ -v --cov=src/ --cov-report=xml --cov-report=term
-    
-    - name: 📊 Upload Coverage
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
-        flags: ${{ matrix.component }}
-        name: codecov-${{ matrix.component }}
-
-  # 🔐 Advanced Security Analysis
-  security-analysis:
-    name: 🔐 Advanced Security Analysis
-    runs-on: ubuntu-latest
-    needs: code-quality
-    timeout-minutes: 15
-    
-    steps:
-    - name: 🔍 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🔒 CodeQL Analysis
-      uses: github/codeql-action/init@v2
-      with:
-        languages: python, javascript
-    
-    - name: 🔍 Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
-    
-    - name: 🛡️ Container Security Scan
-      if: contains(github.event.head_commit.message, 'docker')
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-    
-    - name: 🔐 API Security Testing
-      run: |
-        echo "🔍 Testing API security..."
-        python scripts/key_rotation_monitor.py
-        python config/api_key_rotation.py --status
-
-  # 🚀 Deployment Security
-  deployment-security:
-    name: 🚀 Deployment Security
-    runs-on: ubuntu-latest
-    needs: [security-precheck, code-quality, security-analysis]
-    if: github.ref == 'refs/heads/main'
-    environment: production
-    timeout-minutes: 30
-    
-    steps:
-    - name: 🔍 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🔒 Verify Deployment Security
-      run: |
-        echo "🔍 Pre-deployment security verification..."
-        # Check that API keys are properly configured
-        if [ -f "config/api_key_rotation.py" ]; then
-          echo "✅ API rotation system present"
-        else
-          echo "🚨 ERROR: API rotation system missing!"
-          exit 1
-        fi
-    
-    - name: 🛡️ Environment Security Check
-      run: |
-        echo "🔍 Checking environment security..."
-        # Verify no secrets in environment
-        env | grep -v "GITHUB_" | grep -v "RUNNER_" | grep -v "_URL" | grep -v "_PATH" || true
-    
-    - name: 📊 Generate Security Report
-      run: |
-        echo "📊 Generating security report..."
-        cat > security-deployment-report.md << 'EOF'
-        # 🔒 Security Deployment Report
-        
-        ## ✅ Security Checks Passed:
-        - Secret detection: PASSED
-        - API key leak detection: PASSED
-        - Dependency vulnerabilities: PASSED
-        - Code quality: PASSED
-        - Advanced security analysis: PASSED
-        
-        ## 🛡️ Security Features Active:
-        - 30-day API key rotation system
-        - Comprehensive monitoring
-        - Automated security scanning
-        - Environment protection
-        
-        ## 📅 Report Generated: $(date)
-        EOF
-    
-    - name: 🔗 Production Endpoint Validation
-      run: |
-        echo "🔗 Testing production endpoints..."
-        # Test health endpoint first
-        echo "Testing health endpoint..."
-        curl -f "https://api.ashortstayinhell.com:5562/health" || exit 1
-        
-        # Test authenticated endpoint with API key
-        echo "Testing authenticated endpoint..."
-        response=$(curl -s "https://api.ashortstayinhell.com:5562/books?api_key=${{ secrets.BABEL_API_KEY }}&page=1&page_size=1")
-        if [[ $(echo $response | jq '.pagination.total_items') -lt 800 ]]; then
-          echo "ERROR: Not all books accessible - only found $(echo $response | jq '.pagination.total_items') books"
-          exit 1
-        fi
-        echo "✅ Production endpoints validated - $(echo $response | jq '.pagination.total_items') books accessible"
-    
-    - name: 🔒 SSL Configuration Validation
-      run: |
-        echo "🔒 Verifying HTTPS configuration..."
-        # Check HTTPS response
-        curl -I "https://api.ashortstayinhell.com:5562/health" | grep "HTTP/1.1 200" || exit 1
-        
-        # Check certificate validity
-        echo "Checking SSL certificate..."
-        echo | openssl s_client -connect api.ashortstayinhell.com:5562 2>/dev/null | openssl x509 -noout -dates
-        echo "✅ SSL certificate valid"
-    
-    - name: 🔄 Automated Rollback on Health Check Failure
-      if: failure()
-      run: |
-        echo "🚨 Deployment failure detected - initiating rollback..."
-        # Log the incident
-        echo "$(date): Deployment failed, rollback initiated" >> deployment-incidents.log
-        
-        # Send alert (placeholder for actual notification system)
-        echo "📧 Sending alert to team about failed deployment..."
-        echo "🔄 Rolling back to previous known good version..."
-        
-        # Restart service (placeholder for actual rollback)
-        echo "🔄 Service rollback completed"
-        echo "📊 Logging incident for analysis"
-    
-    - name: 🚀 Deploy (Placeholder)
-      run: |
-        echo "🚀 Deployment would happen here..."
-        echo "✅ Security verification complete"
-        echo "✅ Production endpoints validated"
-        echo "✅ CI/CD enhancement with production validation active"
-
-  # 📊 Security Monitoring
-  security-monitoring:
-    name: 📊 Security Monitoring
-    runs-on: ubuntu-latest
-    if: github.event_name == 'schedule'
-    timeout-minutes: 10
-    
-    steps:
-    - name: 🔍 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🔒 Daily Security Scan
-      run: |
-        echo "🔍 Running daily security monitoring..."
-        python scripts/key_rotation_monitor.py
-        
-    - name: 🛡️ API Key Rotation Check
-      run: |
-        echo "🔍 Checking API key rotation status..."
-        python config/api_key_rotation.py --status
-    
-    - name: 📊 Security Health Report
-      run: |
-        echo "📊 Generating security health report..."
-        echo "Security monitoring completed at $(date)" > security-health.log
-
-  # 🤖 Agent Integration Testing
-  agent-integration:
-    name: 🤖 Agent Integration Testing
-    runs-on: ubuntu-latest
-    needs: code-quality
-    timeout-minutes: 25
-    
-    steps:
-    - name: 🔍 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🐍 Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-    
-    - name: 🤖 Test Agent Systems
-      run: |
-        echo "🤖 Testing agent integration..."
-        python -m pytest tests/test_reddit_agent.py -v
-        python -m pytest tests/test_integration.py -v
-    
-    - name: 📊 Agent Performance Testing
-      run: |
-        echo "📊 Testing agent performance..."
-        python -m pytest tests/test_performance.py -v
-    
-    - name: 🔒 Agent Security Testing
-      run: |
-        echo "🔒 Testing agent security..."
-        python agents/security_qa/security_qa_agent.py || true
-
-# 🎯 Workflow Summary:
-# 1. Security Pre-Check (Fast fail for security issues)
-# 2. Code Quality & Testing (Parallel testing by component)
-# 3. Advanced Security Analysis (Deep security scanning)
-# 4. Deployment Security (Production deployment verification)
-# 5. Security Monitoring (Daily scheduled security checks)
-# 6. Agent Integration Testing (AI agent system validation)
-
-# 🔒 Security Features:
-# - Secret detection with TruffleHog
-# - API key leak prevention
-# - Dependency vulnerability scanning
-# - Code quality enforcement
-# - Container security scanning
-# - Environment protection
-# - Automated security reporting
+        echo "⚠️ THIS WORKFLOW IS DEPRECATED"
+        echo "============================="
+        echo ""
+        echo "This security CI/CD pipeline has been replaced by:"
+        echo "🚀 production-api-deployment.yml - Main deployment pipeline"
+        echo "🔒 security-validation.yml - Focused security scanning"
+        echo ""
+        echo "These new workflows provide:"
+        echo "✅ Faster execution (no agent coordination fluff)"
+        echo "✅ Real API deployment to production"
+        echo "✅ Comprehensive API testing (93.2% success rate)"
+        echo "✅ Container-based deployment"
+        echo "✅ Website documentation updates"
+        echo ""
+        echo "Please use the new workflows instead."
+        echo "Reason for running: ${{ github.event.inputs.reason }}"
