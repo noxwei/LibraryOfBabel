@@ -35,13 +35,13 @@ def before_request():
 
 @standardized_books_bp.route('/api/books')
 @require_auth_unless_localhost
-@validate_params(action='list', id=5560, limit=20, page=1, format='json')
+@validate_params(action='list', id=5560, limit=20, page=1, format='json', sort='title')
 def books_endpoint():
     """
     LEVEL 1 CORE: Standardized Books API
     
     Supported actions:
-    - list: List books with pagination
+    - list: List books with pagination and sorting
     - summary: Get book summary (requires id)
     - toc: Get table of contents (requires id)  
     - random_page: Get random page (requires id)
@@ -54,6 +54,7 @@ def books_endpoint():
     - limit: integer (1-200, default: 20)
     - page: integer (page number, default: 1)
     - format: string (json|simple, default: json)
+    - sort: string (book_id|author|title|publication_date|word_count, default: title)
     """
     try:
         params = request.validated_params
@@ -62,10 +63,11 @@ def books_endpoint():
         limit = params['limit']
         page = params['page']
         response_format = params['format']
+        sort_field = params.get('sort', 'title')
         
         # ACTION ROUTING
         if action == 'list':
-            return _handle_books_list(limit, page, response_format)
+            return _handle_books_list(limit, page, response_format, sort_field)
             
         elif action == 'summary':
             return _handle_book_summary(book_id, response_format)
@@ -109,47 +111,97 @@ def books_endpoint():
             status_code=500
         )
 
-def _handle_books_list(limit: int, page: int, response_format: str):
+def _handle_books_list(limit: int, page: int, response_format: str, sort_field: str):
     """Handle books list action with standardized response - PostgreSQL-First ONLY"""
     try:
-        # Use existing PostgreSQL function api_list_books (pure PostgreSQL-First)
-        result = execute_pg_function('api_list_books', page, limit)
+        # Validate and sanitize sort field
+        valid_sort_fields = ['book_id', 'author', 'title', 'publication_date', 'word_count']
+        if sort_field not in valid_sort_fields:
+            sort_field = 'title'  # Default to title if invalid
         
-        # The function returns TABLE format, convert to list
-        if isinstance(result, list):
-            books = []
-            total_count = 0
-            
-            for row in result:
-                if isinstance(row, dict):
-                    book = {
-                        'book_id': row.get('book_id'),
-                        'title': row.get('title'),
-                        'author': row.get('author'),
-                        'publication_date': row.get('publication_date'),
-                        'genre': row.get('genre', 'Unknown'),
-                        'word_count': row.get('word_count'),
-                        'processed_date': row.get('processed_date')
-                    }
-                    books.append(book)
-                    # Get total count from the first row if available
-                    if 'total_items' in row:
-                        total_count = row['total_items']
-            
-            if response_format == 'simple':
-                # Mobile-optimized simple response
-                return create_success_response(data=books)
-            else:
-                # Full response with pagination metadata
-                return create_list_response(
-                    items=books,
-                    total_count=total_count,
-                    limit=limit,
-                    page=page
-                )
+        # Build ORDER BY clause with proper field mapping
+        if sort_field == 'book_id':
+            order_by_clause = "ORDER BY book_id"
+        elif sort_field == 'author':
+            order_by_clause = "ORDER BY author, title"  # Secondary sort by title
+        elif sort_field == 'title':
+            order_by_clause = "ORDER BY title"
+        elif sort_field == 'publication_date':
+            order_by_clause = "ORDER BY publication_date DESC NULLS LAST, title"  # Newest first, then title
+        elif sort_field == 'word_count':
+            order_by_clause = "ORDER BY word_count DESC NULLS LAST, title"  # Largest first, then title
         else:
-            # Handle unexpected format
-            return create_success_response(data=result)
+            order_by_clause = "ORDER BY title"  # Default fallback
+        
+        # Use direct SQL query approach with dynamic sorting
+        from .database import get_db
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(f"""
+                    SELECT json_build_object(
+                        'success', true,
+                        'data', json_build_object(
+                            'books', json_agg(
+                                json_build_object(
+                                    'book_id', book_id,
+                                    'title', title,
+                                    'author', author,
+                                    'publication_date', publication_date,
+                                    'genre', COALESCE(genre, 'Unknown'),
+                                    'word_count', word_count,
+                                    'processed_date', processed_date
+                                )
+                            ),
+                            'total_count', COUNT(*),
+                            'limit', %s,
+                            'page', %s,
+                            'sort_by', %s
+                        )
+                    )
+                    FROM (
+                        SELECT book_id, title, author, publication_date, genre, word_count, processed_date
+                        FROM books 
+                        {order_by_clause}
+                        LIMIT %s OFFSET %s
+                    ) limited_books
+                """, (limit, page, sort_field, limit, (page - 1) * limit))
+                result = cur.fetchone()[0]
+                
+                # Parse the JSON result
+                if isinstance(result, dict) and 'data' in result:
+                    books_data = result['data']
+                    books = books_data.get('books', [])
+                    total_count = books_data.get('total_count', 0)
+                    sort_by = books_data.get('sort_by', sort_field)
+                    
+                    if response_format == 'simple':
+                        # Mobile-optimized simple response
+                        return create_success_response(data=books)
+                    else:
+                        # Full response with pagination metadata
+                        # Include sorting info in the response data
+                        response_data = {
+                            'items': books,
+                            'pagination': {
+                                'limit': limit,
+                                'page': page,
+                                'total_count': total_count,
+                                'total_pages': (total_count + limit - 1) // limit if total_count > 0 else 0
+                            },
+                            'sorting': {
+                                'sort_by': sort_by,
+                                'sort_options': valid_sort_fields
+                            }
+                        }
+                        return create_success_response(
+                            data=response_data,
+                            total_count=total_count,
+                            limit=limit,
+                            page=page
+                        )
+                else:
+                    # Fallback to raw result
+                    return create_success_response(data=result)
                     
     except Exception as e:
         logger.error(f"Books list error: {e}")

@@ -561,6 +561,14 @@ archive/scripts_old_20250730/
 CALIBRE_DAEMON_GUIDE.md
 *DAEMON_GUIDE*.md
 
+# === SECURITY: Documentation with API keys ===
+# API documentation files that may contain API keys (exclude public versions)
+docs/API_Endpoint_Usage_Guide.md
+docs/Sorting_Implementation_Status.md
+# Allow public versions (no API keys)
+!docs/API_Endpoint_Usage_Guide_PUBLIC.md
+!docs/Sorting_Implementation_Status_PUBLIC.md
+
 # === SECURITY: Files with hardcoded database passwords ===
 # Test and verification scripts with hardcoded credentials
 verify_downloads_simple.py

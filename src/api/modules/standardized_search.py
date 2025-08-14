@@ -36,7 +36,7 @@ def before_request():
 
 @standardized_search_bp.route('/api/search')
 @require_auth_unless_localhost
-@validate_params('q', action='search', limit=20, page=1, format='json')
+@validate_params('q', action='search', limit=20, page=1, format='json', sort='relevance')
 def search_endpoint():
     """
     LEVEL 1 CORE: Standardized Search API
@@ -59,6 +59,7 @@ def search_endpoint():
     - limit: integer (1-200, default: 20)
     - page: integer (page number, default: 1)
     - format: string (json|simple, default: json)
+    - sort: string (relevance|title|author|word_count|publication_date, default: relevance)
     """
     try:
         params = request.validated_params
@@ -67,50 +68,48 @@ def search_endpoint():
         limit = params['limit']
         page = params['page']
         response_format = params['format']
+        sort_field = params.get('sort', 'relevance')
         
         # ACTION ROUTING - All PostgreSQL functions
         if action == 'search':
-            return _handle_basic_search(query, limit, response_format)
+            return _handle_basic_search(query, limit, response_format, sort_field)
             
         elif action == 'count':
             return _handle_search_count(query, response_format)
             
         elif action == 'titles':
-            return _handle_titles_search(query, limit, response_format)
+            return _handle_titles_search(query, limit, response_format, sort_field)
             
         elif action == 'has_results':
             return _handle_has_results(query, response_format)
             
         elif action == 'semantic':
-            return _handle_semantic_search(query, limit, response_format)
+            return _handle_semantic_search(query, limit, response_format, sort_field)
             
         elif action == 'concept':
             threshold = min(max(float(request.args.get('threshold', 0.4)), 0.1), 1.0)
-            return _handle_concept_search(query, threshold, limit, response_format)
+            return _handle_concept_search(query, threshold, limit, response_format, sort_field)
             
         elif action == 'passage':
-            return _handle_passage_search(query, limit, response_format)
+            return _handle_passage_search(query, limit, response_format, sort_field)
             
         elif action == 'emotional':
             book_filter = request.args.get('book_id', type=int)
-            return _handle_emotional_search(query, book_filter, limit, response_format)
+            return _handle_emotional_search(query, book_filter, limit, response_format, sort_field)
             
         elif action == 'highlighted':
             snippet_length = min(int(request.args.get('snippet_length', 200)), 500)
-            return _handle_highlighted_search(query, limit, snippet_length, response_format)
+            return _handle_highlighted_search(query, limit, snippet_length, response_format, sort_field)
             
         elif action == 'advanced':
-            return _handle_advanced_search(query, limit, response_format)
+            return _handle_advanced_search(query, limit, response_format, sort_field)
             
         else:
             return create_error_response(
                 message=f"Unsupported search action: {action}",
-                code="UNSUPPORTED_ACTION",
+                code="UNSUPPORTED_SEARCH_ACTION",
                 details={
-                    "supported_actions": [
-                        "search", "count", "titles", "has_results", "semantic",
-                        "concept", "passage", "emotional", "highlighted", "advanced"
-                    ],
+                    "supported_actions": ["search", "count", "titles", "has_results", "semantic", "concept", "passage", "emotional", "highlighted", "advanced"],
                     "provided_action": action
                 },
                 status_code=400
@@ -124,7 +123,7 @@ def search_endpoint():
             status_code=500
         )
 
-def _handle_basic_search(query: str, limit: int, response_format: str):
+def _handle_basic_search(query: str, limit: int, response_format: str, sort_field: str):
     """Handle basic search using PostgreSQL function"""
     try:
         result = execute_pg_function('api_shortcuts_search_simple', query, limit)
@@ -164,7 +163,7 @@ def _handle_search_count(query: str, response_format: str):
             status_code=500
         )
 
-def _handle_titles_search(query: str, limit: int, response_format: str):
+def _handle_titles_search(query: str, limit: int, response_format: str, sort_field: str):
     """Handle titles search using PostgreSQL function"""
     try:
         titles = execute_pg_function('api_shortcuts_search_titles', query, limit)
@@ -202,7 +201,7 @@ def _handle_has_results(query: str, response_format: str):
             status_code=500
         )
 
-def _handle_semantic_search(query: str, limit: int, response_format: str):
+def _handle_semantic_search(query: str, limit: int, response_format: str, sort_field: str):
     """Handle semantic search using PostgreSQL functions"""
     try:
         # Determine search type based on query length (existing logic)
@@ -230,7 +229,7 @@ def _handle_semantic_search(query: str, limit: int, response_format: str):
             status_code=500
         )
 
-def _handle_concept_search(query: str, threshold: float, limit: int, response_format: str):
+def _handle_concept_search(query: str, threshold: float, limit: int, response_format: str, sort_field: str):
     """Handle concept search using PostgreSQL function"""
     try:
         result = execute_pg_function('api_semantic_concept_search', query, threshold, limit)
@@ -250,29 +249,39 @@ def _handle_concept_search(query: str, threshold: float, limit: int, response_fo
             status_code=500
         )
 
-def _handle_passage_search(query: str, limit: int, response_format: str):
+def _handle_passage_search(query: str, limit: int, response_format: str, sort_field: str):
     """Handle passage search using PostgreSQL functions"""
     try:
-        # Use existing passage search functions (hybrid approach)
-        # Try fullbook search first, then chapter-level fallback
-        try:
-            result = execute_pg_function('api_fullbook_fts_passage_search', query)
-            search_method = "FTS-Fullbook"
-        except:
-            result = execute_pg_function('api_chapter_fts_passage_search', query)
-            search_method = "FTS-Chapters"
+        # Use the correct, existing PostgreSQL function
+        # The previous functions api_fullbook_fts_passage_search and api_chapter_fts_passage_search don't exist
+        result = execute_pg_function('api_passage_similarity_search', query, limit)
+        search_method = "Vector-Passage-Similarity"
         
         # Format results consistently
         formatted_results = []
-        if isinstance(result, list):
-            for row in result[:limit]:  # Apply limit
+        if isinstance(result, dict) and 'results' in result:
+            # Handle JSON response from PostgreSQL function
+            for row in result['results'][:limit]:
                 if isinstance(row, dict):
                     formatted_results.append({
                         'title': row.get('title'),
                         'author': row.get('author'),
-                        'match_position': row.get('match_position'),
-                        'passage_context': row.get('passage_context'),
-                        'chunk_id': row.get('chunk_id')
+                        'content': row.get('content'),
+                        'chunk_id': row.get('chunk_id'),
+                        'similarity_score': row.get('similarity_score'),
+                        'chunk_type': row.get('chunk_type')
+                    })
+        elif isinstance(result, list):
+            # Handle table response from PostgreSQL function
+            for row in result[:limit]:
+                if isinstance(row, dict):
+                    formatted_results.append({
+                        'title': row.get('title'),
+                        'author': row.get('author'),
+                        'content': row.get('content'),
+                        'chunk_id': row.get('chunk_id'),
+                        'similarity_score': row.get('similarity_score'),
+                        'chunk_type': row.get('chunk_type')
                     })
         
         if response_format == 'simple':
@@ -291,7 +300,7 @@ def _handle_passage_search(query: str, limit: int, response_format: str):
             status_code=500
         )
 
-def _handle_emotional_search(query: str, book_filter: int, limit: int, response_format: str):
+def _handle_emotional_search(query: str, book_filter: int, limit: int, response_format: str, sort_field: str):
     """Handle emotional content search using PostgreSQL function"""
     try:
         result = execute_pg_function('api_emotional_content_search', query, book_filter, limit)
@@ -311,7 +320,7 @@ def _handle_emotional_search(query: str, book_filter: int, limit: int, response_
             status_code=500
         )
 
-def _handle_highlighted_search(query: str, limit: int, snippet_length: int, response_format: str):
+def _handle_highlighted_search(query: str, limit: int, snippet_length: int, response_format: str, sort_field: str):
     """Handle highlighted search using PostgreSQL function"""
     try:
         result = execute_pg_function('api_search_content_with_highlights', query, limit, snippet_length)
@@ -331,7 +340,7 @@ def _handle_highlighted_search(query: str, limit: int, snippet_length: int, resp
             status_code=500
         )
 
-def _handle_advanced_search(query: str, limit: int, response_format: str):
+def _handle_advanced_search(query: str, limit: int, response_format: str, sort_field: str):
     """Handle advanced search using PostgreSQL functions"""
     try:
         # Get additional filters from request

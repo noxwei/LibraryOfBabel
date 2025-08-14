@@ -60,7 +60,7 @@ PARAM_SCHEMAS = {
     },
     'sort': {
         'type': str,
-        'allowed_values': ['title', 'author', 'date', 'relevance', 'popularity'],
+        'allowed_values': ['title', 'author', 'date', 'relevance', 'popularity', 'book_id', 'publication_date', 'word_count'],
         'default': 'relevance'
     },
     'format': {
