@@ -753,3 +753,8 @@ docker/ssl/
 secrets/
 certs/
 ssl/
+/prompts
+*.pid
+dual_machine_transfer/chunks_data.sql
+api_critical_issues_summary.json
+API_VALIDATION_SUMMARY.json
