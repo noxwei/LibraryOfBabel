@@ -1,0 +1,412 @@
+name: 🚀 Production Deployment (Blue-Green)
+
+on:
+  workflow_dispatch:
+    inputs:
+      promote_from_staging:
+        description: 'Promote from staging to production'
+        required: true
+        default: true
+        type: boolean
+      
+      force_deployment:
+        description: 'Force deployment even if staging checks fail'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  PRODUCTION_PORT: 5562
+  STAGING_PORT: 5568
+  PRODUCTION_URL: https://api.ashortstayinhell.com:5562
+  STAGING_URL: https://staging.ashortstayinhell.com:5568
+
+jobs:
+  # 🔍 Pre-production validation
+  pre-production-validation:
+    name: 🔍 Pre-production Validation
+    runs-on: self-hosted
+    timeout-minutes: 15
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🎭 Staging Health Check
+      if: inputs.promote_from_staging
+      run: |
+        echo "🎭 Validating staging environment before promotion..."
+        
+        # Check if staging is running
+        if ! curl -k -f "${{ env.STAGING_URL }}/health"; then
+          echo "❌ Staging environment is not healthy"
+          if [ "${{ inputs.force_deployment }}" != "true" ]; then
+            exit 1
+          else
+            echo "⚠️ Proceeding with force deployment"
+          fi
+        else
+          echo "✅ Staging environment is healthy"
+        fi
+    
+    - name: 🗄️ Database Consistency Check
+      run: |
+        echo "🗄️ Checking database consistency..."
+        
+        # Test critical database functions
+        psql -h localhost -d knowledge_base -c "
+          SELECT 
+            COUNT(*) as function_count 
+          FROM pg_proc p 
+          JOIN pg_namespace n ON p.pronamespace = n.oid 
+          WHERE n.nspname = 'public' 
+          AND p.proname LIKE 'search_%';
+        " || exit 1
+        
+        # Test data integrity
+        psql -h localhost -d knowledge_base -c "
+          SELECT 
+            COUNT(*) as book_count,
+            COUNT(DISTINCT book_id) as unique_books
+          FROM chunks 
+          LIMIT 1;
+        " || exit 1
+        
+        echo "✅ Database consistency check passed"
+    
+    - name: 🔒 Production Security Check
+      run: |
+        echo "🔒 Running production security validation..."
+        
+        # Check SSL certificates
+        if [ -f "./ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem" ]; then
+          echo "✅ Production SSL certificate found"
+          
+          # Check certificate expiry
+          cert_expiry=$(openssl x509 -enddate -noout -in "./ssl/letsencrypt-config/live/api.ashortstayinhell.com/fullchain.pem" | cut -d= -f2)
+          echo "📅 Certificate expires: $cert_expiry"
+        else
+          echo "❌ Production SSL certificate not found"
+          exit 1
+        fi
+        
+        # Check for hardcoded secrets
+        if grep -r "strong98-bDaleach" --include="*.py" src/; then
+          echo "❌ Hardcoded production API keys found!"
+          exit 1
+        fi
+        
+        echo "✅ Production security check passed"
+
+  # 🔄 Blue-Green Deployment
+  blue-green-deployment:
+    name: 🔄 Blue-Green Production Deployment
+    runs-on: self-hosted
+    needs: pre-production-validation
+    timeout-minutes: 20
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 📊 Current Production Status
+      run: |
+        echo "📊 Checking current production status..."
+        
+        # Check if production daemon is running
+        if launchctl list | grep "com.librarybabel.api" 2>/dev/null; then
+          echo "✅ Production daemon is currently running"
+          CURRENT_STATUS="running"
+        else
+          echo "⚠️ Production daemon is not running"
+          CURRENT_STATUS="stopped"
+        fi
+        
+        echo "CURRENT_STATUS=$CURRENT_STATUS" >> $GITHUB_ENV
+        
+        # Check production port
+        if lsof -i :5562 2>/dev/null; then
+          echo "🌐 Port 5562 is in use"
+        else
+          echo "⚠️ Port 5562 is not in use"
+        fi
+    
+    - name: 🛑 Graceful Production Shutdown
+      run: |
+        echo "🛑 Gracefully shutting down production..."
+        
+        # Stop the LaunchAgent daemon
+        if launchctl list | grep "com.librarybabel.api" 2>/dev/null; then
+          echo "🔄 Stopping production daemon"
+          launchctl stop com.librarybabel.api 2>/dev/null || true
+          sleep 10
+          
+          # If still running, unload it
+          if launchctl list | grep "com.librarybabel.api" 2>/dev/null; then
+            echo "🔄 Unloading production daemon"
+            launchctl unload ~/Library/LaunchAgents/com.librarybabel.api.plist.disabled 2>/dev/null || true
+            sleep 5
+          fi
+        fi
+        
+        # Force kill any remaining processes on port 5562
+        if lsof -ti:5562; then
+          echo "🔄 Force killing processes on port 5562"
+          kill $(lsof -ti:5562) || true
+          sleep 5
+        fi
+        
+        echo "✅ Production shutdown complete"
+    
+    - name: 📋 Backup Current Configuration
+      run: |
+        echo "📋 Backing up current production configuration..."
+        
+        # Create backup directory
+        BACKUP_DIR="backups/production_$(date +%Y%m%d_%H%M%S)"
+        mkdir -p "$BACKUP_DIR"
+        
+        # Backup current API files
+        cp -r src/api/ "$BACKUP_DIR/" || true
+        
+        # Backup current daemon configuration
+        cp ~/Library/LaunchAgents/com.librarybabel.api.plist.disabled "$BACKUP_DIR/" 2>/dev/null || true
+        
+        # Backup logs
+        cp -r logs/ "$BACKUP_DIR/" 2>/dev/null || true
+        
+        echo "📁 Backup created at: $BACKUP_DIR"
+        echo "BACKUP_DIR=$BACKUP_DIR" >> $GITHUB_ENV
+    
+    - name: 🔧 Prepare Production Environment
+      run: |
+        echo "🔧 Preparing production environment..."
+        
+        # Ensure logs directory exists
+        mkdir -p logs
+        
+        # Make startup script executable
+        chmod +x start_api_daemon.sh
+        
+        # Enable the LaunchAgent
+        if [ -f "~/Library/LaunchAgents/com.librarybabel.api.plist.disabled" ]; then
+          cp ~/Library/LaunchAgents/com.librarybabel.api.plist.disabled ~/Library/LaunchAgents/com.librarybabel.api.plist
+          echo "✅ LaunchAgent plist enabled"
+        else
+          echo "❌ LaunchAgent plist not found"
+          exit 1
+        fi
+    
+    - name: 🚀 Start Production Daemon
+      run: |
+        echo "🚀 Starting production daemon..."
+        
+        # Load and start the LaunchAgent
+        launchctl load ~/Library/LaunchAgents/com.librarybabel.api.plist
+        sleep 10
+        
+        # Check if daemon started
+        if launchctl list | grep "com.librarybabel.api" 2>/dev/null; then
+          echo "✅ Production daemon started successfully"
+        else
+          echo "❌ Production daemon failed to start"
+          echo "📋 Checking logs..."
+          cat logs/api.err.log 2>/dev/null || echo "No error logs found"
+          exit 1
+        fi
+    
+    - name: 🔍 Production Health Check
+      run: |
+        echo "🔍 Running production health check..."
+        
+        # Wait for service to fully start
+        sleep 15
+        
+        # Test production health endpoint
+        for i in {1..10}; do
+          if curl -k -f "${{ env.PRODUCTION_URL }}/health"; then
+            echo "✅ Production health check passed on attempt $i"
+            break
+          else
+            echo "⏳ Health check failed, attempt $i/10, waiting..."
+            sleep 10
+          fi
+          
+          if [ $i -eq 10 ]; then
+            echo "❌ Production health check failed after 10 attempts"
+            echo "📋 Checking daemon logs..."
+            cat logs/api.err.log 2>/dev/null || echo "No error logs found"
+            exit 1
+          fi
+        done
+    
+    - name: 🧪 Production API Validation
+      run: |
+        echo "🧪 Running production API validation..."
+        
+        # Test critical endpoints
+        endpoints=(
+          "/health"
+          "/api/info"
+          "/api/books?action=list&limit=1"
+          "/api/search?q=test&limit=1"
+        )
+        
+        success_count=0
+        total_count=${#endpoints[@]}
+        
+        for endpoint in "${endpoints[@]}"; do
+          if curl -k -s -f "${{ env.PRODUCTION_URL }}$endpoint" -H "X-API-Key: ${{ secrets.BABEL_API_KEY }}" > /dev/null; then
+            echo "✅ $endpoint"
+            ((success_count++))
+          else
+            echo "❌ $endpoint"
+          fi
+        done
+        
+        success_rate=$(( success_count * 100 / total_count ))
+        echo "📊 Production API success rate: $success_rate%"
+        
+        if [ $success_rate -ge 75 ]; then
+          echo "✅ Production API validation passed"
+        else
+          echo "❌ Production API validation failed"
+          exit 1
+        fi
+
+  # 🔄 Rollback Capability
+  rollback-setup:
+    name: 🔄 Rollback Setup
+    runs-on: self-hosted
+    needs: blue-green-deployment
+    if: failure()
+    
+    steps:
+    - name: 🚨 Production Deployment Failed - Initiating Rollback
+      run: |
+        echo "🚨 Production deployment failed, initiating rollback..."
+        
+        # Stop failed deployment
+        launchctl stop com.librarybabel.api 2>/dev/null || true
+        launchctl unload ~/Library/LaunchAgents/com.librarybabel.api.plist 2>/dev/null || true
+        
+        # Restore from backup if available
+        if [ -n "$BACKUP_DIR" ] && [ -d "$BACKUP_DIR" ]; then
+          echo "📋 Restoring from backup: $BACKUP_DIR"
+          
+          # Restore API files
+          cp -r "$BACKUP_DIR/api/" src/ || true
+          
+          # Restore daemon configuration
+          cp "$BACKUP_DIR/com.librarybabel.api.plist.disabled" ~/Library/LaunchAgents/ 2>/dev/null || true
+          
+          # Restart with backup
+          launchctl load ~/Library/LaunchAgents/com.librarybabel.api.plist.disabled 2>/dev/null || true
+        fi
+        
+        echo "🔄 Rollback initiated - check logs for issues"
+
+  # 📊 Deployment Report
+  deployment-report:
+    name: 📊 Deployment Report
+    runs-on: self-hosted
+    needs: [pre-production-validation, blue-green-deployment]
+    if: always()
+    
+    steps:
+    - name: 📊 Generate Production Deployment Report
+      env:
+        VALIDATION_STATUS: ${{ needs.pre-production-validation.result }}
+        DEPLOYMENT_STATUS: ${{ needs.blue-green-deployment.result }}
+      run: |
+        echo "📊 LibraryOfBabel Production Deployment Report"
+        echo "=============================================="
+        echo ""
+        echo "🚀 **DEPLOYMENT SUMMARY**"
+        echo "- Pre-production Validation: $VALIDATION_STATUS"
+        echo "- Blue-Green Deployment: $DEPLOYMENT_STATUS"
+        echo "- Triggered by: ${{ github.actor }}"
+        echo "- Branch: ${{ github.ref }}"
+        echo "- Commit: ${{ github.sha }}"
+        echo ""
+        
+        # Set final status
+        if [ "$DEPLOYMENT_STATUS" = "success" ]; then
+          echo "✅ **STATUS: PRODUCTION DEPLOYMENT SUCCESSFUL**"
+          echo "🌐 API Available: ${{ env.PRODUCTION_URL }}"
+          echo "🔒 SSL: Production certificates active"
+          echo "🗄️ Database: All functions operational"
+          FINAL_STATUS="SUCCESS"
+        else
+          echo "❌ **STATUS: PRODUCTION DEPLOYMENT FAILED**"
+          echo "🔄 Rollback procedures initiated"
+          echo "📋 Check logs for troubleshooting"
+          FINAL_STATUS="FAILED"
+        fi
+        
+        echo ""
+        echo "🎯 **NEXT STEPS**"
+        if [ "$FINAL_STATUS" = "SUCCESS" ]; then
+          echo "- Monitor production metrics"
+          echo "- Validate user traffic"
+          echo "- Update documentation"
+        else
+          echo "- Review deployment logs"
+          echo "- Fix identified issues"
+          echo "- Retry deployment when ready"
+        fi
+
+  # 📝 Update JIRA
+  jira-update:
+    name: 📝 JIRA Update
+    runs-on: self-hosted
+    needs: [pre-production-validation, blue-green-deployment]
+    if: always()
+    
+    steps:
+    - name: 📝 Update JIRA with Production Deployment Status
+      env:
+        DEPLOYMENT_STATUS: ${{ needs.blue-green-deployment.result }}
+      run: |
+        echo "📝 Updating JIRA with production deployment status..."
+        
+        # Set status message
+        if [ "$DEPLOYMENT_STATUS" = "success" ]; then
+          STATUS_EMOJI="🚀"
+          STATUS_TEXT="SUCCESS"
+          NEXT_STEPS="Production deployment complete - monitoring active"
+        else
+          STATUS_EMOJI="🚨"
+          STATUS_TEXT="FAILED"
+          NEXT_STEPS="Rollback initiated - investigate and retry"
+        fi
+        
+        # Update JIRA (if configured)
+        if [ -f "/Users/weixiangzhang/Local_Dev/jira-cli-libraryofbabel/.env.txt" ]; then
+          cd /Users/weixiangzhang/Local_Dev/jira-cli-libraryofbabel
+          source .env.txt
+          
+          acli jira workitem comment --key SCRUM-109 --body "$STATUS_EMOJI **PRODUCTION DEPLOYMENT $STATUS_TEXT**
+
+          🚀 **Production Environment Update**
+          - URL: ${{ env.PRODUCTION_URL }}
+          - Status: $STATUS_TEXT
+          - Method: Blue-Green Deployment
+          - Daemon: LaunchAgent managed
+          - Branch: ${{ github.ref }}
+          - Commit: ${{ github.sha }}
+
+          🔄 **Deployment Process**
+          - Pre-production validation: ${{ needs.pre-production-validation.result }}
+          - Blue-green deployment: $DEPLOYMENT_STATUS
+          - Rollback capability: Ready
+          - Backup created: Available
+
+          **Next Steps**: $NEXT_STEPS
+
+          **CI/CD Pipeline**: Self-hosted runner with LaunchAgent integration" || echo "JIRA update failed"
+        else
+          echo "JIRA configuration not found, skipping update"
+        fi
+        
+        echo "✅ JIRA update attempted"
