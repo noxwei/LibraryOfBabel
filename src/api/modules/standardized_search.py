@@ -168,9 +168,9 @@ def _handle_search_count(query: str, response_format: str):
         )
 
 def _handle_titles_search(query: str, limit: int, response_format: str, sort_field: str):
-    """Handle titles search using PostgreSQL function"""
+    """Handle titles search using fast PostgreSQL function"""
     try:
-        titles = execute_pg_function('api_shortcuts_search_titles', query, limit)
+        titles = execute_pg_function('api_fast_titles_search', query, limit)
         
         if response_format == 'simple':
             # Return just the titles array for mobile
