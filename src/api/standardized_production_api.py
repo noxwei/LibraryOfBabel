@@ -277,12 +277,24 @@ if __name__ == '__main__':
     logger.info("   ❤️ /health, /api/info, /api/health - System utilities (3 endpoints)")
     logger.info("   🎯 TOTAL: 12 clean endpoints (down from 25)")
     
+    # SSL configuration for staging/production
+    ssl_cert = os.getenv('SSL_CERT_PATH')
+    ssl_key = os.getenv('SSL_KEY_PATH')
+    
+    if ssl_cert and ssl_key and os.path.exists(ssl_cert) and os.path.exists(ssl_key):
+        logger.info(f"🔒 SSL enabled with certificates: {ssl_cert}")
+        ssl_context = (ssl_cert, ssl_key)
+    else:
+        logger.info("🔓 SSL not configured - running HTTP only")
+        ssl_context = None
+    
     try:
         app.run(
             host=host,
             port=port,
             debug=debug,
-            threaded=True
+            threaded=True,
+            ssl_context=ssl_context
         )
     except KeyboardInterrupt:
         logger.info("🛑 Standardized API server stopped by user")
