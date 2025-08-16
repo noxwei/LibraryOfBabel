@@ -1,0 +1,457 @@
+openapi: 3.1.0
+info:
+  title: LibraryOfBabel Standardized API
+  description: ""
+  version: 4.0-standardized-postgresql-first
+  contact:
+    name: LibraryOfBabel Team
+    url: https://api.ashortstayinhell.com:5562
+    email: support@ashortstayinhell.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: https://api.ashortstayinhell.com:5562
+    description: LibraryOfBabel Production API (HTTPS - Recommended)
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key required for all endpoints
+  schemas:
+    BookObject:
+      type: object
+      properties:
+        book_id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        publication_year:
+          type: integer
+        genre:
+          type: string
+        word_count:
+          type: integer
+        chapter_count:
+          type: integer
+        chunk_count:
+          type: integer
+    SearchResult:
+      type: object
+      properties:
+        chunk_id:
+          type: string
+        book_id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        content:
+          type: string
+        relevance:
+          type: number
+        chapter_number:
+          type: integer
+        page_number:
+          type: integer
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+        message:
+          type: string
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+            - degraded
+            - unhealthy
+        api_version:
+          type: string
+        database:
+          type: string
+          enum:
+            - connected
+            - disconnected
+        features:
+          type: array
+          items:
+            type: string
+        statistics:
+          type: object
+security:
+  - ApiKeyAuth: []
+paths:
+  /:
+    get:
+      operationId: getRootInfo
+      summary: API root information
+      description: ""
+      tags:
+        - Info
+      responses:
+        "200":
+          description: API information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /health:
+    get:
+      operationId: checkHealthStatus
+      summary: Check API health status
+      description: ""
+      tags:
+        - Health
+      responses:
+        "200":
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /api/info:
+    get:
+      operationId: getApiInfo
+      summary: Get detailed API information
+      description: ""
+      tags:
+        - Info
+      responses:
+        "200":
+          description: API information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /api/health:
+    get:
+      operationId: getDetailedHealth
+      summary: Detailed health check
+      description: ""
+      tags:
+        - Health
+      responses:
+        "200":
+          description: Detailed health status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /api/books:
+    get:
+      operationId: manageBooks
+      summary: Book management and navigation
+      description: ""
+      tags:
+        - Books
+      parameters:
+        - name: action
+          in: query
+          schema:
+            type: string
+            enum:
+              - list
+              - summary
+              - toc
+              - construct
+              - random_page
+              - page
+              - advanced
+            default: list
+        - name: id
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+      responses:
+        "200":
+          description: Book data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /api/search:
+    get:
+      operationId: searchContent
+      summary: Search across all books
+      description: ""
+      tags:
+        - Search
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+            enum:
+              - search
+              - count
+              - titles
+              - semantic
+              - passage
+              - random
+              - has_results
+              - concept
+              - emotional
+              - highlighted
+              - advanced
+            default: search
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /api/mobile/random:
+    get:
+      operationId: mobileRandom
+      summary: Random content for iOS
+      description: ""
+      tags:
+        - Mobile
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum:
+              - title
+              - author
+              - citation
+              - share
+            default: title
+      responses:
+        "200":
+          description: Random content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /api/mobile/search:
+    get:
+      operationId: mobileSearch
+      summary: Mobile-optimized search
+      description: ""
+      tags:
+        - Mobile
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+            enum:
+              - simple
+              - count
+              - has_results
+              - titles
+            default: simple
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /api/mobile/books:
+    get:
+      operationId: mobileBooks
+      summary: Mobile book access
+      description: ""
+      tags:
+        - Mobile
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: action
+          in: query
+          schema:
+            type: string
+            enum:
+              - summary
+              - toc
+              - construct
+              - random_page
+        - name: chapter
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Book data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /api/mobile/stats:
+    get:
+      operationId: mobileStats
+      summary: Collection statistics
+      description: ""
+      tags:
+        - Mobile
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum:
+              - count
+              - health
+            default: count
+      responses:
+        "200":
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /api/mobile/lists:
+    get:
+      operationId: mobileLists
+      summary: Mobile content lists
+      description: ""
+      tags:
+        - Mobile
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum:
+              - titles
+              - authors
+            default: titles
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 5
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: Content lists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /api/mobile/dashboard:
+    get:
+      operationId: mobileDashboard
+      summary: Mobile dashboard overview
+      description: ""
+      tags:
+        - Mobile
+      parameters:
+        - name: include_gaps
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /api/mcp:
+    get:
+      operationId: mcpCapabilities
+      summary: MCP server capabilities
+      description: ""
+      tags:
+        - MCP
+      responses:
+        "200":
+          description: MCP capabilities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  baseUrl:
+                    type: string
+                  capabilities:
+                    type: array
+                    items:
+                      type: string
+                  tools:
+                    type: array
+                    items:
+                      type: object
+                  resources:
+                    type: array
+                    items:
+                      type: object
+tags:
+  - name: Info
+    description: API information
+  - name: Health
+    description: Health checks
+  - name: Books
+    description: Book management
+  - name: Search
+    description: Content search
+  - name: Mobile
+    description: iOS Shortcuts optimized
+  - name: MCP
+    description: Model Context Protocol
