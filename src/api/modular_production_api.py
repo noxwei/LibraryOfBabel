@@ -36,12 +36,18 @@ from modules.books import books_bp
 from modules.search import search_bp
 from modules.shortcuts import shortcuts_bp
 
-# Configure logging
+# Configure logging with container-aware path resolution
+def get_log_path():
+    """Get container-aware log file path"""
+    log_dir = os.getenv('LOG_PATH', '/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs')
+    os.makedirs(log_dir, exist_ok=True)
+    return os.path.join(log_dir, 'modular_api.log')
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/modular_api.log'),
+        logging.FileHandler(get_log_path()),
         logging.StreamHandler()
     ]
 )
@@ -52,8 +58,29 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
+# Container-aware CORS configuration
+def get_cors_origins():
+    """Get CORS origins from environment with container defaults"""
+    env_origins = os.getenv('CORS_ORIGINS', '')
+    if env_origins:
+        return env_origins.split(',')
+    
+    # Default origins for different environments
+    default_origins = ["http://localhost:3000", "https://api.ashortstayinhell.com"]
+    
+    # Add container-specific origins if running in container
+    if os.getenv('RUNNING_IN_CONTAINER', '').lower() == 'true':
+        container_origins = [
+            "http://localhost:5565",
+            "http://127.0.0.1:5565",
+            "http://host.docker.internal:5565"
+        ]
+        default_origins.extend(container_origins)
+    
+    return default_origins
+
 # Enable CORS for frontend integration
-CORS(app, origins=["http://localhost:3000", "https://api.ashortstayinhell.com"])
+CORS(app, origins=get_cors_origins())
 
 # Register blueprints (modular components)
 app.register_blueprint(health_bp)
@@ -63,11 +90,19 @@ app.register_blueprint(shortcuts_bp)
 
 
 def initialize_app():
-    """Initialize application and test database connection"""
+    """Initialize application and test database connection with container awareness"""
     logger.info("🚀 Starting LibraryOfBabel Modular API")
     logger.info("🔧 Architecture: PostgreSQL-First with Modular Design")
     logger.info("👩‍💻 Dr. Sarah Chen (陈雪芳) - PostgreSQL-First Architecture")
     logger.info("🎨 Dr. Elena Rodriguez (IAV) - UX-Optimized Design")
+    
+    # Container environment detection
+    if os.getenv('RUNNING_IN_CONTAINER', '').lower() == 'true':
+        logger.info("🐳 Container environment detected")
+        logger.info(f"📁 Log path: {os.getenv('LOG_PATH', '/app/logs')}")
+        logger.info(f"🌐 CORS origins: {get_cors_origins()}")
+    else:
+        logger.info("💻 Local development environment")
     
     # Test database connection
     if test_connection():
@@ -172,20 +207,26 @@ if __name__ == '__main__':
     # Initialize app before starting
     initialize_app()
     
-    # Development server settings
-    port = int(os.getenv('PORT', 5564))  # Different port to avoid conflicts
+    # Container-aware server configuration
+    is_container = os.getenv('RUNNING_IN_CONTAINER', '').lower() == 'true'
+    port = int(os.getenv('API_PORT', os.getenv('PORT', 5565 if is_container else 5564)))
+    host = os.getenv('API_HOST', '0.0.0.0' if is_container else '127.0.0.1')
     debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     
-    # Enable test mode for local development
-    os.environ['TEST_MODE'] = 'true'
+    # Configure test mode based on environment
+    if not is_container:
+        os.environ['TEST_MODE'] = 'true'
+        logger.info("🧪 DEVELOPMENT MODE - Local testing only")
+        logger.info("🔓 TEST MODE ENABLED - No API key required for localhost")
+    else:
+        logger.info("🐳 CONTAINER MODE - Production-ready configuration")
+        logger.info("🔐 SECURITY ENABLED - API key validation active")
     
-    logger.info(f"🌟 Starting modular API on port {port}")
-    logger.info("🧪 DEVELOPMENT MODE - Local testing only")
-    logger.info("🔓 TEST MODE ENABLED - No API key required for localhost")
+    logger.info(f"🌟 Starting modular API on {host}:{port}")
     
     try:
         app.run(
-            host='127.0.0.1',
+            host=host,
             port=port,
             debug=debug,
             threaded=True

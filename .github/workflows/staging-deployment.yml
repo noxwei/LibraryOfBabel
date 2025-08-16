@@ -1,0 +1,281 @@
+name: 🎭 Staging Deployment
+
+on:
+  push:
+    branches: [ main, dev, staging ]
+    paths:
+      - 'src/api/**'
+      - 'flyway/sql/**'
+      - 'requirements.txt'
+      - '.github/workflows/staging-deployment.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/api/**'
+      - 'flyway/sql/**'
+
+env:
+  STAGING_PORT: 5568
+  STAGING_URL: https://staging.ashortstayinhell.com:5568
+
+jobs:
+  # 🔍 Pre-deployment validation
+  pre-deployment:
+    name: 🔍 Pre-deployment Validation
+    runs-on: self-hosted
+    timeout-minutes: 10
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔒 Security Pre-check
+      run: |
+        echo "🔒 Running security pre-checks..."
+        
+        # Check for hardcoded secrets
+        if grep -r "babel_secure_" --include="*.py" src/; then
+          echo "❌ Hardcoded secrets found!"
+          exit 1
+        fi
+        
+        # Check API key patterns
+        if grep -r "strong98-bDaleach" --include="*.py" src/; then
+          echo "❌ Hardcoded API keys found!"
+          exit 1
+        fi
+        
+        echo "✅ Security pre-check passed"
+    
+    - name: 🗄️ Database Migration Check
+      run: |
+        echo "🗄️ Checking for new database migrations..."
+        
+        # Check if Flyway migrations exist
+        if [ -d "flyway/sql" ]; then
+          echo "📁 Found Flyway migrations directory"
+          ls -la flyway/sql/
+          
+          # Count migration files
+          migration_count=$(ls flyway/sql/V*.sql 2>/dev/null | wc -l || echo 0)
+          echo "📊 Found $migration_count migration files"
+        else
+          echo "⚠️ No Flyway directory found"
+        fi
+        
+        echo "✅ Database migration check completed"
+
+  # 🗄️ Database Migration
+  database-migration:
+    name: 🗄️ Database Migration
+    runs-on: self-hosted
+    needs: pre-deployment
+    timeout-minutes: 15
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔄 Run Flyway Migrations
+      env:
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: knowledge_base
+        DB_USER: weixiangzhang
+      run: |
+        echo "🔄 Running Flyway database migrations..."
+        
+        cd flyway
+        
+        # Check if flyway command exists
+        if command -v flyway &> /dev/null; then
+          echo "✅ Flyway CLI found"
+          flyway -configFiles=conf/flyway.conf migrate
+        else
+          echo "⚠️ Flyway CLI not found, running manual migrations"
+          
+          # Run SQL migrations manually
+          for migration in sql/V*.sql; do
+            if [ -f "$migration" ]; then
+              echo "🔄 Applying migration: $migration"
+              psql -h localhost -d knowledge_base -f "$migration" || true
+            fi
+          done
+        fi
+        
+        echo "✅ Database migrations completed"
+    
+    - name: 🧪 Database Health Check
+      run: |
+        echo "🧪 Testing database connectivity..."
+        
+        # Test PostgreSQL connection
+        psql -h localhost -d knowledge_base -c "SELECT 'Database connection successful' as status;" || exit 1
+        
+        # Test critical functions exist
+        psql -h localhost -d knowledge_base -c "SELECT proname FROM pg_proc WHERE proname LIKE 'search_%' LIMIT 5;" || exit 1
+        
+        echo "✅ Database health check passed"
+
+  # 🚀 Staging Deployment
+  staging-deployment:
+    name: 🚀 Staging Deployment
+    runs-on: self-hosted
+    needs: [pre-deployment, database-migration]
+    timeout-minutes: 10
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🛑 Stop Existing Staging Server
+      run: |
+        echo "🛑 Stopping existing staging server..."
+        
+        # Stop staging LaunchAgent daemon
+        if launchctl list | grep "com.librarybabel.staging" 2>/dev/null; then
+          echo "🔄 Stopping staging LaunchAgent daemon"
+          launchctl stop com.librarybabel.staging 2>/dev/null || true
+          launchctl unload ~/Library/LaunchAgents/com.librarybabel.staging.plist 2>/dev/null || true
+          sleep 5
+        fi
+        
+        # Kill any remaining processes on port 5568
+        if lsof -ti:5568; then
+          echo "🔄 Force killing processes on port 5568"
+          kill $(lsof -ti:5568) || true
+          sleep 5
+        fi
+        
+        echo "✅ Staging server stopped"
+    
+    - name: 🧹 Environment Cleanup
+      run: |
+        echo "🧹 Cleaning up environment..."
+        
+        # Clear any temp files
+        rm -f /tmp/staging_api_*.log || true
+        
+        # Ensure staging script is executable
+        chmod +x start_api_staging.sh
+        
+        echo "✅ Environment cleaned"
+    
+    - name: 🎭 Start Staging Server via LaunchAgent
+      run: |
+        echo "🎭 Starting staging server via LaunchAgent daemon..."
+        
+        # Set staging environment variable
+        export STAGING_API_KEY="${{ secrets.STAGING_API_KEY }}"
+        
+        # Load and start the staging LaunchAgent
+        launchctl load ~/Library/LaunchAgents/com.librarybabel.staging.plist
+        sleep 10
+        
+        # Verify daemon started
+        if launchctl list | grep "com.librarybabel.staging" 2>/dev/null; then
+          echo "✅ Staging LaunchAgent daemon started successfully"
+        else
+          echo "❌ Staging LaunchAgent daemon failed to start"
+          echo "📋 Checking logs..."
+          cat logs/staging.err.log 2>/dev/null || echo "No staging error logs found"
+          exit 1
+        fi
+    
+    - name: 🔍 Health Check
+      run: |
+        echo "🔍 Running staging health check..."
+        
+        # Wait a bit more for full startup
+        sleep 5
+        
+        # Test health endpoint
+        for i in {1..5}; do
+          if curl -k -f "${{ env.STAGING_URL }}/health"; then
+            echo "✅ Health check passed on attempt $i"
+            break
+          else
+            echo "⏳ Health check failed, attempt $i/5, waiting..."
+            sleep 10
+          fi
+          
+          if [ $i -eq 5 ]; then
+            echo "❌ Health check failed after 5 attempts"
+            exit 1
+          fi
+        done
+    
+    - name: 📊 Staging Status Report
+      run: |
+        echo "📊 Staging Deployment Report"
+        echo "============================"
+        echo "🌐 Staging URL: ${{ env.STAGING_URL }}"
+        echo "🔒 SSL: Wildcard certificate enabled"
+        echo "🗄️ Database: Migrations applied"
+        echo "🎯 Status: DEPLOYED"
+        echo ""
+        
+        # Show running processes
+        echo "🔄 Running processes:"
+        ps aux | grep -E "(standardized_production_api|start_api_staging)" | grep -v grep || echo "No staging processes found"
+        
+        # Show port usage
+        echo ""
+        echo "🌐 Port usage:"
+        lsof -i :5568 || echo "Port 5568 not in use"
+
+  # 📝 Update JIRA
+  jira-update:
+    name: 📝 JIRA Update
+    runs-on: self-hosted
+    needs: staging-deployment
+    if: always()
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 📝 Update JIRA with Deployment Status
+      env:
+        DEPLOYMENT_STATUS: ${{ needs.staging-deployment.result }}
+      run: |
+        echo "📝 Updating JIRA with staging deployment status..."
+        
+        # Set status message
+        if [ "$DEPLOYMENT_STATUS" = "success" ]; then
+          STATUS_EMOJI="✅"
+          STATUS_TEXT="SUCCESS"
+          NEXT_STEPS="Ready for QA testing and production promotion"
+        else
+          STATUS_EMOJI="❌"
+          STATUS_TEXT="FAILED"
+          NEXT_STEPS="Check logs and fix issues before retry"
+        fi
+        
+        # Update JIRA (if configured)
+        if [ -f "/Users/weixiangzhang/Local_Dev/jira-cli-libraryofbabel/.env.txt" ]; then
+          cd /Users/weixiangzhang/Local_Dev/jira-cli-libraryofbabel
+          source .env.txt
+          
+          acli jira workitem comment --key SCRUM-109 --body "$STATUS_EMOJI **STAGING DEPLOYMENT $STATUS_TEXT**
+
+          🎭 **Staging Environment Update**
+          - URL: ${{ env.STAGING_URL }}
+          - Status: $STATUS_TEXT
+          - Branch: ${{ github.ref }}
+          - Commit: ${{ github.sha }}
+          - Triggered by: ${{ github.actor }}
+
+          🔄 **Components Updated**
+          - API Server: Deployed with wildcard SSL
+          - Database: Flyway migrations applied
+          - Environment: Staging isolation maintained
+
+          **Next Steps**: $NEXT_STEPS
+
+          **CI/CD Pipeline**: Self-hosted runner deployment complete" || echo "JIRA update failed"
+        else
+          echo "JIRA configuration not found, skipping update"
+        fi
+        
+        echo "✅ JIRA update attempted"

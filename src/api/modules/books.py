@@ -104,17 +104,12 @@ def v4_books():
 def shortcuts_books():
     """iOS Shortcuts optimized books endpoint"""
     try:
-        book_id = request.args.get('id', type=int)
+        book_id = request.args.get('id', 5560, type=int)  # Default to 5560 as per prompts
         action = request.args.get('action', 'summary')
         chapter = request.args.get('chapter', type=int)
         page = request.args.get('page', type=int)
         
-        if not book_id:
-            return jsonify({
-                'success': False,
-                'error': 'Book ID required',
-                'usage': '/api/shortcuts/books?id=123&action=summary'
-            }), 400
+        # Note: Now using default book ID 5560 when not specified (consistent with prompts)
         
         # Handle chapter navigation (navigate to first page of chapter)
         if chapter:

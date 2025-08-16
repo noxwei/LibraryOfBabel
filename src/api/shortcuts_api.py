@@ -386,8 +386,8 @@ def get_search_count(term: str):
                     SELECT COUNT(DISTINCT c.book_id) 
                     FROM chunks c
                     WHERE c.search_vector @@ plainto_tsquery('english', %s)
-                       OR c.content ILIKE %s;
-                """, (term, f'%{term}%'))
+                       OR c.content % %s;  -- TRIGRAM MATCH
+                """, (term, term))
                 count = cur.fetchone()[0]
                 return str(count), 200, {'Content-Type': 'text/plain'}
     except Exception as e:
@@ -403,10 +403,10 @@ def get_search_has_results(term: str):
                     SELECT EXISTS(
                         SELECT 1 FROM chunks c
                         WHERE c.search_vector @@ plainto_tsquery('english', %s)
-                           OR c.content ILIKE %s
+                           OR c.content % %s  -- TRIGRAM MATCH
                         LIMIT 1
                     );
-                """, (term, f'%{term}%'))
+                """, (term, term))
                 has_results = cur.fetchone()[0]
                 return str(has_results).lower(), 200, {'Content-Type': 'text/plain'}
     except Exception as e:
@@ -426,10 +426,10 @@ def get_search_results(term: str, format_type: str, fields: List[str], limit: in
                     FROM books b
                     JOIN chunks c ON b.book_id = c.book_id
                     WHERE c.search_vector @@ plainto_tsquery('english', %s)
-                       OR c.content ILIKE %s
+                       OR c.content % %s  -- TRIGRAM MATCH
                     ORDER BY relevance_score DESC, b.title
                     LIMIT %s;
-                """, (term, term, f'%{term}%', limit))
+                """, (term, term, term, limit))
                 
                 results = cur.fetchall()
                 
@@ -866,11 +866,11 @@ def get_theme_blend(theme: str, count: int, speed: str):
                     FROM chunks c
                     JOIN books b ON c.book_id = b.book_id
                     WHERE c.search_vector @@ plainto_tsquery('english', %s) 
-                       OR c.content ILIKE %s
+                       OR c.content % %s  -- TRIGRAM MATCH
                     AND LENGTH(c.content) > 100
                     ORDER BY RANDOM()
                     LIMIT %s;
-                """, (theme, f'%{theme}%', count))
+                """, (theme, theme, count))
                 
                 results = cur.fetchall()
                 

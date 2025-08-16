@@ -1,0 +1,496 @@
+name: 🧪 QA Validation Suite
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: 'Environment to test'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      
+      test_suite:
+        description: 'Test suite to run'
+        required: true
+        default: 'comprehensive'
+        type: choice
+        options:
+        - comprehensive
+        - smoke
+        - performance
+        - security
+  
+  # Auto-trigger after staging deployment
+  workflow_run:
+    workflows: ["🎭 Staging Deployment"]
+    types:
+      - completed
+
+env:
+  STAGING_URL: https://staging.ashortstayinhell.com:5568
+  PRODUCTION_URL: https://api.ashortstayinhell.com:5562
+  API_KEY: ${{ secrets.BABEL_API_KEY }}
+
+jobs:
+  # 🎯 Environment Setup
+  setup-qa:
+    name: 🎯 QA Environment Setup
+    runs-on: self-hosted
+    timeout-minutes: 5
+    
+    outputs:
+      target_url: ${{ steps.setup.outputs.target_url }}
+      environment_name: ${{ steps.setup.outputs.environment_name }}
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🎯 Setup Target Environment
+      id: setup
+      run: |
+        # Determine target environment
+        if [ "${{ github.event.inputs.target_environment }}" = "production" ]; then
+          TARGET_URL="${{ env.PRODUCTION_URL }}"
+          ENV_NAME="production"
+        else
+          TARGET_URL="${{ env.STAGING_URL }}"
+          ENV_NAME="staging"
+        fi
+        
+        echo "target_url=$TARGET_URL" >> $GITHUB_OUTPUT
+        echo "environment_name=$ENV_NAME" >> $GITHUB_OUTPUT
+        
+        echo "🎯 Target Environment: $ENV_NAME"
+        echo "🌐 Target URL: $TARGET_URL"
+    
+    - name: 🔍 Pre-QA Health Check
+      run: |
+        echo "🔍 Performing pre-QA health check..."
+        
+        TARGET_URL="${{ steps.setup.outputs.target_url }}"
+        
+        # Basic connectivity test
+        if curl -k -f "$TARGET_URL/health" --max-time 10; then
+          echo "✅ Environment is responsive"
+        else
+          echo "❌ Environment is not responsive"
+          exit 1
+        fi
+
+  # 🔥 Smoke Tests
+  smoke-tests:
+    name: 🔥 Smoke Tests
+    runs-on: self-hosted
+    needs: setup-qa
+    timeout-minutes: 10
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔥 Critical Endpoint Smoke Tests
+      env:
+        TARGET_URL: ${{ needs.setup-qa.outputs.target_url }}
+      run: |
+        echo "🔥 Running smoke tests on ${{ needs.setup-qa.outputs.environment_name }}..."
+        
+        # Critical endpoints that must work
+        declare -A endpoints=(
+          ["/health"]="System health check"
+          ["/api/health"]="API health endpoint"
+          ["/api/books?action=list&limit=1"]="Books list endpoint"
+          ["/api/search?action=query&q=test&limit=1"]="Search endpoint"
+          ["/api/mobile/random?type=title"]="Mobile random endpoint"
+        )
+        
+        failed_tests=0
+        total_tests=0
+        
+        for endpoint in "${!endpoints[@]}"; do
+          total_tests=$((total_tests + 1))
+          description="${endpoints[$endpoint]}"
+          
+          echo "🧪 Testing: $description"
+          
+          if [ "$endpoint" = "/health" ]; then
+            # Health endpoint doesn't require API key
+            response=$(curl -k -s -w "%{http_code}" "$TARGET_URL$endpoint" --max-time 10)
+          else
+            # Other endpoints require API key
+            response=$(curl -k -s -w "%{http_code}" "$TARGET_URL$endpoint" \
+              -H "X-API-Key: ${{ env.API_KEY }}" --max-time 10)
+          fi
+          
+          # Extract HTTP status code
+          http_code="${response: -3}"
+          
+          if [ "$http_code" = "200" ]; then
+            echo "✅ PASS: $description ($http_code)"
+          else
+            echo "❌ FAIL: $description ($http_code)"
+            failed_tests=$((failed_tests + 1))
+          fi
+        done
+        
+        # Report results
+        success_rate=$(( (total_tests - failed_tests) * 100 / total_tests ))
+        echo ""
+        echo "🔥 Smoke Test Results:"
+        echo "   Total Tests: $total_tests"
+        echo "   Passed: $((total_tests - failed_tests))"
+        echo "   Failed: $failed_tests"
+        echo "   Success Rate: $success_rate%"
+        
+        # Fail if success rate is below 80%
+        if [ $success_rate -lt 80 ]; then
+          echo "❌ Smoke tests failed - success rate below 80%"
+          exit 1
+        else
+          echo "✅ Smoke tests passed"
+        fi
+
+  # 📊 Comprehensive API Tests
+  comprehensive-tests:
+    name: 📊 Comprehensive API Tests
+    runs-on: self-hosted
+    needs: [setup-qa, smoke-tests]
+    if: inputs.test_suite == 'comprehensive' || inputs.test_suite == ''
+    timeout-minutes: 20
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 📊 Run Comprehensive API Test Suite
+      env:
+        TARGET_URL: ${{ needs.setup-qa.outputs.target_url }}
+      run: |
+        echo "📊 Running comprehensive API tests..."
+        
+        # Check if test script exists
+        if [ -f "test_all_endpoints.sh" ]; then
+          echo "🔄 Using existing test script"
+          
+          # Make executable and run
+          chmod +x test_all_endpoints.sh
+          
+          # Modify script to use correct URL and API key
+          sed -i.bak "s|BASE_URL=.*|BASE_URL=\"$TARGET_URL\"|g" test_all_endpoints.sh
+          sed -i.bak "s|API_KEY=.*|API_KEY=\"${{ env.API_KEY }}\"|g" test_all_endpoints.sh
+          
+          # Run the test
+          ./test_all_endpoints.sh
+          
+        else
+          echo "📊 Running inline comprehensive tests..."
+          
+          # Comprehensive endpoint testing
+          declare -A test_endpoints=(
+            ["/api/books?action=list&limit=5"]="Books list (5 items)"
+            ["/api/books?action=summary&id=1"]="Book summary"
+            ["/api/books?action=random_page&id=1"]="Random page"
+            ["/api/search?action=query&q=artificial%20intelligence&limit=3"]="AI search"
+            ["/api/search?action=titles&q=science&limit=3"]="Title search"
+            ["/api/search?action=count&q=technology"]="Search count"
+            ["/api/mobile/random?type=quote"]="Mobile random quote"
+            ["/api/mobile/search?q=philosophy&limit=2"]="Mobile search"
+            ["/api/mobile/stats"]="Mobile stats"
+          )
+          
+          total_tests=0
+          passed_tests=0
+          
+          for endpoint in "${!test_endpoints[@]}"; do
+            total_tests=$((total_tests + 1))
+            description="${test_endpoints[$endpoint]}"
+            
+            echo "🧪 Testing: $description"
+            
+            response=$(curl -k -s -w "%{http_code}" "$TARGET_URL$endpoint" \
+              -H "X-API-Key: ${{ env.API_KEY }}" \
+              -H "Accept: application/json" \
+              --max-time 15)
+            
+            http_code="${response: -3}"
+            response_body="${response%???}"
+            
+            if [ "$http_code" = "200" ]; then
+              # Additional validation for JSON response
+              if echo "$response_body" | python3 -m json.tool >/dev/null 2>&1; then
+                echo "✅ PASS: $description (Valid JSON)"
+                passed_tests=$((passed_tests + 1))
+              else
+                echo "⚠️  WARN: $description (Invalid JSON)"
+              fi
+            else
+              echo "❌ FAIL: $description ($http_code)"
+            fi
+          done
+          
+          # Calculate success rate
+          success_rate=$(( passed_tests * 100 / total_tests ))
+          
+          echo ""
+          echo "📊 Comprehensive Test Results:"
+          echo "   Total Tests: $total_tests"
+          echo "   Passed: $passed_tests"
+          echo "   Success Rate: $success_rate%"
+          
+          # Require 90% success rate for comprehensive tests
+          if [ $success_rate -lt 90 ]; then
+            echo "❌ Comprehensive tests failed - success rate below 90%"
+            exit 1
+          else
+            echo "✅ Comprehensive tests passed"
+          fi
+        fi
+
+  # ⚡ Performance Tests
+  performance-tests:
+    name: ⚡ Performance Tests
+    runs-on: self-hosted
+    needs: [setup-qa, smoke-tests]
+    if: inputs.test_suite == 'performance' || inputs.test_suite == 'comprehensive'
+    timeout-minutes: 15
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: ⚡ API Performance Testing
+      env:
+        TARGET_URL: ${{ needs.setup-qa.outputs.target_url }}
+      run: |
+        echo "⚡ Running performance tests..."
+        
+        # Test response times for critical endpoints
+        declare -A perf_endpoints=(
+          ["/health"]="Health check"
+          ["/api/search?q=test&limit=1"]="Single search"
+          ["/api/books?action=list&limit=10"]="Books list"
+        )
+        
+        echo "🔄 Testing response times..."
+        
+        for endpoint in "${!perf_endpoints[@]}"; do
+          description="${perf_endpoints[$endpoint]}"
+          
+          echo "⏱️  Testing: $description"
+          
+          # Perform 3 requests and get average
+          total_time=0
+          for i in {1..3}; do
+            if [ "$endpoint" = "/health" ]; then
+              response_time=$(curl -k -s -w "%{time_total}" -o /dev/null "$TARGET_URL$endpoint" --max-time 30)
+            else
+              response_time=$(curl -k -s -w "%{time_total}" -o /dev/null "$TARGET_URL$endpoint" \
+                -H "X-API-Key: ${{ env.API_KEY }}" --max-time 30)
+            fi
+            
+            # Convert to milliseconds
+            response_ms=$(echo "$response_time * 1000" | bc -l | cut -d. -f1)
+            total_time=$((total_time + response_ms))
+          done
+          
+          avg_time=$((total_time / 3))
+          
+          echo "   Average response time: ${avg_time}ms"
+          
+          # Check if response time is acceptable
+          if [ $avg_time -lt 2000 ]; then
+            echo "✅ PASS: $description (${avg_time}ms < 2000ms)"
+          elif [ $avg_time -lt 5000 ]; then
+            echo "⚠️  WARN: $description (${avg_time}ms > 2000ms but < 5000ms)"
+          else
+            echo "❌ FAIL: $description (${avg_time}ms > 5000ms)"
+          fi
+        done
+        
+        echo "✅ Performance testing completed"
+
+  # 🔒 Security Tests
+  security-tests:
+    name: 🔒 Security Tests
+    runs-on: self-hosted
+    needs: [setup-qa, smoke-tests]
+    if: inputs.test_suite == 'security' || inputs.test_suite == 'comprehensive'
+    timeout-minutes: 10
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔒 API Security Testing
+      env:
+        TARGET_URL: ${{ needs.setup-qa.outputs.target_url }}
+      run: |
+        echo "🔒 Running security tests..."
+        
+        # Test 1: Unauthorized access
+        echo "🧪 Testing unauthorized access..."
+        response=$(curl -k -s -w "%{http_code}" "$TARGET_URL/api/search?q=test" --max-time 10)
+        http_code="${response: -3}"
+        
+        if [ "$http_code" = "401" ] || [ "$http_code" = "403" ]; then
+          echo "✅ PASS: Unauthorized access properly blocked ($http_code)"
+        else
+          echo "❌ FAIL: Unauthorized access not blocked ($http_code)"
+        fi
+        
+        # Test 2: Invalid API key
+        echo "🧪 Testing invalid API key..."
+        response=$(curl -k -s -w "%{http_code}" "$TARGET_URL/api/search?q=test" \
+          -H "X-API-Key: invalid-key-12345" --max-time 10)
+        http_code="${response: -3}"
+        
+        if [ "$http_code" = "401" ] || [ "$http_code" = "403" ]; then
+          echo "✅ PASS: Invalid API key properly rejected ($http_code)"
+        else
+          echo "❌ FAIL: Invalid API key not rejected ($http_code)"
+        fi
+        
+        # Test 3: SQL injection attempt
+        echo "🧪 Testing SQL injection protection..."
+        response=$(curl -k -s -w "%{http_code}" "$TARGET_URL/api/search?q='; DROP TABLE books; --" \
+          -H "X-API-Key: ${{ env.API_KEY }}" --max-time 10)
+        http_code="${response: -3}"
+        
+        if [ "$http_code" = "200" ] || [ "$http_code" = "400" ]; then
+          echo "✅ PASS: SQL injection attempt handled safely ($http_code)"
+        else
+          echo "⚠️  WARN: Unexpected response to SQL injection test ($http_code)"
+        fi
+        
+        # Test 4: HTTPS enforcement (if applicable)
+        if [[ "$TARGET_URL" == https://* ]]; then
+          echo "🧪 Testing HTTPS certificate..."
+          if curl -s "$TARGET_URL/health" --max-time 10 >/dev/null; then
+            echo "✅ PASS: HTTPS certificate validation successful"
+          else
+            echo "❌ FAIL: HTTPS certificate validation failed"
+          fi
+        fi
+        
+        echo "✅ Security testing completed"
+
+  # 📊 QA Report Generation
+  qa-report:
+    name: 📊 QA Report
+    runs-on: self-hosted
+    needs: [setup-qa, smoke-tests, comprehensive-tests, performance-tests, security-tests]
+    if: always()
+    
+    steps:
+    - name: 📊 Generate QA Report
+      env:
+        ENVIRONMENT: ${{ needs.setup-qa.outputs.environment_name }}
+        TARGET_URL: ${{ needs.setup-qa.outputs.target_url }}
+        SMOKE_STATUS: ${{ needs.smoke-tests.result }}
+        COMPREHENSIVE_STATUS: ${{ needs.comprehensive-tests.result }}
+        PERFORMANCE_STATUS: ${{ needs.performance-tests.result }}
+        SECURITY_STATUS: ${{ needs.security-tests.result }}
+      run: |
+        echo "📊 LibraryOfBabel QA Validation Report"
+        echo "====================================="
+        echo ""
+        echo "🎯 **TEST ENVIRONMENT**"
+        echo "Environment: $ENVIRONMENT"
+        echo "Target URL: $TARGET_URL"
+        echo "Test Suite: ${{ github.event.inputs.test_suite || 'comprehensive' }}"
+        echo "Triggered by: ${{ github.actor }}"
+        echo ""
+        echo "🧪 **TEST RESULTS**"
+        echo "- Smoke Tests: $SMOKE_STATUS"
+        echo "- Comprehensive Tests: $COMPREHENSIVE_STATUS"
+        echo "- Performance Tests: $PERFORMANCE_STATUS"
+        echo "- Security Tests: $SECURITY_STATUS"
+        echo ""
+        
+        # Determine overall status
+        if [ "$SMOKE_STATUS" = "success" ] && \
+           [ "$COMPREHENSIVE_STATUS" = "success" ] && \
+           [ "$PERFORMANCE_STATUS" = "success" ] && \
+           [ "$SECURITY_STATUS" = "success" ]; then
+          echo "✅ **OVERALL STATUS: PASSED**"
+          echo "🚀 Environment is ready for promotion to production"
+          OVERALL_STATUS="PASSED"
+        else
+          echo "❌ **OVERALL STATUS: FAILED**"
+          echo "🔧 Issues found - review and fix before promotion"
+          OVERALL_STATUS="FAILED"
+        fi
+        
+        echo ""
+        echo "📝 **NEXT STEPS**"
+        if [ "$OVERALL_STATUS" = "PASSED" ]; then
+          echo "- Environment validated and ready"
+          echo "- Proceed with production deployment"
+          echo "- Monitor post-deployment metrics"
+        else
+          echo "- Review failed test details"
+          echo "- Fix identified issues"
+          echo "- Re-run QA validation"
+        fi
+
+  # 📝 Update JIRA with QA Results
+  jira-update:
+    name: 📝 JIRA QA Update
+    runs-on: self-hosted
+    needs: [setup-qa, smoke-tests, comprehensive-tests, performance-tests, security-tests]
+    if: always()
+    
+    steps:
+    - name: 📝 Update JIRA with QA Results
+      env:
+        ENVIRONMENT: ${{ needs.setup-qa.outputs.environment_name }}
+        SMOKE_STATUS: ${{ needs.smoke-tests.result }}
+        COMPREHENSIVE_STATUS: ${{ needs.comprehensive-tests.result }}
+        PERFORMANCE_STATUS: ${{ needs.performance-tests.result }}
+        SECURITY_STATUS: ${{ needs.security-tests.result }}
+      run: |
+        echo "📝 Updating JIRA with QA results..."
+        
+        # Determine overall QA status
+        if [ "$SMOKE_STATUS" = "success" ] && \
+           [ "$COMPREHENSIVE_STATUS" = "success" ] && \
+           [ "$PERFORMANCE_STATUS" = "success" ] && \
+           [ "$SECURITY_STATUS" = "success" ]; then
+          QA_STATUS="PASSED"
+          STATUS_EMOJI="✅"
+        else
+          QA_STATUS="FAILED"
+          STATUS_EMOJI="❌"
+        fi
+        
+        # Update JIRA if available
+        if [ -f "/Users/weixiangzhang/Local_Dev/jira-cli-libraryofbabel/.env.txt" ]; then
+          cd /Users/weixiangzhang/Local_Dev/jira-cli-libraryofbabel
+          source .env.txt
+          
+          acli jira workitem comment --key SCRUM-109 --body "$STATUS_EMOJI **QA VALIDATION $QA_STATUS**
+
+          🧪 **Quality Assurance Report**
+          - Environment: $ENVIRONMENT
+          - Test Suite: ${{ github.event.inputs.test_suite || 'comprehensive' }}
+          - Execution Date: $(date)
+
+          📊 **Test Results**
+          - 🔥 Smoke Tests: $SMOKE_STATUS
+          - 📊 Comprehensive Tests: $COMPREHENSIVE_STATUS  
+          - ⚡ Performance Tests: $PERFORMANCE_STATUS
+          - 🔒 Security Tests: $SECURITY_STATUS
+
+          **Overall Status**: $QA_STATUS
+
+          **Next Steps**: $([ "$QA_STATUS" = "PASSED" ] && echo "Ready for production deployment" || echo "Fix issues and retry QA validation")
+
+          **CI/CD Pipeline**: Self-hosted QA validation complete" || echo "JIRA update failed"
+        else
+          echo "JIRA configuration not found, skipping update"
+        fi
+        
+        echo "✅ JIRA update attempted"

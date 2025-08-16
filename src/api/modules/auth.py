@@ -121,8 +121,17 @@ def require_auth(f):
 
 
 def is_localhost():
-    """Check if request is from localhost"""
-    return request.remote_addr in ['127.0.0.1', '::1', 'localhost']
+    """Check if request is from localhost (container-aware)"""
+    localhost_addresses = ['127.0.0.1', '::1', 'localhost']
+    
+    # In container environment, also consider container gateway
+    if os.getenv('RUNNING_IN_CONTAINER', '').lower() == 'true':
+        localhost_addresses.extend([
+            '172.21.0.1',  # Docker gateway
+            'host.docker.internal'
+        ])
+    
+    return request.remote_addr in localhost_addresses
 
 
 def require_auth_unless_localhost(f):
