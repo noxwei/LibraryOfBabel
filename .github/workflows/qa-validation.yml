@@ -101,9 +101,9 @@ jobs:
         # Critical endpoints that must work
         declare -A endpoints=(
           ["/health"]="System health check"
-          ["/api/info"]="API information endpoint"
+          ["/api/health"]="API health endpoint"
           ["/api/books?action=list&limit=1"]="Books list endpoint"
-          ["/api/search?q=test&limit=1"]="Search endpoint"
+          ["/api/search?action=query&q=test&limit=1"]="Search endpoint"
           ["/api/mobile/random?type=title"]="Mobile random endpoint"
         )
         
@@ -193,7 +193,7 @@ jobs:
             ["/api/books?action=list&limit=5"]="Books list (5 items)"
             ["/api/books?action=summary&id=1"]="Book summary"
             ["/api/books?action=random_page&id=1"]="Random page"
-            ["/api/search?q=artificial%20intelligence&limit=3"]="AI search"
+            ["/api/search?action=query&q=artificial%20intelligence&limit=3"]="AI search"
             ["/api/search?action=titles&q=science&limit=3"]="Title search"
             ["/api/search?action=count&q=technology"]="Search count"
             ["/api/mobile/random?type=quote"]="Mobile random quote"

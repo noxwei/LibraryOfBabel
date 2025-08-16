@@ -132,23 +132,20 @@ jobs:
       run: |
         echo "🛑 Stopping existing staging server..."
         
-        # Check for staging daemon first
-        if launchctl list | grep "staging" 2>/dev/null; then
-          echo "🔄 Stopping staging daemon"
+        # Stop staging LaunchAgent daemon
+        if launchctl list | grep "com.librarybabel.staging" 2>/dev/null; then
+          echo "🔄 Stopping staging LaunchAgent daemon"
           launchctl stop com.librarybabel.staging 2>/dev/null || true
           launchctl unload ~/Library/LaunchAgents/com.librarybabel.staging.plist 2>/dev/null || true
-        fi
-        
-        # Kill any process on port 5568
-        if lsof -ti:5568; then
-          echo "🔄 Killing process on port 5568"
-          kill $(lsof -ti:5568) || true
           sleep 5
         fi
         
-        # Kill any existing staging processes
-        pkill -f "standardized_production_api.py.*5568" || true
-        pkill -f "start_api_staging.sh" || true
+        # Kill any remaining processes on port 5568
+        if lsof -ti:5568; then
+          echo "🔄 Force killing processes on port 5568"
+          kill $(lsof -ti:5568) || true
+          sleep 5
+        fi
         
         echo "✅ Staging server stopped"
     
@@ -164,26 +161,24 @@ jobs:
         
         echo "✅ Environment cleaned"
     
-    - name: 🎭 Start Staging Server
+    - name: 🎭 Start Staging Server via LaunchAgent
       run: |
-        echo "🎭 Starting staging server with wildcard SSL..."
+        echo "🎭 Starting staging server via LaunchAgent daemon..."
         
-        # Start staging server in background
-        nohup ./start_api_staging.sh > /tmp/staging_api_$(date +%Y%m%d_%H%M%S).log 2>&1 &
-        STAGING_PID=$!
+        # Set staging environment variable
+        export STAGING_API_KEY="${{ secrets.STAGING_API_KEY }}"
         
-        echo "🚀 Staging server started with PID: $STAGING_PID"
-        
-        # Wait for server to start
-        echo "⏳ Waiting for server to start..."
+        # Load and start the staging LaunchAgent
+        launchctl load ~/Library/LaunchAgents/com.librarybabel.staging.plist
         sleep 10
         
-        # Check if process is still running
-        if ps -p $STAGING_PID > /dev/null; then
-          echo "✅ Staging server is running"
+        # Verify daemon started
+        if launchctl list | grep "com.librarybabel.staging" 2>/dev/null; then
+          echo "✅ Staging LaunchAgent daemon started successfully"
         else
-          echo "❌ Staging server failed to start"
-          cat /tmp/staging_api_*.log || true
+          echo "❌ Staging LaunchAgent daemon failed to start"
+          echo "📋 Checking logs..."
+          cat logs/staging.err.log 2>/dev/null || echo "No staging error logs found"
           exit 1
         fi
     
