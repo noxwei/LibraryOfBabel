@@ -38,7 +38,7 @@ PARAM_SCHEMAS = {
     },
     'action': {
         'type': str,
-        'allowed_values': ['list', 'summary', 'search', 'count', 'titles', 'semantic', 'passage', 'random', 'has_results', 'concept', 'emotional', 'highlighted', 'advanced', 'toc', 'random_page', 'construct', 'page', 'simple'],
+        'allowed_values': ['list', 'summary', 'search', 'count', 'titles', 'semantic', 'semantic_passages', 'passage', 'random', 'has_results', 'concept', 'emotional', 'highlighted', 'advanced', 'toc', 'random_page', 'construct', 'page', 'simple'],
         'default': 'list'
     },
     'id': {

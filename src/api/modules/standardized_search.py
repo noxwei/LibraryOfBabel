@@ -46,7 +46,8 @@ def search_endpoint():
     - count: Count search results
     - titles: Search book titles only
     - has_results: Check if results exist
-    - semantic: Semantic vector search
+    - semantic: Semantic vector search (book-level results)
+    - semantic_passages: Semantic vector search (passage/chunk-level results)
     - concept: Concept-based search
     - passage: Passage similarity search
     - emotional: Emotional content search
@@ -86,6 +87,9 @@ def search_endpoint():
         elif action == 'semantic':
             return _handle_semantic_search(query, limit, response_format, sort_field)
             
+        elif action == 'semantic_passages':
+            return _handle_semantic_passages_search(query, limit, response_format, sort_field)
+            
         elif action == 'concept':
             threshold = min(max(float(request.args.get('threshold', 0.4)), 0.1), 1.0)
             return _handle_concept_search(query, threshold, limit, response_format, sort_field)
@@ -109,7 +113,7 @@ def search_endpoint():
                 message=f"Unsupported search action: {action}",
                 code="UNSUPPORTED_SEARCH_ACTION",
                 details={
-                    "supported_actions": ["search", "count", "titles", "has_results", "semantic", "concept", "passage", "emotional", "highlighted", "advanced"],
+                    "supported_actions": ["search", "count", "titles", "has_results", "semantic", "semantic_passages", "concept", "passage", "emotional", "highlighted", "advanced"],
                     "provided_action": action
                 },
                 status_code=400
@@ -204,15 +208,8 @@ def _handle_has_results(query: str, response_format: str):
 def _handle_semantic_search(query: str, limit: int, response_format: str, sort_field: str):
     """Handle semantic search using PostgreSQL functions"""
     try:
-        # Determine search type based on query length (existing logic)
-        word_count = len(query.split())
-        
-        if word_count <= 5:
-            # Use optimized 3-5 word vector semantic search
-            result = execute_pg_function('api_semantic_phrase_search_optimized', query, limit)
-        else:
-            # Use extended 10-word vector semantic search
-            result = execute_pg_function('api_extended_semantic_search', query, limit)
+        # Use the new fullbook semantic search with actual nomic embeddings
+        result = execute_pg_function('api_semantic_fullbook_search', query, limit)
             
         if response_format == 'simple':
             if isinstance(result, dict) and 'data' in result:
@@ -369,5 +366,26 @@ def _handle_advanced_search(query: str, limit: int, response_format: str, sort_f
         return create_error_response(
             message=f"Advanced search failed for query: {query}",
             code="ADVANCED_SEARCH_ERROR",
+            status_code=500
+        )
+
+def _handle_semantic_passages_search(query: str, limit: int, response_format: str, sort_field: str):
+    """Handle semantic passages search using PostgreSQL functions"""
+    try:
+        # Use the new passages semantic search with actual nomic embeddings
+        result = execute_pg_function('api_semantic_passages_search', query, limit)
+            
+        if response_format == 'simple':
+            if isinstance(result, dict) and 'data' in result:
+                return create_success_response(data=result['data'])
+            return create_success_response(data=result)
+        else:
+            return create_single_item_response(result)
+            
+    except Exception as e:
+        logger.error(f"Semantic passages search error for query '{query}': {e}")
+        return create_error_response(
+            message=f"Semantic passages search failed for query: {query}",
+            code="SEMANTIC_PASSAGES_SEARCH_ERROR",
             status_code=500
         )
