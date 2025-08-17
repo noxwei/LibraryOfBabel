@@ -238,6 +238,144 @@ BEGIN
 END;
 $$;
 
+-- Enhanced: Book Page with Dynamic Word Count Pagination
+CREATE OR REPLACE FUNCTION api_shortcuts_book_page_dynamic(p_book_id INTEGER, p_page_num INTEGER, p_words_per_page INTEGER DEFAULT 1000, p_base_url TEXT DEFAULT 'https://api.ashortstayinhell.com:5562')
+RETURNS JSON
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_result JSON;
+    v_total_chunks INTEGER;
+    v_total_words INTEGER;
+    v_total_dynamic_pages INTEGER;
+    v_start_word INTEGER;
+    v_end_word INTEGER;
+    v_current_content TEXT;
+    v_current_word_count INTEGER;
+    v_accumulated_words INTEGER;
+    v_chunk_record RECORD;
+    v_content_words TEXT[];
+    v_page_content TEXT;
+    v_page_word_count INTEGER;
+BEGIN
+    -- Validate words_per_page parameter
+    IF p_words_per_page < 100 OR p_words_per_page > 2000 THEN
+        RETURN json_build_object('success', false, 'error', 'words_per_page must be between 100 and 2000');
+    END IF;
+    
+    -- Get book info and total word count
+    SELECT chunk_count, word_count INTO v_total_chunks, v_total_words
+    FROM books WHERE book_id = p_book_id;
+    
+    IF v_total_chunks IS NULL THEN
+        RETURN json_build_object('success', false, 'error', 'Book not found');
+    END IF;
+    
+    -- Calculate total dynamic pages based on word count
+    v_total_dynamic_pages := CEIL(v_total_words::numeric / p_words_per_page);
+    
+    IF p_page_num < 1 OR p_page_num > v_total_dynamic_pages THEN
+        RETURN json_build_object('success', false, 'error', 'Page number out of range');
+    END IF;
+    
+    -- Calculate word boundaries for this page
+    v_start_word := (p_page_num - 1) * p_words_per_page + 1;
+    v_end_word := p_page_num * p_words_per_page;
+    
+    -- Accumulate content until we reach the target word range
+    v_accumulated_words := 0;
+    v_page_content := '';
+    v_page_word_count := 0;
+    
+    FOR v_chunk_record IN 
+        SELECT content, word_count 
+        FROM chunks 
+        WHERE book_id = p_book_id 
+        AND chunk_id NOT LIKE 'FULLBOOK%'  -- Exclude full book chunks to prevent duplication
+        ORDER BY chunk_id
+    LOOP
+        -- Check if this chunk contains our target words
+        IF v_accumulated_words + v_chunk_record.word_count >= v_start_word THEN
+            -- Split content into words
+            v_content_words := string_to_array(v_chunk_record.content, ' ');
+            
+            -- Calculate word positions within this chunk
+            DECLARE
+                chunk_start_word INTEGER := v_accumulated_words + 1;
+                chunk_end_word INTEGER := v_accumulated_words + v_chunk_record.word_count;
+                page_start_in_chunk INTEGER;
+                page_end_in_chunk INTEGER;
+                i INTEGER;
+            BEGIN
+                -- Determine which words from this chunk to include
+                page_start_in_chunk := GREATEST(1, v_start_word - v_accumulated_words);
+                page_end_in_chunk := LEAST(v_chunk_record.word_count, v_end_word - v_accumulated_words);
+                
+                -- Extract the relevant words
+                FOR i IN page_start_in_chunk..page_end_in_chunk LOOP
+                    IF i <= array_length(v_content_words, 1) THEN
+                        IF v_page_content != '' THEN
+                            v_page_content := v_page_content || ' ';
+                        END IF;
+                        v_page_content := v_page_content || v_content_words[i];
+                        v_page_word_count := v_page_word_count + 1;
+                    END IF;
+                END LOOP;
+            END;
+            
+            -- If we've reached our word limit, stop
+            IF v_accumulated_words + v_chunk_record.word_count >= v_end_word THEN
+                EXIT;
+            END IF;
+        END IF;
+        
+        v_accumulated_words := v_accumulated_words + v_chunk_record.word_count;
+    END LOOP;
+    
+    -- Get book title for response
+    SELECT title INTO v_current_content FROM books WHERE book_id = p_book_id;
+    
+    -- Build response with dynamic navigation
+    SELECT json_build_object(
+        'success', true,
+        'data', json_build_object(
+            'book_id', p_book_id,
+            'title', v_current_content,
+            'page_number', p_page_num,
+            'content', v_page_content,
+            'word_count', v_page_word_count,
+            'words_per_page', p_words_per_page,
+            'pagination_info', json_build_object(
+                'total_pages', v_total_dynamic_pages,
+                'total_words', v_total_words,
+                'word_range', json_build_object(
+                    'start', v_start_word,
+                    'end', LEAST(v_end_word, v_total_words)
+                )
+            ),
+            'navigation', json_build_object(
+                'previous_page', CASE WHEN p_page_num > 1 
+                    THEN CONCAT('/api/books?action=page&id=', p_book_id, '&page_num=', p_page_num - 1, '&words_per_page=', p_words_per_page)
+                    ELSE NULL END,
+                'next_page', CASE WHEN p_page_num < v_total_dynamic_pages 
+                    THEN CONCAT('/api/books?action=page&id=', p_book_id, '&page_num=', p_page_num + 1, '&words_per_page=', p_words_per_page)
+                    ELSE NULL END,
+                'first_page', CONCAT('/api/books?action=page&id=', p_book_id, '&page_num=1', '&words_per_page=', p_words_per_page),
+                'last_page', CONCAT('/api/books?action=page&id=', p_book_id, '&page_num=', v_total_dynamic_pages, '&words_per_page=', p_words_per_page),
+                'previous_page_url', CASE WHEN p_page_num > 1 
+                    THEN CONCAT(p_base_url, '/api/books?action=page&id=', p_book_id, '&page_num=', p_page_num - 1, '&words_per_page=', p_words_per_page)
+                    ELSE NULL END,
+                'next_page_url', CASE WHEN p_page_num < v_total_dynamic_pages 
+                    THEN CONCAT(p_base_url, '/api/books?action=page&id=', p_book_id, '&page_num=', p_page_num + 1, '&words_per_page=', p_words_per_page)
+                    ELSE NULL END
+            )
+        )
+    ) INTO v_result;
+    
+    RETURN v_result;
+END;
+$$;
+
 -- Shortcuts: Random Page
 CREATE OR REPLACE FUNCTION api_shortcuts_book_random_page(p_book_id INTEGER)
 RETURNS JSON
