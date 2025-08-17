@@ -26,6 +26,7 @@ STANDARD_PARAMS = {
     'sort': 'sort',         # Sorting parameter
     'filter': 'filter',     # Filtering parameter
     'format': 'format',     # Response format
+    'words_per_page': 'words_per_page',  # Dynamic pagination word count
 }
 
 # PARAMETER VALIDATION SCHEMAS
@@ -67,6 +68,12 @@ PARAM_SCHEMAS = {
         'type': str,
         'allowed_values': ['json', 'simple'],
         'default': 'json'
+    },
+    'words_per_page': {
+        'type': int,
+        'min_value': 100,
+        'max_value': 2000,
+        'default': 1000
     }
 }
 

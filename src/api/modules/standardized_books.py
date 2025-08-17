@@ -35,7 +35,7 @@ def before_request():
 
 @standardized_books_bp.route('/api/books')
 @require_auth_unless_localhost
-@validate_params(action='list', id=5560, limit=20, page=1, format='json', sort='title')
+@validate_params(action='list', id=5560, limit=20, page=1, format='json', sort='title', words_per_page=1000)
 def books_endpoint():
     """
     LEVEL 1 CORE: Standardized Books API
@@ -46,7 +46,7 @@ def books_endpoint():
     - toc: Get table of contents (requires id)  
     - random_page: Get random page (requires id)
     - construct: Get book construction (requires id)
-    - page: Get specific page (requires id, page_num)
+    - page: Get specific page (requires id, page_num, optional words_per_page)
     
     Standard Parameters:
     - action: string (list|summary|toc|random_page|construct|page)
@@ -55,6 +55,7 @@ def books_endpoint():
     - page: integer (page number, default: 1)
     - format: string (json|simple, default: json)
     - sort: string (book_id|author|title|publication_date|word_count, default: title)
+    - words_per_page: integer (100-2000, default: 1000) - Dynamic pagination word count
     """
     try:
         params = request.validated_params
@@ -82,15 +83,16 @@ def books_endpoint():
             return _handle_book_construct(book_id, response_format)
             
         elif action == 'page':
-            # Page action requires additional page_num parameter
+            # Page action requires additional page_num parameter and optional words_per_page
             page_num = request.args.get('page_num', 1, type=int)
+            words_per_page = params.get('words_per_page', 1000)
             if page_num < 1:
                 return create_error_response(
                     message="page_num must be at least 1",
                     code="INVALID_PAGE_NUMBER",
                     status_code=400
                 )
-            return _handle_book_page(book_id, page_num, response_format)
+            return _handle_book_page(book_id, page_num, response_format, words_per_page)
             
         else:
             return create_error_response(
@@ -119,19 +121,15 @@ def _handle_books_list(limit: int, page: int, response_format: str, sort_field: 
         if sort_field not in valid_sort_fields:
             sort_field = 'title'  # Default to title if invalid
         
-        # Build ORDER BY clause with proper field mapping
-        if sort_field == 'book_id':
-            order_by_clause = "ORDER BY book_id"
-        elif sort_field == 'author':
-            order_by_clause = "ORDER BY author, title"  # Secondary sort by title
-        elif sort_field == 'title':
-            order_by_clause = "ORDER BY title"
-        elif sort_field == 'publication_date':
-            order_by_clause = "ORDER BY publication_date DESC NULLS LAST, title"  # Newest first, then title
-        elif sort_field == 'word_count':
-            order_by_clause = "ORDER BY word_count DESC NULLS LAST, title"  # Largest first, then title
-        else:
-            order_by_clause = "ORDER BY title"  # Default fallback
+        # Secure ORDER BY clause mapping to prevent SQL injection
+        ORDER_BY_CLAUSES = {
+            'book_id': 'ORDER BY book_id',
+            'author': 'ORDER BY author, title',
+            'title': 'ORDER BY title', 
+            'publication_date': 'ORDER BY publication_date DESC NULLS LAST, title',
+            'word_count': 'ORDER BY word_count DESC NULLS LAST, title'
+        }
+        order_by_clause = ORDER_BY_CLAUSES.get(sort_field, ORDER_BY_CLAUSES['title'])
         
         # Use direct SQL query approach with dynamic sorting
         from .database import get_db
@@ -292,10 +290,23 @@ def _handle_book_construct(book_id: int, response_format: str):
             status_code=500
         )
 
-def _handle_book_page(book_id: int, page_num: int, response_format: str):
-    """Handle specific book page action"""
+def _handle_book_page(book_id: int, page_num: int, response_format: str, words_per_page: int = 1000):
+    """Handle specific book page action with dynamic word count pagination"""
     try:
-        result = execute_pg_function('api_shortcuts_book_page', book_id, page_num)
+        # Determine base URL based on environment
+        import os
+        port = os.environ.get('API_PORT', '5562')
+        if port == '5568':
+            base_url = 'https://staging.ashortstayinhell.com:5568'
+        else:
+            base_url = 'https://api.ashortstayinhell.com:5562'
+        
+        # Use enhanced function if words_per_page is specified and not default chunk-based
+        if words_per_page != 1000:
+            result = execute_pg_function('api_shortcuts_book_page_dynamic', book_id, page_num, words_per_page, base_url)
+        else:
+            # Fallback to original function for backward compatibility
+            result = execute_pg_function('api_shortcuts_book_page', book_id, page_num)
         
         if response_format == 'simple':
             if isinstance(result, dict) and 'data' in result:
@@ -305,7 +316,7 @@ def _handle_book_page(book_id: int, page_num: int, response_format: str):
             return create_single_item_response(result)
             
     except Exception as e:
-        logger.error(f"Book page error for ID {book_id}, page {page_num}: {e}")
+        logger.error(f"Book page error for ID {book_id}, page {page_num}, words_per_page {words_per_page}: {e}")
         return create_error_response(
             message=f"Failed to get page {page_num} for book {book_id}",
             code="BOOK_PAGE_ERROR",
