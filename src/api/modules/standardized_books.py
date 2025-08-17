@@ -136,6 +136,15 @@ def _handle_books_list(limit: int, page: int, response_format: str, sort_field: 
         with get_db() as conn:
             with conn.cursor() as cur:
                 cur.execute(f"""
+                    WITH book_data AS (
+                        SELECT book_id, title, author, publication_date, genre, word_count, processed_date
+                        FROM books 
+                        {order_by_clause}
+                        LIMIT %s OFFSET %s
+                    ),
+                    total_count AS (
+                        SELECT COUNT(*) as total_books FROM books
+                    )
                     SELECT json_build_object(
                         'success', true,
                         'data', json_build_object(
@@ -148,21 +157,16 @@ def _handle_books_list(limit: int, page: int, response_format: str, sort_field: 
                                     'genre', COALESCE(genre, 'Unknown'),
                                     'word_count', word_count,
                                     'processed_date', processed_date
-                                )
+                                ) ORDER BY title
                             ),
-                            'total_count', COUNT(*),
+                            'total_count', (SELECT total_books FROM total_count),
                             'limit', %s,
                             'page', %s,
                             'sort_by', %s
                         )
                     )
-                    FROM (
-                        SELECT book_id, title, author, publication_date, genre, word_count, processed_date
-                        FROM books 
-                        {order_by_clause}
-                        LIMIT %s OFFSET %s
-                    ) limited_books
-                """, (limit, page, sort_field, limit, (page - 1) * limit))
+                    FROM book_data
+                """, (limit, (page - 1) * limit, limit, page, sort_field))
                 result = cur.fetchone()[0]
                 
                 # Parse the JSON result

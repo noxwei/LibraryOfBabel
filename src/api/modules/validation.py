@@ -39,7 +39,7 @@ PARAM_SCHEMAS = {
     },
     'action': {
         'type': str,
-        'allowed_values': ['list', 'summary', 'search', 'count', 'titles', 'semantic', 'semantic_passages', 'passage', 'random', 'has_results', 'concept', 'emotional', 'highlighted', 'advanced', 'toc', 'random_page', 'construct', 'page', 'simple'],
+        'allowed_values': ['list', 'summary', 'search', 'count', 'titles', 'books', 'semantic', 'semantic_passages', 'passage', 'random', 'has_results', 'concept', 'emotional', 'highlighted', 'advanced', 'toc', 'random_page', 'construct', 'page', 'simple'],
         'default': 'list'
     },
     'id': {
@@ -74,6 +74,30 @@ PARAM_SCHEMAS = {
         'min_value': 100,
         'max_value': 2000,
         'default': 1000
+    },
+    'title': {
+        'type': str,
+        'min_length': 1,
+        'max_length': 500,
+        'strip': True
+    },
+    'author': {
+        'type': str,
+        'min_length': 1,
+        'max_length': 255,
+        'strip': True
+    },
+    'genre': {
+        'type': str,
+        'min_length': 1,
+        'max_length': 100,
+        'strip': True
+    },
+    'description': {
+        'type': str,
+        'min_length': 1,
+        'max_length': 500,
+        'strip': True
     }
 }
 
