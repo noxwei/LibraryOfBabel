@@ -24,6 +24,7 @@ LibraryOfBabel isn't just another ebook manager—it's a **semantic understandin
 - 📱 **Universal Access**: REST API for any platform (iOS, web, CLI, agents)
 - 🎯 **Flexible Results**: 1-10,000 result limits for any use case
 - 🤖 **AI-Native**: Structured responses perfect for LLM agents
+- 📖 **E-Reader Experience**: Dynamic word-count pagination for customizable reading experience
 
 ## 🚀 **Quick Start - Lightning Demo**
 
@@ -37,7 +38,10 @@ curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_KEY&q=quantum%20
 # 3. Book-specific search with AI routing
 curl "https://api.ashortstayinhell.com:5562/books/1099/search?api_key=YOUR_KEY&q=neural%20networks"
 
-# 4. Advanced: Search by embedding model type
+# 4. E-reader style reading with dynamic pagination
+curl "https://api.ashortstayinhell.com:5562/api/books?action=page&id=1482&page_num=1&words_per_page=500&api_key=YOUR_KEY"
+
+# 5. Advanced: Search by embedding model type
 curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_KEY&q=machine%20learning&model=technical&limit=10"
 ```
 
@@ -241,7 +245,26 @@ GET  /health                   # System status and metrics
 POST /search/batch             # Bulk search operations
 ```
 
-### **Response Format**
+### **E-Reader Endpoints**
+```
+GET  /api/books?action=page     # Dynamic word-count pagination
+     &id={book_id}              # Book identifier
+     &page_num={page}           # Page number (1-based)
+     &words_per_page={count}    # 100-2000 words (default: 1000)
+
+GET  /api/books?action=toc      # Table of contents navigation
+GET  /api/books?action=summary  # Book metadata and details
+```
+
+### **Dynamic Pagination Features**
+- **📖 Customizable Reading Experience**: Choose 100-2000 words per page
+- **🧭 Smart Navigation**: Environment-aware URLs for staging/production
+- **🎧 TTS Integration**: Ready-to-use URLs for automation workflows
+- **📱 iOS Shortcuts Compatible**: Perfect for mobile automation
+- **⚡ Sub-second Performance**: PostgreSQL-optimized pagination
+- **🔄 Backward Compatible**: Existing chunk-based pagination preserved
+
+### **Search Response Format**
 ```json
 {
   "status": "success",
@@ -261,6 +284,37 @@ POST /search/batch             # Bulk search operations
       "embedding_model": "granite-embedding"
     }
   ]
+}
+```
+
+### **E-Reader Response Format**
+```json
+{
+  "success": true,
+  "data": {
+    "book_id": 1482,
+    "title": "Cloud Cuckoo Land",
+    "page_number": 1,
+    "content": "Konstance A fourteen-year-old girl sits cross-legged...",
+    "word_count": 500,
+    "words_per_page": 500,
+    "pagination_info": {
+      "total_pages": 281,
+      "total_words": 140048,
+      "word_range": { "start": 1, "end": 500 }
+    },
+    "navigation": {
+      "next_page": "/api/books?action=page&id=1482&page_num=2&words_per_page=500",
+      "next_page_url": "https://api.ashortstayinhell.com:5562/api/books?action=page&id=1482&page_num=2&words_per_page=500",
+      "previous_page_url": null,
+      "first_page": "/api/books?action=page&id=1482&page_num=1&words_per_page=500",
+      "last_page": "/api/books?action=page&id=1482&page_num=281&words_per_page=500"
+    }
+  },
+  "meta": {
+    "response_time_ms": 0.8,
+    "timestamp": "2025-01-17T02:36:21Z"
+  }
 }
 ```
 
