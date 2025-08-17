@@ -36,7 +36,7 @@ def before_request():
 
 @standardized_search_bp.route('/api/search')
 @require_auth_unless_localhost
-@validate_params('q', action='search', limit=20, page=1, format='json', sort='relevance')
+@validate_params('q', action='search', limit=20, page=1, format='json', sort='relevance', id=None)
 def search_endpoint():
     """
     LEVEL 1 CORE: Standardized Search API
@@ -103,7 +103,8 @@ def search_endpoint():
             
         elif action == 'highlighted':
             snippet_length = min(int(request.args.get('snippet_length', 200)), 500)
-            return _handle_highlighted_search(query, limit, snippet_length, response_format, sort_field)
+            book_id = params.get('id')
+            return _handle_highlighted_search(query, limit, snippet_length, response_format, sort_field, book_id)
             
         elif action == 'advanced':
             return _handle_advanced_search(query, limit, response_format, sort_field)
@@ -317,10 +318,15 @@ def _handle_emotional_search(query: str, book_filter: int, limit: int, response_
             status_code=500
         )
 
-def _handle_highlighted_search(query: str, limit: int, snippet_length: int, response_format: str, sort_field: str):
+def _handle_highlighted_search(query: str, limit: int, snippet_length: int, response_format: str, sort_field: str, book_id: int = None):
     """Handle highlighted search using PostgreSQL function"""
     try:
-        result = execute_pg_function('api_search_content_with_highlights', query, limit, snippet_length)
+        if book_id:
+            # Book-specific passage search with regular text matching
+            result = execute_pg_function('api_book_passage_search', book_id, query, limit)
+        else:
+            # Global trigram search across entire database
+            result = execute_pg_function('api_search_content_with_highlights', query, limit, snippet_length)
         
         if response_format == 'simple':
             if isinstance(result, dict) and 'data' in result:
@@ -330,7 +336,7 @@ def _handle_highlighted_search(query: str, limit: int, snippet_length: int, resp
             return create_single_item_response(result)
             
     except Exception as e:
-        logger.error(f"Highlighted search error for query '{query}': {e}")
+        logger.error(f"Highlighted search error for query '{query}' (book_id: {book_id}): {e}")
         return create_error_response(
             message=f"Highlighted search failed for query: {query}",
             code="HIGHLIGHTED_SEARCH_ERROR",
