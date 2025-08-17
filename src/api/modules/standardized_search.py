@@ -36,7 +36,7 @@ def before_request():
 
 @standardized_search_bp.route('/api/search')
 @require_auth_unless_localhost
-@validate_params('q', action='search', limit=20, page=1, format='json', sort='relevance', id=None)
+@validate_params(q=None, action='search', limit=20, page=1, format='json', sort='relevance', id=None, title=None, author=None, description=None, genre=None)
 def search_endpoint():
     """
     LEVEL 1 CORE: Standardized Search API
@@ -45,6 +45,7 @@ def search_endpoint():
     - search: Basic content search (default)
     - count: Count search results
     - titles: Search book titles only
+    - books: Comprehensive book metadata search (title, author, description, genre)
     - has_results: Check if results exist
     - semantic: Semantic vector search (book-level results)
     - semantic_passages: Semantic vector search (passage/chunk-level results)
@@ -81,6 +82,9 @@ def search_endpoint():
         elif action == 'titles':
             return _handle_titles_search(query, limit, response_format, sort_field)
             
+        elif action == 'books':
+            return _handle_books_metadata_search(query, limit, page, response_format, sort_field)
+            
         elif action == 'has_results':
             return _handle_has_results(query, response_format)
             
@@ -114,7 +118,7 @@ def search_endpoint():
                 message=f"Unsupported search action: {action}",
                 code="UNSUPPORTED_SEARCH_ACTION",
                 details={
-                    "supported_actions": ["search", "count", "titles", "has_results", "semantic", "semantic_passages", "concept", "passage", "emotional", "highlighted", "advanced"],
+                    "supported_actions": ["search", "count", "titles", "books", "has_results", "semantic", "semantic_passages", "concept", "passage", "emotional", "highlighted", "advanced"],
                     "provided_action": action
                 },
                 status_code=400
@@ -393,5 +397,52 @@ def _handle_semantic_passages_search(query: str, limit: int, response_format: st
         return create_error_response(
             message=f"Semantic passages search failed for query: {query}",
             code="SEMANTIC_PASSAGES_SEARCH_ERROR",
+            status_code=500
+        )
+
+def _handle_books_metadata_search(query: str, limit: int, page: int, response_format: str, sort_field: str):
+    """Handle comprehensive book metadata search using PostgreSQL function"""
+    try:
+        # Get field-specific filters from request
+        title_filter = request.args.get('title', '').strip()
+        author_filter = request.args.get('author', '').strip()
+        description_filter = request.args.get('description', '').strip()
+        genre_filter = request.args.get('genre', '').strip()
+        
+        # Map sort field to PostgreSQL function parameter
+        sort_mapping = {
+            'relevance': 'author_title',
+            'title': 'title',
+            'author': 'author', 
+            'word_count': 'word_count'
+        }
+        pg_sort_field = sort_mapping.get(sort_field, 'author_title')
+        
+        # Call the PostgreSQL function with field-specific filters
+        result = execute_pg_function(
+            'api_book_metadata_search',
+            query,
+            author_filter,
+            genre_filter,
+            title_filter,
+            description_filter,
+            page,
+            limit,
+            pg_sort_field
+        )
+        
+        if response_format == 'simple':
+            # Return simplified format for mobile
+            if isinstance(result, dict) and 'data' in result:
+                return create_success_response(data=result['data']['books'])
+            return create_success_response(data=result)
+        else:
+            return create_single_item_response(result)
+            
+    except Exception as e:
+        logger.error(f"Books metadata search error for query '{query}': {e}")
+        return create_error_response(
+            message=f"Book metadata search failed for query: {query}",
+            code="BOOK_METADATA_SEARCH_ERROR", 
             status_code=500
         )

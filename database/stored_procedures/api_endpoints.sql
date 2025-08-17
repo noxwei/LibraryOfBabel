@@ -12,6 +12,197 @@
 -- BOOKS FUNCTIONS
 -- ================================
 
+-- Book Metadata Search - Comprehensive book discovery
+CREATE OR REPLACE FUNCTION api_book_metadata_search(
+    p_search_query TEXT DEFAULT NULL,
+    p_author_filter TEXT DEFAULT NULL,
+    p_genre_filter TEXT DEFAULT NULL,
+    p_title_filter TEXT DEFAULT NULL,
+    p_description_filter TEXT DEFAULT NULL,
+    p_page INTEGER DEFAULT 1,
+    p_page_size INTEGER DEFAULT 20,
+    p_sort_field TEXT DEFAULT 'author_title'
+)
+RETURNS JSON
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_result JSON;
+    v_offset INTEGER;
+    v_total_items BIGINT;
+    v_total_pages INTEGER;
+    v_sort_clause TEXT;
+BEGIN
+    -- Input validation
+    IF p_page < 1 THEN p_page := 1; END IF;
+    IF p_page_size < 1 OR p_page_size > 100 THEN p_page_size := 20; END IF;
+    
+    -- Calculate offset
+    v_offset := (p_page - 1) * p_page_size;
+    
+    -- Safe sort clause mapping (prevent SQL injection)
+    CASE p_sort_field
+        WHEN 'author' THEN v_sort_clause := 'ORDER BY COALESCE(b.author, '''') ASC, b.title ASC';
+        WHEN 'title' THEN v_sort_clause := 'ORDER BY b.title ASC, COALESCE(b.author, '''') ASC';
+        WHEN 'genre' THEN v_sort_clause := 'ORDER BY COALESCE(b.genre, '''') ASC, COALESCE(b.author, '''') ASC, b.title ASC';
+        WHEN 'word_count' THEN v_sort_clause := 'ORDER BY b.word_count DESC, COALESCE(b.author, '''') ASC';
+        ELSE v_sort_clause := 'ORDER BY COALESCE(b.author, '''') ASC, b.title ASC, COALESCE(b.genre, '''') ASC';
+    END CASE;
+    
+    -- Get total count for pagination
+    SELECT COUNT(*) INTO v_total_items
+    FROM books b
+    WHERE 
+        -- Global search across all fields (when p_search_query is provided)
+        (p_search_query IS NULL OR p_search_query = '' OR 
+         (b.title ILIKE '%' || p_search_query || '%' OR 
+          COALESCE(b.author, '') ILIKE '%' || p_search_query || '%' OR 
+          COALESCE(b.description, '') ILIKE '%' || p_search_query || '%' OR
+          COALESCE(b.genre, '') ILIKE '%' || p_search_query || '%'))
+        -- Field-specific filters
+        AND (p_title_filter IS NULL OR p_title_filter = '' OR 
+             b.title ILIKE '%' || p_title_filter || '%')
+        AND (p_author_filter IS NULL OR p_author_filter = '' OR 
+             COALESCE(b.author, '') ILIKE '%' || p_author_filter || '%')
+        AND (p_description_filter IS NULL OR p_description_filter = '' OR 
+             COALESCE(b.description, '') ILIKE '%' || p_description_filter || '%')
+        AND (p_genre_filter IS NULL OR p_genre_filter = '' OR 
+             COALESCE(b.genre, '') ILIKE '%' || p_genre_filter || '%');
+    
+    -- Calculate total pages
+    v_total_pages := CASE WHEN v_total_items = 0 THEN 0 ELSE CEIL(v_total_items::NUMERIC / p_page_size) END;
+    
+    -- Build JSON response with paginated results
+    SELECT json_build_object(
+        'success', true,
+        'data', json_build_object(
+            'books', COALESCE(book_array.books, '[]'::json),
+            'pagination', json_build_object(
+                'current_page', p_page,
+                'total_pages', v_total_pages,
+                'total_books', v_total_items,
+                'books_per_page', p_page_size,
+                'has_next', (p_page < v_total_pages),
+                'has_previous', (p_page > 1)
+            ),
+            'filters_applied', json_build_object(
+                'search_query', COALESCE(p_search_query, ''),
+                'title_filter', COALESCE(p_title_filter, ''),
+                'author_filter', COALESCE(p_author_filter, ''),
+                'description_filter', COALESCE(p_description_filter, ''),
+                'genre_filter', COALESCE(p_genre_filter, '')
+            ),
+            'sort_order', p_sort_field
+        )
+    ) INTO v_result
+    FROM (
+        SELECT json_agg(
+            json_build_object(
+                'book_id', b.book_id,
+                'title', b.title,
+                'author', COALESCE(b.author, 'Unknown Author'),
+                'genre', COALESCE(b.genre, 'Unknown Genre'),
+                'word_count', COALESCE(b.word_count, 0),
+                'description', COALESCE(
+                    CASE 
+                        WHEN LENGTH(b.description) > 200 
+                        THEN SUBSTRING(b.description FROM 1 FOR 200) || '...'
+                        ELSE b.description
+                    END, 
+                    'No description available'
+                ),
+                'chunk_count', COALESCE(b.chunk_count, 0)
+            ) ORDER BY 
+                CASE p_sort_field
+                    WHEN 'author' THEN COALESCE(b.author, '')
+                    WHEN 'title' THEN b.title
+                    WHEN 'genre' THEN COALESCE(b.genre, '')
+                    WHEN 'word_count' THEN b.word_count::text
+                    ELSE COALESCE(b.author, '')
+                END ASC,
+                CASE p_sort_field
+                    WHEN 'word_count' THEN COALESCE(b.author, '')
+                    ELSE b.title
+                END ASC
+        ) as books
+        FROM (
+            SELECT b.*
+            FROM books b
+            WHERE 
+                -- Global search across all fields (when p_search_query is provided)
+                (p_search_query IS NULL OR p_search_query = '' OR 
+                 (b.title ILIKE '%' || p_search_query || '%' OR 
+                  COALESCE(b.author, '') ILIKE '%' || p_search_query || '%' OR 
+                  COALESCE(b.description, '') ILIKE '%' || p_search_query || '%' OR
+                  COALESCE(b.genre, '') ILIKE '%' || p_search_query || '%'))
+                -- Field-specific filters
+                AND (p_title_filter IS NULL OR p_title_filter = '' OR 
+                     b.title ILIKE '%' || p_title_filter || '%')
+                AND (p_author_filter IS NULL OR p_author_filter = '' OR 
+                     COALESCE(b.author, '') ILIKE '%' || p_author_filter || '%')
+                AND (p_description_filter IS NULL OR p_description_filter = '' OR 
+                     COALESCE(b.description, '') ILIKE '%' || p_description_filter || '%')
+                AND (p_genre_filter IS NULL OR p_genre_filter = '' OR 
+                     COALESCE(b.genre, '') ILIKE '%' || p_genre_filter || '%')
+            ORDER BY 
+                CASE p_sort_field
+                    WHEN 'author' THEN COALESCE(b.author, '')
+                    WHEN 'title' THEN b.title
+                    WHEN 'genre' THEN COALESCE(b.genre, '')
+                    WHEN 'word_count' THEN LPAD(b.word_count::text, 10, '0')
+                    ELSE COALESCE(b.author, '')
+                END ASC,
+                CASE p_sort_field
+                    WHEN 'word_count' THEN COALESCE(b.author, '')
+                    ELSE b.title
+                END ASC,
+                CASE p_sort_field
+                    WHEN 'author' THEN b.title
+                    WHEN 'title' THEN COALESCE(b.author, '')
+                    WHEN 'genre' THEN COALESCE(b.author, '')
+                    ELSE COALESCE(b.genre, '')
+                END ASC
+            LIMIT p_page_size OFFSET v_offset
+        ) b
+    ) book_array;
+    
+    -- Handle empty results
+    IF v_result IS NULL OR v_total_items = 0 THEN
+        v_result := json_build_object(
+            'success', true,
+            'data', json_build_object(
+                'books', '[]'::json,
+                'pagination', json_build_object(
+                    'current_page', p_page,
+                    'total_pages', 0,
+                    'total_books', 0,
+                    'books_per_page', p_page_size,
+                    'has_next', false,
+                    'has_previous', false
+                ),
+                'filters_applied', json_build_object(
+                    'search_query', COALESCE(p_search_query, ''),
+                    'title_filter', COALESCE(p_title_filter, ''),
+                    'author_filter', COALESCE(p_author_filter, ''),
+                    'description_filter', COALESCE(p_description_filter, ''),
+                    'genre_filter', COALESCE(p_genre_filter, '')
+                ),
+                'sort_order', p_sort_field
+            )
+        );
+    END IF;
+    
+    RETURN v_result;
+    
+EXCEPTION WHEN OTHERS THEN
+    RETURN json_build_object(
+        'success', false, 
+        'error', 'Search request failed',
+        'code', 'BOOK_METADATA_SEARCH_ERROR'
+    );
+END;
+$$;
+
 -- Shortcuts: Book Summary
 CREATE OR REPLACE FUNCTION api_shortcuts_book_summary(p_book_id INTEGER)
 RETURNS JSON
@@ -416,12 +607,12 @@ BEGIN
         RETURN 0;
     END IF;
     
+    -- FAST COUNT: Use trigram indexes only (no slow search_vector joins)
     SELECT COUNT(DISTINCT b.book_id) INTO v_count
     FROM books b
-    JOIN chunks c ON b.book_id = c.book_id
-    WHERE c.search_vector @@ plainto_tsquery('english', p_term)
-       OR LOWER(b.title) LIKE LOWER('%' || p_term || '%')
-       OR LOWER(b.author) LIKE LOWER('%' || p_term || '%');
+    WHERE b.title % p_term  -- Fast trigram similarity on title (uses idx_books_title_trigram)
+       OR LOWER(b.title) LIKE LOWER('%' || p_term || '%')  -- Title substring
+       OR LOWER(b.author) LIKE LOWER('%' || p_term || '%');  -- Author substring
     
     RETURN COALESCE(v_count, 0);
 END;
@@ -485,10 +676,10 @@ BEGIN
         );
     END IF;
     
-    -- Get total count
+    -- Get total count using fast approach
     v_total_results := api_shortcuts_search_count(p_term);
     
-    -- Get results with proper limit
+    -- FAST SEARCH: Use trigram indexes only (no slow search_vector joins)
     SELECT json_build_object(
         'success', true,
         'data', json_build_object(
@@ -511,17 +702,22 @@ BEGIN
             b.title,
             b.author,
             CASE 
+                WHEN b.title % p_term THEN 'title_trigram'
                 WHEN LOWER(b.title) LIKE LOWER('%' || p_term || '%') THEN 'title'
                 WHEN LOWER(b.author) LIKE LOWER('%' || p_term || '%') THEN 'author'
-                ELSE 'content'
+                ELSE 'other'
             END as match_type,
-            ts_rank(c.search_vector, plainto_tsquery('english', p_term)) as relevance_score
+            CASE 
+                WHEN b.title % p_term THEN 0.9
+                WHEN LOWER(b.title) LIKE LOWER('%' || p_term || '%') THEN 0.8
+                WHEN LOWER(b.author) LIKE LOWER('%' || p_term || '%') THEN 0.7
+                ELSE 0.3
+            END as relevance_score
         FROM books b
-        JOIN chunks c ON b.book_id = c.book_id
-        WHERE c.search_vector @@ plainto_tsquery('english', p_term)
-           OR LOWER(b.title) LIKE LOWER('%' || p_term || '%')
-           OR LOWER(b.author) LIKE LOWER('%' || p_term || '%')
-        ORDER BY ts_rank(c.search_vector, plainto_tsquery('english', p_term)) DESC
+        WHERE b.title % p_term  -- Fast trigram similarity on title (uses idx_books_title_trigram)
+           OR LOWER(b.title) LIKE LOWER('%' || p_term || '%')  -- Title substring
+           OR LOWER(b.author) LIKE LOWER('%' || p_term || '%')  -- Author substring
+        ORDER BY relevance_score DESC
         LIMIT p_limit
     ) limited_results;
     
