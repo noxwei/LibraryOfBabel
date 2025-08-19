@@ -562,12 +562,12 @@ CALIBRE_DAEMON_GUIDE.md
 *DAEMON_GUIDE*.md
 
 # === SECURITY: Documentation with API keys ===
-# API documentation files that may contain API keys (exclude public versions)
-docs/API_Endpoint_Usage_Guide.md
-docs/Sorting_Implementation_Status.md
+# OLD: API documentation files that may contain API keys (exclude public versions)
+# REMOVED: docs/API_Endpoint_Usage_Guide.md (cleaned up - no longer contains API keys)
+# docs/Sorting_Implementation_Status.md
 # Allow public versions (no API keys)
-!docs/API_Endpoint_Usage_Guide_PUBLIC.md
-!docs/Sorting_Implementation_Status_PUBLIC.md
+# !docs/API_Endpoint_Usage_Guide_PUBLIC.md
+# !docs/Sorting_Implementation_Status_PUBLIC.md
 
 # === SECURITY: Files with hardcoded database passwords ===
 # Test and verification scripts with hardcoded credentials
@@ -610,8 +610,21 @@ backups/calibre_cleanup_20250730_032135/current_books_list.txt
 backups/calibre_cleanup_20250730_032135/library_structure_before.txt
 *.pgdump
 calibre_cleanup_log_20250730_032508.json
+# === CLAUDE LOCAL FILES ===
+# Claude local settings and configurations (contain personal paths)
 CLAUDE.local.md
+CLAUDE.local.*
+claude.local.*
+.claude/
+**/.claude/
 .claude/settings.local.json
+
+# Claude MCP configurations (contain personal paths)
+config/claude_desktop_config.json
+config/claude_mcp_config.json  
+config/claude_remote_mcp_config.json
+config/claude_*_config.json
+src/.claude/
 /.claude
 /config/macos
 /config
@@ -766,3 +779,144 @@ ssl/
 dual_machine_transfer/chunks_data.sql
 api_critical_issues_summary.json
 API_VALIDATION_SUMMARY.json
+/tests
+10_query_test_results.json
+endpoint_test_results.json
+chunk_analysis_results.json
+multi_model_ab_test_results.json
+multibook_passage_test_results.json
+sql_multi_model_ab_test_results.json
+comprehensive_20book_test_results.json
+semantic_passages_nomic_test_results.json
+multibook_semantic_passage_test_results.json
+overnight_conversion_output.txt
+multi_model_semantic_functions.sql
+start_persistent_api.sh
+multi_threaded_bge_stats.json
+semantic_search_test_queries.json
+chapter_focused_semantic_test.py
+controlled_bge_passage_test.py
+intensive_bge_quality_test.py
+nomic_genre_chapter_test.py
+simple_endpoint_test.sh
+generate_test_queries.py
+run_10_query_test.py
+test_multi_model_deep_embeddings.py
+test_sql_multi_model_embeddings.py
+test_all_intertextual_endpoints.sh
+test_multibook_passage_search.py
+test_20_comprehensive_queries.py
+test_semantic_passages_nomic.py
+test_global_semantic_search.py
+test_20books_comprehensive.py
+test_multimodel_api.py
+test_book_ids_20.json
+test_all_endpoints.sh
+test_book_ids.json
+test_nomic_api.py
+
+# === CLEANUP PREVENTION (August 2025) ===
+# Patterns to prevent future accumulation of development debris
+
+# Development log files in root
+*.log
+*_daemon.log
+*_embedding.log
+*_processing.log
+
+# Test and analysis scripts in root
+test_*.py
+*_analysis.py
+*_daemon.py (in root only)
+*_test.py
+
+# Development result files
+*_test_results.json
+*_analysis_*.json
+*_stats.json
+*_progress.json
+*_state.json
+
+# Temporary conversion and processing files
+*_conversion*.sh
+*_processing*.sh
+*_output.txt
+overnight_*.sh
+simple_*.sh
+
+# Development SQL files in root
+fix_*.sql
+*_cleanup.sql
+*_optimization.sql (in root only)
+
+# Daemon and process files
+*.pid
+daemon_progress.json
+*_checkpoint_*.json
+
+# Archive directories from cleanups
+archive/2025_Q*_cleanup/
+archive/20*_cleanup/
+
+# === LARGE FILE PROTECTION (50MB+ files) ===
+# Prevent accidentally committing large files to git
+
+# Large EPUB files (typically with images/audio)
+*.epub
+!**/*sample*.epub
+!**/*demo*.epub
+
+# Large database files
+*.db
+*.sqlite
+*.sqlite3
+!**/schema*.db
+!**/test*.db
+
+# Large backup and dump files
+*.pgdump
+*.dump
+*.sql.gz
+*.tar.gz
+*.zip
+
+# Large media and binary files
+*.mp3
+*.m4a
+*.m4b
+*.wav
+*.flac
+*.mp4
+*.avi
+*.mov
+*.pdf
+
+# Large PyTorch model files
+**/torch/lib/*
+**/pytorch/**/*.so
+**/site-packages/torch/**/*
+
+# Git LFS objects (already large)
+.git/lfs/objects/**/*
+
+# Large download directories
+**/downloads/*.epub
+**/downloads/*.pdf
+**/downloads/*.mp3
+**/downloads/*.m4b
+
+# Backup directories with large files
+ebooks/backup_*/**/*
+ebooks/processed/**/*
+ebooks/downloads/**/*
+ebooks/failed/**/*
+ebooks/reprocess/**/*
+
+# Database exports and imports
+database/prologue_export/**/*
+database/imports/**/*
+database/exports/**/*
+
+# Virtual environment large files
+venv*/lib/python*/site-packages/torch/**/*
+src/venv/lib/python*/site-packages/torch/**/*

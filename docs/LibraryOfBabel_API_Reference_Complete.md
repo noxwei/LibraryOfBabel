@@ -1,10 +1,11 @@
 # 📚 LibraryOfBabel API Reference v2.0
 
-**Complete documentation for the LibraryOfBabel API with 5,832 books, field-specific search, and comprehensive pagination.**
+**Complete documentation for the LibraryOfBabel API with 6,000+ books, field-specific search, and computational literary research capabilities.**
 
 **🎯 Production Ready**: Dr. Sarah Chen (陈雪芳) PostgreSQL-First Architecture  
 **📱 Mobile Optimized**: Dr. Elena Rodriguez (IAV) Information Architecture  
 **🔍 Field-Specific Search**: Advanced filtering by title, author, description, genre  
+**🧠 Intertextual Analysis**: Computational literary research with author networks and thematic evolution  
 
 ---
 
@@ -45,7 +46,7 @@ X-API-Key: YOUR_API_KEY
 ### 1. Books API (`/api/books`)
 
 **Base URL**: `/api/books`  
-**Description**: Access book metadata, content, and pagination with 5,832 total books
+**Description**: Access book metadata, content, and pagination with 6,000+ total books
 
 #### Supported Actions
 
@@ -90,8 +91,8 @@ X-API-Key: YOUR_API_KEY
     "pagination": {
       "limit": 20,
       "page": 1,
-      "total_count": 5832,
-      "total_pages": 292
+      "total_count": 6000,
+      "total_pages": 300
     },
     "sorting": {
       "sort_by": "title",
@@ -162,6 +163,13 @@ curl "https://api.ashortstayinhell.com:5562/api/books?action=random_page&id=4297
 | `emotional` | Emotional content search | AI/Sentiment | ❌ |
 | `highlighted` | Search with highlighting | Text/Keyword | ✅ |
 | `advanced` | Advanced multi-field search | Combined | ✅ |
+| **Intertextual Analysis Actions** |
+| `author_influence` | Author influence network analysis | Literary/NLP | ❌ |
+| `thematic_evolution` | Thematic evolution across periods | Literary/NLP | ❌ |
+| `content_analysis` | Stylometric and content analysis | Literary/NLP | ❌ |
+| `discovery` | Semantic book discovery | Literary/NLP | ❌ |
+| `style` | Writing style analysis | Literary/NLP | ❌ |
+| `quality` | Content quality assessment | Literary/NLP | ❌ |
 
 #### Parameters
 
@@ -296,6 +304,239 @@ curl "https://api.ashortstayinhell.com:5562/api/search?q=melancholy%20and%20nost
 ```bash
 curl "https://api.ashortstayinhell.com:5562/api/search?action=advanced&title=war&author=tolstoy&genre=historical%20fiction&api_key=YOUR_KEY"
 ```
+
+---
+
+## 🧠 Intertextual Analysis API
+
+**Transform LibraryOfBabel from basic book search into a computational literary research platform**
+
+The intertextual analysis system provides sophisticated NLP-powered literary research capabilities using the `/api/search` endpoint with specialized actions. This revolutionary feature set enables academic research, content discovery, and computational humanities applications.
+
+### 🌐 Author Influence Networks (`action=author_influence`)
+
+**Purpose**: Analyze stylistic connections between authors through computational similarity analysis  
+**Methodology**: Vector embeddings of opening passages (first 8K words) using nomic-embed-text  
+**Data**: 1035 relationships across 90 unique authors with 0.99+ similarity threshold  
+**Performance**: 20-30ms response time
+
+#### Examples
+
+**Network Overview**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?action=author_influence&limit=5&api_key=YOUR_KEY"
+```
+
+**Find Similar Authors**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?q=Mark%20Fisher&action=author_influence&limit=3&api_key=YOUR_KEY"
+```
+
+#### Response Structure
+```json
+{
+  "data": {
+    "data": {
+      "network_statistics": {
+        "total_relationships": 1035,
+        "unique_authors": 90,
+        "avg_influence_score": 0.992
+      },
+      "top_connected_authors": [
+        {
+          "author": "Mark Fisher",
+          "connection_count": 45,
+          "avg_score": 0.994
+        }
+      ]
+    }
+  }
+}
+```
+
+### 🔄 Thematic Evolution (`action=thematic_evolution`)
+
+**Purpose**: Track how literary themes evolve across historical periods  
+**Methodology**: Semantic clustering (MiniBatchKMeans) + temporal analysis  
+**Data**: 3 primary themes with 6 evolution patterns across medieval/enlightenment periods  
+**Performance**: 20-25ms response time
+
+#### Examples
+
+**Evolution Overview**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?action=thematic_evolution&limit=5&api_key=YOUR_KEY"
+```
+
+**Specific Theme Tracking**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?q=time_memory&action=thematic_evolution&limit=3&api_key=YOUR_KEY"
+```
+
+#### Response Structure
+```json
+{
+  "data": {
+    "data": {
+      "theme_rankings": [
+        {
+          "theme_name": "time_memory",
+          "avg_prevalence": 3.629,
+          "pattern_count": 2,
+          "time_periods": ["period_enlightenment", "period_medieval"]
+        }
+      ],
+      "evolution_statistics": {
+        "total_themes": 3,
+        "total_patterns": 6,
+        "avg_theme_prevalence": 2.713
+      }
+    }
+  }
+}
+```
+
+### 📊 Content Analysis (`action=content_analysis`)
+
+**Purpose**: Deep NLP-powered stylometric and thematic analysis  
+**Methodology**: spaCy pipeline with en_core_web_sm + custom stylometric metrics  
+**Data**: 50 books analyzed with comprehensive stylometric profiling  
+**Performance**: 35-45ms response time
+
+#### Examples
+
+**Stylometric Analysis**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?q=stylometric&action=content_analysis&limit=2&api_key=YOUR_KEY"
+```
+
+**Content Overview**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?q=overview&action=content_analysis&limit=3&api_key=YOUR_KEY"
+```
+
+#### Response Structure
+```json
+{
+  "data": {
+    "data": {
+      "analysis_type": "stylometric_features",
+      "books": [
+        {
+          "book_id": 45,
+          "title": "Capitalist Realism",
+          "author": "Mark Fisher",
+          "stylometric_profile": {
+            "vocabulary_richness": 0.096,
+            "avg_sentence_length": 25.4,
+            "dialogue_ratio": 0.0,
+            "narrative_structure": "odyssey"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+### 🔍 Semantic Discovery (`action=discovery`)
+
+**Purpose**: Intelligent book discovery using opening passage semantic analysis  
+**Methodology**: Vector similarity search on opening chunks (first 8K words)  
+**Performance**: 200-400ms response time
+
+#### Examples
+
+**Thematic Discovery**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?q=mystery%20detective%20crime&action=discovery&limit=3&api_key=YOUR_KEY"
+```
+
+**Genre Discovery**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?q=science%20fiction%20space&action=discovery&limit=3&api_key=YOUR_KEY"
+```
+
+### ✍️ Writing Style Analysis (`action=style`)
+
+**Purpose**: Analyze and match writing styles based on opening passages  
+**Methodology**: Stylistic similarity scoring using vector embeddings  
+**Performance**: 25-35ms response time
+
+#### Examples
+
+**Narrative Style Matching**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?q=first%20person%20narrative&action=style&limit=3&api_key=YOUR_KEY"
+```
+
+**Prose Style Analysis**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?q=hemingway%20sparse%20prose&action=style&limit=2&api_key=YOUR_KEY"
+```
+
+### ⭐ Content Quality Assessment (`action=quality`)
+
+**Purpose**: Assess content quality using computational metrics  
+**Methodology**: Quality scoring based on opening passage analysis  
+**Performance**: 25-35ms response time
+
+#### Examples
+
+**Literary Quality**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?q=well%20written%20literary&action=quality&limit=2&api_key=YOUR_KEY"
+```
+
+**Complex Prose Quality**
+```bash
+curl "https://api.ashortstayinhell.com:5562/api/search?q=complex%20literary%20prose&action=quality&limit=3&api_key=YOUR_KEY"
+```
+
+### 🎯 Research Applications
+
+#### Academic Research
+- **Literary Network Analysis**: Map stylistic influence patterns between authors
+- **Digital Humanities**: Quantitative analysis of literary evolution
+- **Comparative Literature**: Cross-author stylistic similarity studies
+- **Thematic Studies**: Track theme evolution across historical periods
+
+#### Content Discovery & Recommendation
+- **Smart Recommendations**: Semantic similarity beyond keyword matching
+- **Quality Curation**: Computational quality metrics for content assessment
+- **Style Matching**: Find books with similar narrative voices and techniques
+- **Thematic Exploration**: Discover works exploring similar literary concepts
+
+#### Computational Literary Criticism
+- **Stylometric Research**: Quantitative writing style analysis
+- **Cultural Evolution**: Track thematic changes across time periods
+- **Author Attribution**: Stylistic fingerprinting and similarity analysis
+- **Narrative Structure**: Classify story archetypes and narrative patterns
+
+### 🔬 Technical Methodology
+
+#### Data Processing Pipeline
+- **Corpus**: 6,000+ books with opening passage analysis (first 8K words)
+- **Embeddings**: nomic-embed-text vector embeddings for semantic analysis
+- **NLP Engine**: spaCy with en_core_web_sm for linguistic analysis
+- **Clustering**: MiniBatchKMeans semantic clustering (25 themes from 4,956 books)
+
+#### Validation & Quality Metrics
+- **Author Networks**: 1035 validated relationships with 0.99+ similarity threshold
+- **Thematic Evolution**: 3 primary themes tracked across 6 distinct patterns
+- **Content Analysis**: 50 books with comprehensive stylometric validation
+- **Performance**: Sub-50ms response times for most literary analysis operations
+
+### ⚡ Performance Characteristics
+
+| Analysis Type | Response Time | Data Volume | Computational Load |
+|---------------|---------------|-------------|-------------------|
+| Author Influence | 20-30ms | 1035 relationships | Vector similarity (optimized) |
+| Thematic Evolution | 20-25ms | 6 patterns, 3 themes | Clustering analysis (fast) |
+| Content Analysis | 35-45ms | 50 books analyzed | spaCy NLP processing |
+| Discovery | 200-400ms | 6K books | Semantic vector search |
+| Style Analysis | 25-35ms | Opening passages | Embedding comparison |
+| Quality Assessment | 25-35ms | Quality metrics | Computational scoring |
 
 ---
 
@@ -572,20 +813,25 @@ curl "https://api.ashortstayinhell.com:5562/api/info?api_key=YOUR_KEY"
   "system": {
     "name": "LibraryOfBabel API",
     "version": "2.0",
-    "total_books": 5832,
-    "total_chunks": 450000,
-    "last_updated": "2025-01-17T10:30:00Z"
+    "total_books": 6000,
+    "total_chunks": 500000,
+    "last_updated": "2025-08-19T10:30:00Z"
   },
   "endpoints": {
     "core": ["/api/books", "/api/search"],
     "mobile": ["/api/mobile/*"],
-    "system": ["/api/health", "/api/info"]
+    "system": ["/api/health", "/api/info"],
+    "intertextual": ["author_influence", "thematic_evolution", "content_analysis", "discovery", "style", "quality"]
   },
   "features": {
     "field_specific_search": true,
     "semantic_search": true,
     "pagination": true,
-    "mobile_optimized": true
+    "mobile_optimized": true,
+    "intertextual_analysis": true,
+    "author_networks": true,
+    "thematic_evolution": true,
+    "stylometric_analysis": true
   }
 }
 ```
@@ -670,10 +916,11 @@ curl "https://api.ashortstayinhell.com:5562/api/books?page=100&limit=50&api_key=
 - **Mobile Endpoints**: ~20ms average
 
 ### Data Limits
-- **Total Books**: 5,832
-- **Total Pages**: 1,167 (with default 20 per page)
+- **Total Books**: 6,000+
+- **Total Pages**: 300+ (with default 20 per page)
 - **Maximum Page Size**: 200 books per request
 - **Mobile Page Size**: 1-10 results (optimized)
+- **Intertextual Analysis**: 1035 author relationships, 50 analyzed books
 
 ### Rate Limits
 - **Standard**: 60 requests per minute per API key
@@ -684,19 +931,21 @@ curl "https://api.ashortstayinhell.com:5562/api/books?page=100&limit=50&api_key=
 
 ## 🚀 API Features Summary
 
-✅ **Complete Coverage**: All 5,832 books with full metadata  
+✅ **Complete Coverage**: All 6,000+ books with full metadata  
 🔍 **Field-Specific Search**: title, author, description, genre filtering  
 📊 **Accurate Pagination**: Real book counts with proper page calculation  
 🎯 **Multiple Sort Options**: 5 different sorting methods  
 📱 **Mobile Optimized**: Dedicated lightweight endpoints  
+🧠 **Intertextual Analysis**: Author networks, thematic evolution, stylometric analysis  
 🤖 **AI Integration**: Semantic search and MCP protocol support  
 ⚡ **High Performance**: Optimized PostgreSQL-first architecture  
 🔒 **Secure**: API key authentication with rate limiting  
-📝 **Comprehensive**: 12 search actions, 6 book actions  
+📝 **Comprehensive**: 18 search actions (including 6 literary analysis), 6 book actions  
 🔄 **Backward Compatible**: Support for legacy endpoints  
+🎓 **Research Ready**: Computational literary research platform capabilities  
 
 ---
 
-**📚 LibraryOfBabel API v2.0** - Complete access to 5,832 books with field-specific search, accurate pagination, and mobile optimization.
+**📚 LibraryOfBabel API v2.0** - Complete access to 6,000+ books with field-specific search, accurate pagination, mobile optimization, and computational literary research capabilities.
 
-*Generated: 2025-01-17 | Dr. Sarah Chen (陈雪芳) PostgreSQL-First Architecture*
+*Updated: 2025-08-19 | Dr. Sarah Chen (陈雪芳) PostgreSQL-First Architecture | Intertextual Analysis System*
