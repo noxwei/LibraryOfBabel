@@ -1,0 +1,5 @@
+- This is the main Bash(./production_api_service.sh restart to restart the api restart on public site.
+- never test with produciton website https://api.ashortstayinhell.com:5562
+- when testing with local host, do not use 5562
+- our database db is called knowledge_base
+- never use production_api_service for testing, thats how to restart production. use staging

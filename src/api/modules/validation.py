@@ -39,7 +39,7 @@ PARAM_SCHEMAS = {
     },
     'action': {
         'type': str,
-        'allowed_values': ['list', 'summary', 'search', 'count', 'titles', 'books', 'semantic', 'semantic_passages', 'passage', 'random', 'has_results', 'concept', 'emotional', 'highlighted', 'advanced', 'toc', 'random_page', 'construct', 'page', 'simple'],
+        'allowed_values': ['list', 'summary', 'search', 'count', 'titles', 'books', 'semantic', 'semantic_passages', 'passage', 'random', 'has_results', 'concept', 'emotional', 'highlighted', 'advanced', 'toc', 'random_page', 'construct', 'page', 'simple', 'discovery', 'style', 'quality', 'author_influence', 'thematic_evolution', 'content_analysis'],
         'default': 'list'
     },
     'id': {
@@ -61,7 +61,7 @@ PARAM_SCHEMAS = {
     },
     'sort': {
         'type': str,
-        'allowed_values': ['title', 'author', 'date', 'relevance', 'popularity', 'book_id', 'publication_date', 'word_count'],
+        'allowed_values': ['title', 'author', 'date', 'relevance', 'popularity', 'book_id', 'publication_date', 'word_count', 'alpha_title', 'alpha_author'],
         'default': 'relevance'
     },
     'format': {
@@ -98,6 +98,15 @@ PARAM_SCHEMAS = {
         'min_length': 1,
         'max_length': 500,
         'strip': True
+    },
+    'embedding_model': {
+        'type': str,
+        'allowed_values': ['nomic-embed-text', 'mxbai-embed-large', 'bge-m3'],
+        'default': 'nomic-embed-text'
+    },
+    'ensemble': {
+        'type': bool,
+        'default': False
     }
 }
 
@@ -135,6 +144,21 @@ class ParameterValidator:
                 value = str(value)
             if schema.get('strip', False):
                 value = value.strip()
+        
+        elif expected_type == bool:
+            if isinstance(value, bool):
+                pass  # Already boolean
+            elif isinstance(value, str):
+                if value.lower() in ('true', '1', 'yes', 'on'):
+                    value = True
+                elif value.lower() in ('false', '0', 'no', 'off'):
+                    value = False
+                else:
+                    raise ValidationError(name, f"Parameter '{name}' must be a boolean (true/false)", "INVALID_TYPE")
+            elif isinstance(value, int):
+                value = bool(value)
+            else:
+                raise ValidationError(name, f"Parameter '{name}' must be a boolean", "INVALID_TYPE")
         
         # String validation
         if expected_type == str and value:
