@@ -1,0 +1,95 @@
+{
+  "database_environments": {
+    "production": {
+      "host": "localhost",
+      "database": "knowledge_base",
+      "user": "weixiangzhang", 
+      "port": 5432,
+      "ssl_mode": "prefer",
+      "connect_timeout": 30,
+      "application_name": "library_of_babel_embeddings"
+    },
+    "staging": {
+      "host": "localhost",
+      "database": "knowledge_base_staging",
+      "user": "weixiangzhang",
+      "port": 5432,
+      "ssl_mode": "prefer",
+      "connect_timeout": 30,
+      "application_name": "library_of_babel_embeddings_staging"
+    },
+    "development": {
+      "host": "localhost", 
+      "database": "knowledge_base_dev",
+      "user": "weixiangzhang",
+      "port": 5432,
+      "ssl_mode": "disable",
+      "connect_timeout": 10,
+      "application_name": "library_of_babel_embeddings_dev"
+    }
+  },
+  "connection_pooling": {
+    "min_connections": 1,
+    "max_connections": 10,
+    "connection_lifetime": 3600,
+    "connection_idle_timeout": 600,
+    "pool_pre_ping": true
+  },
+  "embedding_tables": {
+    "chunk_embeddings": {
+      "primary_key": "embedding_id",
+      "indexes": [
+        "idx_chunk_embeddings_book_id",
+        "idx_chunk_embeddings_model", 
+        "idx_chunk_embeddings_vector_gin"
+      ],
+      "partitioning": {
+        "type": "hash",
+        "column": "book_id",
+        "partitions": 8
+      }
+    }
+  },
+  "performance_optimization": {
+    "shared_buffers": "8GB",
+    "effective_cache_size": "24GB", 
+    "maintenance_work_mem": "2GB",
+    "checkpoint_completion_target": 0.9,
+    "wal_buffers": "16MB",
+    "max_wal_size": "2GB",
+    "random_page_cost": 1.1,
+    "effective_io_concurrency": 200
+  },
+  "embedding_specific": {
+    "vector_dimensions": {
+      "bge-m3": 1024,
+      "mxbai-embed-large": 1024,
+      "nomic-embed-text": 768
+    },
+    "storage_format": "jsonb",
+    "compression": "lz4",
+    "index_type": "gin",
+    "bulk_insert_settings": {
+      "batch_size": 1000,
+      "synchronous_commit": "off",
+      "checkpoint_segments": 32
+    }
+  },
+  "monitoring": {
+    "log_connections": true,
+    "log_disconnections": true,
+    "log_duration": true,
+    "log_min_duration_statement": 1000,
+    "log_statement": "mod",
+    "track_activities": true,
+    "track_counts": true,
+    "track_io_timing": true
+  },
+  "backup_and_recovery": {
+    "backup_schedule": "0 2 * * *",
+    "backup_retention_days": 30,
+    "point_in_time_recovery": true,
+    "archive_mode": "on",
+    "archive_command": "cp %p /backup/wal/%f"
+  }
+}

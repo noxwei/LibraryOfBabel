@@ -1,0 +1,42 @@
+{
+  "local_setup": {
+    "base_url": "http://localhost:11434",
+    "instances": [
+      "http://localhost:11434",
+      "http://localhost:11435", 
+      "http://localhost:11436"
+    ],
+    "max_workers": 4
+  },
+  "container_setup": {
+    "base_url": "http://host.docker.internal:11434",
+    "instances": [
+      "http://host.docker.internal:11434",
+      "http://host.docker.internal:11435",
+      "http://host.docker.internal:11436"
+    ],
+    "max_workers": 4
+  },
+  "models": {
+    "nomic-embed-text": {
+      "dimensions": 768,
+      "max_length": 8000,
+      "description": "NOMIC embedding model for semantic search"
+    },
+    "bge-m3": {
+      "dimensions": 1024,
+      "max_length": 8192,
+      "description": "BGE-M3 multilingual embedding model"
+    }
+  },
+  "rate_limiting": {
+    "request_delay_seconds": 0.5,
+    "timeout_seconds": 30,
+    "max_retries": 3
+  },
+  "test_settings": {
+    "max_chunks_per_batch": 100,
+    "max_workers": 4,
+    "enable_rate_limiting": true
+  }
+}
