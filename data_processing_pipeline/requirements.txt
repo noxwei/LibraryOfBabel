@@ -1,0 +1,34 @@
+# BabelProcessorDb Pipeline Requirements
+# Minimal dependencies for EPUB processing and embedding generation
+
+# Core Python packages
+psycopg2-binary==2.9.7
+requests==2.31.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# EPUB processing
+ebooklib==0.18
+zipfile36==0.1.3
+
+# Text processing
+nltk==3.8.1
+textstat==0.7.3
+
+# Data handling
+pandas==2.0.3
+numpy==1.24.4
+
+# Utilities
+python-dotenv==1.0.0
+tqdm==4.66.1
+jsonschema==4.19.0
+
+# Logging and monitoring
+structlog==23.1.0
+
+# Health check server
+flask==2.3.3
+
+# Vector operations (if needed locally)
+scikit-learn==1.3.0

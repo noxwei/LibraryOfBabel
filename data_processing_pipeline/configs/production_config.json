@@ -1,0 +1,99 @@
+{
+  "deployment": {
+    "name": "multi-ollama-beast-mode",
+    "version": "2.0",
+    "environment": "production",
+    "created": "2025-08-19",
+    "instances": [
+      {
+        "port": 11434,
+        "role": "primary",
+        "model": "bge-m3",
+        "workers": 14,
+        "priority": 1
+      },
+      {
+        "port": 11435,
+        "role": "secondary",
+        "model": "bge-m3",
+        "workers": 14,
+        "priority": 2
+      },
+      {
+        "port": 11436,
+        "role": "tertiary",
+        "model": "bge-m3",
+        "workers": 14,
+        "priority": 3
+      }
+    ],
+    "load_balancing": {
+      "strategy": "round_robin",
+      "health_check_interval": 30,
+      "retry_attempts": 3,
+      "timeout_seconds": 30,
+      "failure_threshold": 3,
+      "recovery_delay": 60
+    },
+    "performance": {
+      "total_workers": 42,
+      "batch_size_multiplier": 6,
+      "target_throughput": 51000,
+      "success_rate_threshold": 0.99,
+      "max_processing_time_ms": 500,
+      "memory_limit_mb": 1800
+    }
+  },
+  "database": {
+    "host": "localhost",
+    "database": "knowledge_base",
+    "user": "weixiangzhang",
+    "port": 5432,
+    "connection_pool": {
+      "min_connections": 1,
+      "max_connections": 10,
+      "connection_timeout": 30
+    }
+  },
+  "models": {
+    "bge-m3": {
+      "dimension": 1024,
+      "max_length": 8192,
+      "description": "BGE M3 multilingual embedding model",
+      "memory_usage_mb": 1700,
+      "optimal_batch_size": 10
+    },
+    "mxbai-embed-large": {
+      "dimension": 1024,
+      "max_length": 8000,
+      "description": "MixedBread AI large embedding model",
+      "memory_usage_mb": 1800,
+      "optimal_batch_size": 8
+    },
+    "nomic-embed-text": {
+      "dimension": 768,
+      "max_length": 8000,
+      "description": "Optimized for text embeddings",
+      "memory_usage_mb": 1200,
+      "optimal_batch_size": 15
+    }
+  },
+  "monitoring": {
+    "log_level": "INFO",
+    "stats_update_interval": 30,
+    "performance_window_size": 10,
+    "alert_thresholds": {
+      "embedding_rate_per_hour": 30000,
+      "success_rate_percentage": 95,
+      "response_time_ms": 1000,
+      "system_memory_usage": 90,
+      "database_connections": 80
+    }
+  },
+  "failover": {
+    "enable_automatic_fallback": true,
+    "single_instance_fallback": true,
+    "emergency_worker_reduction": true,
+    "max_consecutive_failures": 5
+  }
+}

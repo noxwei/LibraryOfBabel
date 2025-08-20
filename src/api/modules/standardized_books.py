@@ -42,10 +42,10 @@ def books_endpoint():
     
     Supported actions:
     - list: List books with pagination and sorting
-    - summary: Get book summary (requires id)
+    - summary: Get book summary (requires id, optional enhanced=true for opening analysis)
     - toc: Get table of contents (requires id)  
     - random_page: Get random page (requires id)
-    - construct: Get book construction (requires id)
+    - construct: Get book construction (requires id, optional enhanced=true, style_analysis=true, thematic_analysis=true)
     - page: Get specific page (requires id, page_num, optional words_per_page)
     
     Standard Parameters:
@@ -214,9 +214,17 @@ def _handle_books_list(limit: int, page: int, response_format: str, sort_field: 
         )
 
 def _handle_book_summary(book_id: int, response_format: str):
-    """Handle book summary action"""
+    """Handle enhanced book summary action using opening chunk analysis"""
     try:
-        result = execute_pg_function('api_shortcuts_book_summary', book_id)
+        # Check if we have an enhanced summary request with opening analysis
+        use_enhanced = request.args.get('enhanced', 'false').lower() == 'true'
+        
+        if use_enhanced:
+            # Use opening chunk for AI-generated enhanced summary
+            result = execute_pg_function('api_book_enhanced_summary_with_opening', book_id)
+        else:
+            # Use standard summary
+            result = execute_pg_function('api_shortcuts_book_summary', book_id)
         
         if response_format == 'simple':
             # Extract just the core data for mobile
@@ -275,9 +283,20 @@ def _handle_book_random_page(book_id: int, response_format: str):
         )
 
 def _handle_book_construct(book_id: int, response_format: str):
-    """Handle book construction action"""
+    """Handle enhanced book construction action with thematic analysis and style metrics"""
     try:
-        result = execute_pg_function('api_shortcuts_book_construct', book_id)
+        # Check if we have an enhanced analysis request with opening chunk analysis
+        use_enhanced = request.args.get('enhanced', 'false').lower() == 'true'
+        include_style = request.args.get('style_analysis', 'false').lower() == 'true'
+        include_themes = request.args.get('thematic_analysis', 'false').lower() == 'true'
+        
+        if use_enhanced or include_style or include_themes:
+            # Use opening chunk for enhanced construction analysis
+            result = execute_pg_function('api_book_enhanced_construct_with_opening', 
+                                       book_id, include_style, include_themes)
+        else:
+            # Use standard construction
+            result = execute_pg_function('api_shortcuts_book_construct', book_id)
         
         if response_format == 'simple':
             if isinstance(result, dict) and 'data' in result:
