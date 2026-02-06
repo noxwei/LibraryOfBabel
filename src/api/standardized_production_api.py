@@ -18,7 +18,7 @@ PRODUCTION-READY STANDARDIZED API v4.1
 import os
 import sys
 import logging
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 
 # Add the parent directory to the path so we can import modules
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -52,8 +52,12 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# Create Flask app
-app = Flask(__name__)
+# Static frontend directory (Next.js static export)
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'frontend', 'out')
+FRONTEND_DIR = os.path.normpath(FRONTEND_DIR)
+
+# Create Flask app (static files served via custom routes, not Flask static_folder)
+app = Flask(__name__, static_folder=None)
 app.config['JSON_SORT_KEYS'] = False
 
 # Container-aware CORS configuration
@@ -120,33 +124,21 @@ def initialize_app():
 
 @app.errorhandler(404)
 def not_found(error):
-    """Handle 404 errors with clean response"""
-    return jsonify({
-        'success': False,
-        'error': {
-            'code': 'ENDPOINT_NOT_FOUND',
-            'message': 'The requested API endpoint does not exist'
-        },
-        'available_endpoints': {
-            'core_resources': [
-                '/api/books - Book management and navigation',
-                '/api/search - All search functionality'
-            ],
-            'mobile_optimized': [
-                '/api/mobile/random - Random content for iOS',
-                '/api/mobile/search - Mobile search',
-                '/api/mobile/books - Mobile books',
-                '/api/mobile/stats - Mobile statistics',
-                '/api/mobile/lists - Mobile lists',
-                '/api/mobile/dashboard - Mobile dashboard'
-            ],
-            'utilities': [
-                '/health - Public health check',
-                '/api/info - System information',
-                '/api/health - Detailed health check'
-            ]
-        }
-    }), 404
+    """Handle 404 - serve frontend 404 page or API error"""
+    from flask import request
+    if request.path.startswith('/api/') or request.path == '/health':
+        return jsonify({
+            'success': False,
+            'error': {
+                'code': 'ENDPOINT_NOT_FOUND',
+                'message': 'The requested API endpoint does not exist'
+            }
+        }), 404
+    # For non-API routes, serve frontend 404
+    fallback_path = os.path.join(FRONTEND_DIR, '404.html')
+    if os.path.exists(fallback_path):
+        return send_from_directory(FRONTEND_DIR, '404.html'), 404
+    return jsonify({'error': 'Not found'}), 404
 
 @app.errorhandler(500)
 def internal_error(error):
@@ -162,30 +154,42 @@ def internal_error(error):
 
 @app.route('/')
 def root():
-    """
-    Root endpoint - CLEAN response with no version pollution
-    Only essential information, no designer metadata
-    """
+    """Serve frontend landing page"""
+    index_path = os.path.join(FRONTEND_DIR, 'index.html')
+    if os.path.exists(index_path):
+        return send_from_directory(FRONTEND_DIR, 'index.html')
+    # Fallback to API info if no frontend build
     return jsonify({
         'api_name': 'LibraryOfBabel Production API',
         'status': 'operational',
-        'architecture': 'PostgreSQL-First with REST Standardization',
-        'endpoints': {
-            'books': '/api/books?action=list',
-            'search': '/api/search?q=your_query',
-            'mobile_random': '/api/mobile/random?type=title',
-            'mobile_search': '/api/mobile/search?q=your_query',
-            'health': '/health',
-            'system_info': '/api/info'
-        },
-        'features': [
-            'Standardized parameter naming',
-            'Unified response schema',
-            'PostgreSQL-First architecture',
-            'Mobile-optimized endpoints',
-            'Zero version pollution'
-        ]
+        'frontend': 'not built - run npm run build in frontend/'
     })
+
+@app.route('/<path:path>')
+def serve_frontend(path):
+    """Serve static frontend files for Next.js static export"""
+    # Don't intercept API or health routes (let Flask blueprints handle them)
+    if path.startswith('api/') or path == 'health':
+        return jsonify({'error': 'Not found'}), 404
+
+    # Strip trailing slash for consistent lookup
+    clean_path = path.rstrip('/')
+
+    # Try path/index.html for Next.js static export routes (e.g., demo/ -> demo/index.html)
+    index_path = os.path.join(FRONTEND_DIR, clean_path, 'index.html')
+    if os.path.isfile(index_path):
+        return send_from_directory(os.path.join(FRONTEND_DIR, clean_path), 'index.html')
+
+    # Try exact file (e.g., _next/static/*, images, etc.)
+    file_path = os.path.join(FRONTEND_DIR, path)
+    if os.path.isfile(file_path):
+        return send_from_directory(FRONTEND_DIR, path)
+
+    # Fallback to 404.html
+    fallback_path = os.path.join(FRONTEND_DIR, '404.html')
+    if os.path.exists(fallback_path):
+        return send_from_directory(FRONTEND_DIR, '404.html'), 404
+    return jsonify({'error': 'Not found'}), 404
 
 # Legacy endpoint redirect helpers
 @app.route('/api/v4/<path:path>')
