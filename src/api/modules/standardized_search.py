@@ -18,7 +18,7 @@ POSTGRESQL-FIRST ONLY - ZERO HARDCODED SQL
 import logging
 import re
 from flask import Blueprint, request
-from .auth import require_auth_unless_localhost
+from .auth import public_read
 from .database import execute_pg_function
 from .validation import validate_params
 from .nomic_intelligent_search import nomic_chapter_semantic_search
@@ -37,7 +37,7 @@ def before_request():
     init_response_timing()
 
 @standardized_search_bp.route('/api/search')
-@require_auth_unless_localhost
+@public_read
 @validate_params(q=None, action='search', limit=20, page=1, format='json', sort='relevance', id=None, title=None, author=None, description=None, genre=None, embedding_model='nomic-embed-text', ensemble=False)
 def search_endpoint():
     """

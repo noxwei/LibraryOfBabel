@@ -14,7 +14,7 @@ ZERO INCONSISTENCIES - PRODUCTION READY
 
 import logging
 from flask import Blueprint, request
-from .auth import require_auth_unless_localhost
+from .auth import public_read
 from .database import execute_pg_function
 from .validation import validate_params
 from .response_helpers import (
@@ -34,7 +34,7 @@ def before_request():
     init_response_timing()
 
 @standardized_books_bp.route('/api/books')
-@require_auth_unless_localhost
+@public_read
 @validate_params(action='list', id=5560, limit=20, page=1, format='json', sort='title', words_per_page=1000)
 def books_endpoint():
     """
@@ -348,7 +348,7 @@ def _handle_book_page(book_id: int, page_num: int, response_format: str, words_p
 
 # CHAPTER NAVIGATION HELPER (from original shortcuts implementation)
 @standardized_books_bp.route('/api/books/chapter')
-@require_auth_unless_localhost
+@public_read
 @validate_params(id=DEFAULT_BOOK_ID, chapter=1)
 def books_chapter_navigation():
     """

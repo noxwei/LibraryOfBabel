@@ -70,7 +70,12 @@ def get_cors_origins():
         return env_origins.split(',')
     
     # Default origins for different environments
-    default_origins = ["http://localhost:3000", "https://api.ashortstayinhell.com"]
+    default_origins = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://api.ashortstayinhell.com",
+        "https://api.ashortstayinhell.com:5562",
+    ]
     
     # Add container-specific origins if running in container
     if os.getenv('RUNNING_IN_CONTAINER', '').lower() == 'true':

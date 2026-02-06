@@ -142,3 +142,26 @@ def require_auth_unless_localhost(f):
             }), 401
         return f(*args, **kwargs)
     return decorated_function
+
+
+def public_read(f):
+    """Decorator for public read-only endpoints.
+
+    GET requests are allowed without authentication (for the public website).
+    POST/PUT/DELETE requests still require authentication.
+    API key users are still validated if they provide a key (for rate limiting etc).
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if request.method == 'GET':
+            # Public read access — no auth required
+            return f(*args, **kwargs)
+        # Write operations require auth
+        if not is_localhost() and not verify_api_key():
+            return jsonify({
+                'success': False,
+                'error': 'Authentication required',
+                'message': 'Valid API key required for write operations'
+            }), 401
+        return f(*args, **kwargs)
+    return decorated_function
