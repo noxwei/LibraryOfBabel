@@ -16,6 +16,7 @@ POSTGRESQL-FIRST ONLY - ZERO HARDCODED SQL
 """
 
 import logging
+import re
 from flask import Blueprint, request
 from .auth import require_auth_unless_localhost
 from .database import execute_pg_function
@@ -102,6 +103,13 @@ def search_endpoint():
         elif action == 'semantic_passages':
             embedding_model = params.get('embedding_model', 'nomic-embed-text')
             genre_filter = request.args.get('genre')
+            if genre_filter and (len(genre_filter) > 100 or not re.match(r'^[a-zA-Z0-9\s\-\']+$', genre_filter)):
+                return create_error_response(
+                    message="Invalid genre parameter",
+                    code="INVALID_GENRE_PARAMETER",
+                    details={"max_length": 100, "allowed_characters": "alphanumeric, spaces, hyphens, apostrophes"},
+                    status_code=400
+                )
             return _handle_nomic_intelligent_search(query, limit, response_format, genre_filter, sort_field)
             
         elif action == 'concept':
@@ -471,9 +479,7 @@ def _handle_nomic_intelligent_search(query: str, limit: int, response_format: st
                     'model': 'nomic-embed-text',
                     'intelligent_preview': True,
                     'max_chapter_words': metadata['max_chapter_words'],
-                    'genre_filter': genre_filter,
-                    'success_rate_benchmark': '73.3%',
-                    'genre_accuracy_benchmark': '100%'
+                    'genre_filter': genre_filter
                 }
                 enhanced_results.append(enhanced_item)
             

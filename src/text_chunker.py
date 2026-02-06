@@ -128,20 +128,37 @@ class TextChunker:
     def _create_chapter_chunk(self, chapter, book_id: str) -> TextChunk:
         """Create a chapter-level chunk."""
         chunk_id = f"{book_id}_ch{chapter.chapter_number or chapter.spine_order}"
-        
+
+        content = chapter.content
+
+        # Cap content at 8000 characters, truncating to nearest sentence boundary
+        if len(content) > 8000:
+            truncation_zone = content[:8000]
+            # Find the last sentence-ending punctuation before the 8000-char limit
+            last_sentence_end = max(
+                truncation_zone.rfind('.'),
+                truncation_zone.rfind('!'),
+                truncation_zone.rfind('?')
+            )
+            if last_sentence_end > 0:
+                content = content[:last_sentence_end + 1]
+            else:
+                # No sentence boundary found; hard truncate at 8000
+                content = content[:8000]
+
         return TextChunk(
             chunk_id=chunk_id,
             book_id=book_id,
             chunk_type=ChunkType.CHAPTER,
             title=chapter.title,
-            content=chapter.content,
-            word_count=chapter.word_count,
-            character_count=len(chapter.content),
+            content=content,
+            word_count=len(content.split()),
+            character_count=len(content),
             chapter_number=chapter.chapter_number,
             section_number=None,
             paragraph_number=None,
             start_position=0,
-            end_position=len(chapter.content)
+            end_position=len(content)
         )
     
     def _create_section_chunks(self, chapter, book_id: str, parent_chunk_id: str) -> List[TextChunk]:

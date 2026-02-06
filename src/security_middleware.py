@@ -65,9 +65,14 @@ class SecurityManager:
             elif 'X-API-Key' in request.headers:
                 api_key = request.headers.get('X-API-Key')
             
-            # 3. Check query parameter (for Shortcuts app compatibility)
+            # 3. Reject query parameter API keys (insecure: logged in URLs, referrer headers, browser history)
             elif 'api_key' in request.args:
-                api_key = request.args.get('api_key')
+                logger.warning(f"🚫 Rejected API key via query parameter from {request.remote_addr} — use headers instead")
+                return jsonify({
+                    'success': False,
+                    'error': 'API key via query parameter is not allowed',
+                    'message': 'Provide API key via Authorization header (Bearer token) or X-API-Key header'
+                }), 400
             
             # 4. Check JSON body
             elif request.is_json and request.json and 'api_key' in request.json:
@@ -79,7 +84,7 @@ class SecurityManager:
                 return jsonify({
                     'success': False,
                     'error': 'API key required',
-                    'message': 'Provide API key via Authorization header, X-API-Key header, or api_key parameter'
+                    'message': 'Provide API key via Authorization header (Bearer token), X-API-Key header, or JSON body'
                 }), 401
             
             if not self._verify_api_key(api_key):
@@ -254,7 +259,7 @@ def rotate_api_key() -> str:
 if __name__ == "__main__":
     # Test security functions
     print("🔐 LibraryOfBabel Security Test")
-    print(f"✅ API Key: {security_manager.api_key}")
+    print(f"✅ API Key loaded: (last 8 chars) ...{security_manager.api_key[-8:]}")
     print(f"🔑 API Key Hash: {security_manager.api_key_hash[:16]}...")
     print(f"📁 SSL Context: {get_ssl_context()}")
     

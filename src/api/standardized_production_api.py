@@ -29,6 +29,7 @@ from modules.standardized_health import standardized_health_bp
 from modules.standardized_books import standardized_books_bp
 from modules.standardized_search import standardized_search_bp
 from modules.standardized_mobile import standardized_mobile_bp
+from modules.standardized_upload import standardized_upload_bp
 
 # Configure container-aware logging
 def get_log_path():
@@ -81,11 +82,22 @@ def get_cors_origins():
 # Enable CORS for frontend integration
 CORS(app, origins=get_cors_origins())
 
+# Security headers for all responses (no CSP to avoid breaking frontend)
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    return response
+
 # Register standardized blueprints (CLEAN HIERARCHY)
 app.register_blueprint(standardized_health_bp)    # Level 4: Utilities
 app.register_blueprint(standardized_books_bp)     # Level 1: Core Resources
-app.register_blueprint(standardized_search_bp)    # Level 1: Core Resources  
+app.register_blueprint(standardized_search_bp)    # Level 1: Core Resources
 app.register_blueprint(standardized_mobile_bp)    # Level 3: Mobile Optimized
+app.register_blueprint(standardized_upload_bp)    # Level 2: Upload & Processing
 
 def initialize_app():
     """Initialize application and test database connection"""

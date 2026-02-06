@@ -12,6 +12,7 @@ SECURITY FIXES:
 import os
 import re
 import logging
+import secrets
 from functools import wraps
 from flask import request, jsonify
 
@@ -64,7 +65,7 @@ def verify_api_key():
     # Check for API-Key header (primary)
     request_key = request.headers.get('API-Key')
     if request_key:
-        is_valid = request_key == api_key
+        is_valid = secrets.compare_digest(str(request_key), str(api_key))
         if not is_valid:
             security_logger.warning(f"Invalid API key attempt from {client_ip} via header")
         return is_valid
@@ -72,7 +73,7 @@ def verify_api_key():
     # Check for X-API-Key header (secondary)
     request_key = request.headers.get('X-API-Key')
     if request_key:
-        is_valid = request_key == api_key
+        is_valid = secrets.compare_digest(str(request_key), str(api_key))
         if not is_valid:
             security_logger.warning(f"Invalid API key attempt from {client_ip} via X-API-Key")
         return is_valid
@@ -81,7 +82,7 @@ def verify_api_key():
     auth_header = request.headers.get('Authorization', '')
     if auth_header.startswith('Bearer '):
         token = auth_header.split(' ', 1)[1]
-        is_valid = token == api_key
+        is_valid = secrets.compare_digest(str(token), str(api_key))
         if not is_valid:
             security_logger.warning(f"Invalid bearer token from {client_ip}")
         return is_valid
@@ -89,15 +90,10 @@ def verify_api_key():
     # SECURITY FIX: Removed query parameter support
     # Query parameters expose API keys in logs, referrer headers, browser history
     
-    # Check for deprecated query parameter and warn
+    # SECURITY: Reject API keys via query parameters entirely
     if request.args.get('api_key'):
-        security_logger.warning(f"Deprecated API key in query parameter from {client_ip} - use headers instead")
-        # Still allow for backward compatibility but log the security issue
-        request_key = request.args.get('api_key')
-        is_valid = request_key == api_key
-        if not is_valid:
-            security_logger.warning(f"Invalid API key in query param from {client_ip}")
-        return is_valid
+        security_logger.warning("API key via query parameter rejected - use X-API-Key header")
+        return False
     
     security_logger.info(f"No API key provided from {client_ip}")
     return False
