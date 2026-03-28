@@ -37,17 +37,17 @@
   "author": "Library of Babel Project",
   "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.40.0",
-    "concurrently": "^8.2.2",
-    "typescript": "^5.2.2"
+    "@playwright/test": "^1.58.1",
+    "concurrently": "^9.0.1",
+    "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@types/node": "^20.8.0",
-    "playwright": "^1.54.1"
+    "@types/node": "^22.5.0",
+    "playwright": "^1.58.1"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
   "repository": {
     "type": "git",

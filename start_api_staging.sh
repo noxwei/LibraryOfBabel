@@ -10,7 +10,8 @@ export API_KEY="${STAGING_API_KEY}"
 # Authentication token sourced from environment
 export API_PORT="5568"
 export API_HOST="0.0.0.0"
-export OLLAMA_MODEL="llama3.2:3b"
+export OLLAMA_MODEL="gemma3:4b"            # Gemma 3 4B — better than llama3.2:3b (same RAM, stronger reasoning)
+export MLX_MODEL="mlx-community/gemma-3-4b-it-4bit"  # MLX backend: ~110 tok/s on M2 Pro (vs ~89 Ollama)
 export SSL_CERT_PATH="./ssl/letsencrypt-config/live/wildcard-ashortstayinhell/fullchain.pem"
 export SSL_KEY_PATH="./ssl/letsencrypt-config/live/wildcard-ashortstayinhell/privkey.pem"
 

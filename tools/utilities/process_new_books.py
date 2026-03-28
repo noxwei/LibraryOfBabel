@@ -210,11 +210,11 @@ class EbookProcessor:
                             count = int(line.split(':')[1].strip())
                             self.stats["books_ingested"] = count
                             break
-                except:
+                except (ValueError, IndexError):
                     pass
-        
+
         return success
-    
+
     def generate_embeddings(self):
         """Generate vector embeddings for new chunks"""
         success, output = self.run_command([
@@ -234,7 +234,7 @@ class EbookProcessor:
                             count = int(line.split(':')[1].strip().replace(',', ''))
                             self.stats["embeddings_generated"] = count
                             break
-                except:
+                except (ValueError, IndexError):
                     pass
         
         return success
@@ -258,7 +258,7 @@ class EbookProcessor:
                             count = int(line.split(':')[1].strip())
                             self.stats["genres_classified"] = count
                             break
-                except:
+                except (ValueError, IndexError):
                     pass
         
         return success

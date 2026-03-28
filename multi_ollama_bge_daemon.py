@@ -362,7 +362,7 @@ class MultiOllamaEmbeddingDaemon:
             
             try:
                 os.remove(self.pid_file)
-            except:
+            except OSError:
                 pass
             
             print("✅ Multi-Ollama BGE-M3 daemon shutdown complete")

@@ -220,7 +220,7 @@ def main():
         # Clean up PID file
         try:
             os.remove(pid_file)
-        except:
+        except OSError:
             pass
 
 if __name__ == "__main__":

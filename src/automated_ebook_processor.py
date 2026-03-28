@@ -144,7 +144,7 @@ class AutomatedEbookProcessor:
         try:
             size_bytes = file_path.stat().st_size
             return size_bytes / (1024 * 1024)
-        except:
+        except OSError:
             return 0.0
     
     def find_ebooks_to_process(self) -> List[Dict]:
@@ -293,7 +293,7 @@ class AutomatedEbookProcessor:
                 if ebook_info['format'] != 'epub' and epub_path and epub_path != ebook_path:
                     try:
                         epub_path.unlink()
-                    except:
+                    except OSError:
                         pass
                 
                 self.stats['processed'] += 1

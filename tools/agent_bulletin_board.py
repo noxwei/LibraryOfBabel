@@ -198,7 +198,7 @@ class AgentBulletinBoard:
         try:
             with open(file_path, 'rb') as f:
                 return hashlib.md5(f.read()).hexdigest()
-        except:
+        except OSError:
             return ""
     
     def has_commentary(self, file_path: str) -> bool:
@@ -207,7 +207,7 @@ class AgentBulletinBoard:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
                 return "<!-- Agent Commentary -->" in content
-        except:
+        except OSError:
             return False
     
     def select_random_agents(self, num_agents: int = None) -> List[str]:

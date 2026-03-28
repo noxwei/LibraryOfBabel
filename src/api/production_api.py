@@ -928,7 +928,7 @@ def ollama_ios_chat_legacy():
         # Initialize Ollama agent with Llama3 7B model
         try:
             ollama_agent = OllamaUrlGeneratorAgent(
-                ollama_model="llama3.2:3b",  # Llama3.2 3B model
+                ollama_model="gemma3:4b",  # Gemma 3 4B — upgraded from llama3.2:3b
                 api_key=API_KEY,
                 library_api_base=request.host_url.rstrip('/') + '/api/v3'
             )
@@ -1358,7 +1358,7 @@ def _time_ago(timestamp_str):
             return f"{minutes}m ago"
         else:
             return "just now"
-    except:
+    except (ValueError, TypeError, AttributeError):
         return "unknown"
 
 @lru_cache(maxsize=1000)
@@ -1628,7 +1628,7 @@ def upload_epub():
 try:
     ollama_agent = OllamaUrlGeneratorAgent(
         ollama_endpoint=os.getenv('OLLAMA_ENDPOINT', 'http://localhost:11434'),
-        ollama_model=os.getenv('OLLAMA_MODEL', 'llama2'),
+        ollama_model=os.getenv('OLLAMA_MODEL', 'gemma3:4b'),  # default upgraded from llama2 → gemma3:4b
         api_key=API_KEY,
         library_api_base=f"https://api.ashortstayinhell.com/api/v3"
     )
@@ -1876,7 +1876,7 @@ def lexi_chat():
         # Initialize Ollama agent for Lexi personality
         try:
             lexi_agent = OllamaUrlGeneratorAgent(
-                ollama_model="llama3.2:3b",
+                ollama_model="gemma3:4b",  # Gemma 3 4B — upgraded from llama3.2:3b
                 api_key=API_KEY,
                 library_api_base=request.host_url.rstrip('/') + '/api/v3'
             )

@@ -2,7 +2,7 @@
 # Dr. Marcus Thompson - DevOps Monitoring & Observability Specialist
 # LibraryOfBabel Agentic AI-Ready Monitoring Architecture
 
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 LABEL maintainer="Dr. Marcus Thompson <devops@libraryofbabel.com>"
 LABEL description="AI Agent Communication Gateway for LibraryOfBabel Monitoring"

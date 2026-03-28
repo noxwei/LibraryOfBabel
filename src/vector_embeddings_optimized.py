@@ -90,7 +90,7 @@ class OptimizedVectorGenerator:
                     self.embedding_cache[text_hash] = embedding  # Load to memory
                     self.cache_hits += 1
                     return embedding
-            except:
+            except (OSError, pickle.UnpicklingError, EOFError):
                 pass
         
         self.cache_misses += 1

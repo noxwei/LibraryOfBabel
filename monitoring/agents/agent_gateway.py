@@ -276,21 +276,21 @@ class LibraryOfBabelGateway:
             # Check Prometheus
             response = await self.http_client.get(f"{self.prometheus_url}/-/healthy", timeout=5.0)
             services["prometheus"] = "healthy" if response.status_code == 200 else "unhealthy"
-        except:
+        except Exception:
             services["prometheus"] = "unreachable"
-        
+
         try:
             # Check Loki
             response = await self.http_client.get(f"{self.loki_url}/ready", timeout=5.0)
             services["loki"] = "healthy" if response.status_code == 200 else "unhealthy"
-        except:
+        except Exception:
             services["loki"] = "unreachable"
-        
+
         try:
             # Check Grafana
             response = await self.http_client.get(f"{self.grafana_url}/api/health", timeout=5.0)
             services["grafana"] = "healthy" if response.status_code == 200 else "unhealthy"
-        except:
+        except Exception:
             services["grafana"] = "unreachable"
         
         return services

@@ -93,7 +93,7 @@ class SafeFolderCleanup:
             )
             conn.close()
             return True
-        except:
+        except Exception:
             return False
     
     def test_hybrid_api_import(self) -> bool:

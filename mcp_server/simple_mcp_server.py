@@ -65,6 +65,8 @@ class SimpleMCPServer:
                 "real_time_analytics": True
             },
             "models_supported": ["nomic", "bge", "mxbai", "arctic"],
+            "llm_model": "gemma3:4b",
+            "llm_model_mlx": "mlx-community/gemma-3-4b-it-4bit",
             "current_scale": "1.4M+ chunks processing"
         }
     
@@ -443,11 +445,28 @@ class SimpleMCPServer:
     def _get_embedding_config(self) -> str:
         """Get embedding models configuration"""
         config = {
-            "models": {
-                "nomic": {"name": "nomic-embed-text", "dimensions": 768, "use_case": "General"},
-                "bge": {"name": "bge-m3", "dimensions": 1024, "use_case": "Creative/Narrative"},
-                "mxbai": {"name": "mxbai-embed-large", "dimensions": 1024, "use_case": "Multilingual"},
-                "arctic": {"name": "snowflake-arctic-embed", "dimensions": 1024, "use_case": "Technical"}
+            "embedding_models": {
+                "nomic":  {"name": "nomic-embed-text",      "dimensions": 768,  "use_case": "General fallback",         "context_tokens": 8192,  "backend": "ollama"},
+                "bge":    {"name": "bge-m3",                "dimensions": 1024, "use_case": "Creative/Narrative",       "context_tokens": 8192,  "backend": "ollama", "mteb_score": 63.0, "rag_recall_at_10": "72%"},
+                "mxbai":  {"name": "mxbai-embed-large",     "dimensions": 1024, "use_case": "Multilingual/Cultural",    "context_tokens": 512,   "backend": "ollama"},
+                "arctic": {"name": "snowflake-arctic-embed", "dimensions": 1024, "use_case": "Technical/Academic",       "context_tokens": 4096,  "backend": "ollama"},
+            },
+            "llm_models": {
+                "gemma3_4b":   {"name": "gemma3:4b",   "use_case": "Classification/Inference", "backend": "ollama", "tok_s_m2pro": "~110", "ram_gb": 3.0},
+                "gemma3_4b_mlx": {"name": "mlx-community/gemma-3-4b-it-4bit", "use_case": "Classification/Inference (faster)", "backend": "mlx-lm", "tok_s_m2pro": "~110-130", "ram_gb": 2.5},
+                "gemma3_12b":  {"name": "gemma3:12b",  "use_case": "High-quality classification", "backend": "ollama", "tok_s_m2pro": "~40", "ram_gb": 8.0},
+                "gemma2_27b":  {"name": "gemma2:27b",  "use_case": "Maximum quality (int4)", "backend": "ollama", "tok_s_m2pro": "~20", "ram_gb": 14.5},
+            },
+            "planned_embedding_models": {
+                "gemma3_embed": {
+                    "name": "google/embedding-gemma",
+                    "dimensions": 768,
+                    "use_case": "General (MTEB #1 sub-500M)",
+                    "context_tokens": 2048,
+                    "backend": "sentence-transformers",
+                    "status": "awaiting_ollama_support",
+                    "note": "Outperforms bge-m3 on MTEB for <500M params but 2K context too small for full chapter embedding",
+                },
             },
             "routing_strategy": "intelligent_content_classification",
             "last_updated": datetime.now().isoformat()

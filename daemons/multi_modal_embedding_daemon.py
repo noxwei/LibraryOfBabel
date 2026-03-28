@@ -5,9 +5,20 @@
 
 Intelligent content routing daemon that continuously processes chunks with optimal AI models:
 - Technical/Academic: snowflake-arctic-embed (1024d) - Precise factual embedding
-- Creative/Narrative: bge-m3 (1024d) - Rich semantic understanding  
+- Creative/Narrative: bge-m3 (1024d) - Rich semantic understanding (best RAG recall: 72%)
 - Cultural/Multilingual: mxbai-embed-large (1024d) - Cross-linguistic preservation
 - General: nomic-embed-text (768d) - Broad coverage fallback
+
+LLM Backend (for classification queries):
+- Ollama: gemma3:4b — replaces llama3.2:3b (better reasoning, same ~3GB RAM)
+- MLX (Apple Silicon): mlx-community/gemma-3-4b-it-4bit via mlx-lm (~110 tok/s M2 Pro)
+- Upgrade: gemma3:12b for higher quality, gemma2:27b for maximum quality (14GB int4)
+
+Planned (5th embedding model — EmbeddingGemma):
+- google/embedding-gemma (308M) via sentence-transformers
+- MTEB rank #1 for sub-500M models, outperforms bge-m3 in that class
+- LIMITATION: 2K context window — too small for full book chunks (use for queries only)
+- Status: awaiting Ollama support. See: pip install sentence-transformers
 
 Features:
 - Continuous processing with restart capability
@@ -120,12 +131,26 @@ class MultiModalEmbeddingDaemon:
             "arctic": {
                 "ollama_name": "snowflake-arctic-embed:latest",
                 "dimensions": 1024,
-                "specialization": "technical_academic", 
+                "specialization": "technical_academic",
                 "description": "Technical/academic content - Arctic embedding model",
-                "keywords": ["technology", "science", "research", "analysis", "theory", "methodology", 
-                           "academic", "scholarly", "technical", "engineering", "mathematics", "physics", 
+                "keywords": ["technology", "science", "research", "analysis", "theory", "methodology",
+                           "academic", "scholarly", "technical", "engineering", "mathematics", "physics",
                            "chemistry", "biology", "computer", "algorithm", "philosophy", "business", "economics"]
-            }
+            },
+            # ── PLANNED: 5th model — EmbeddingGemma (enable when Ollama adds support) ──────
+            # "gemma3_embed": {
+            #     "ollama_name": None,               # Not in Ollama yet
+            #     "hf_model": "google/embedding-gemma",  # sentence-transformers backend
+            #     "dimensions": 768,
+            #     "specialization": "general_short",
+            #     "description": "EmbeddingGemma 308M — MTEB #1 sub-500M, outperforms bge-m3 in class",
+            #     "context_limit_tokens": 2048,       # HARD LIMIT — NOT suitable for full book chunks
+            #     "best_for": "short queries, summaries, titles, < ~1500 words",
+            #     "mteb_note": "Highest ranking multilingual embedding under 500M params",
+            #     "mlx_available": False,             # No mlx-embeddings support yet
+            #     "to_enable": "pip install sentence-transformers; update backend to use HF pipeline",
+            #     "keywords": ["general", "reference", "guide", "overview", "short", "summary"]
+            # },
         }
         
         # Processing parameters

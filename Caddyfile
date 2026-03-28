@@ -1,0 +1,17 @@
+# LibraryOfBabel — Caddy with mkcert TLS (Tailscale-only access)
+# Cert covers: weixiangs-mac-mini.tail1ef495.ts.net, 100.71.141.45, 10.0.0.13, localhost
+
+{
+    # Disable automatic HTTPS — we provide our own cert
+    auto_https off
+}
+
+https://weixiangs-mac-mini.tail1ef495.ts.net:443 {
+    tls /etc/caddy/certs/cert.pem /etc/caddy/certs/key.pem
+    reverse_proxy api:5565
+}
+
+# Redirect HTTP to HTTPS
+http://weixiangs-mac-mini.tail1ef495.ts.net:80 {
+    redir https://weixiangs-mac-mini.tail1ef495.ts.net{uri} permanent
+}

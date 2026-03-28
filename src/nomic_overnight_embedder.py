@@ -217,7 +217,7 @@ class NomicOvernightEmbedder:
                 with conn.cursor() as cur:
                     cur.execute("SELECT COUNT(*) FROM chunks WHERE embedding_nomic IS NULL")
                     return cur.fetchone()[0]
-        except:
+        except Exception:
             return -1
 
     def run(self):
@@ -312,7 +312,7 @@ class NomicOvernightEmbedder:
         # Cleanup PID file
         try:
             os.remove(self.pid_file)
-        except:
+        except OSError:
             pass
 
 

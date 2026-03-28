@@ -672,7 +672,7 @@ class LibraryOfBabelExporter:
             success_rate = self.get_current_success_rate()
             
             return f"LibraryOfBabel is performing excellently with {book_count} books processed at {success_rate}% accuracy. The multi-modal AI pipeline is operating smoothly with MxBai, BGE, and Nomic models all contributing to high-quality genre classification and content analysis."
-        except:
+        except Exception:
             return "LibraryOfBabel system is operational. Multi-modal AI processing is active and performing well."
     
     def generate_ai_insights(self) -> Dict[str, str]:
@@ -705,7 +705,7 @@ class LibraryOfBabelExporter:
                 with open(library_state_file) as f:
                     data = json.load(f)
                     return data.get("processed_count", 0)
-        except:
+        except (OSError, KeyError, ValueError):
             pass
         return 1504  # Fallback to known value
     
@@ -717,7 +717,7 @@ class LibraryOfBabelExporter:
                 with open(library_state_file) as f:
                     data = json.load(f)
                     return round(data.get("final_accuracy", 96.54), 2)
-        except:
+        except (OSError, KeyError, ValueError):
             pass
         return 96.54  # Fallback to known value
     
@@ -729,7 +729,7 @@ class LibraryOfBabelExporter:
                 with open(library_state_file) as f:
                     data = json.load(f)
                     return data.get("status", "operational")
-        except:
+        except (OSError, KeyError, ValueError):
             pass
         return "operational"
     

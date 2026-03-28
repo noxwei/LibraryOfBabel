@@ -113,7 +113,7 @@ class PostgreSQLFirstAutomatedProcessor:
         """Get file size in MB"""
         try:
             return file_path.stat().st_size / (1024 * 1024)
-        except:
+        except OSError:
             return 0.0
     
     def find_ebooks_to_process(self) -> List[Dict]:
@@ -452,7 +452,7 @@ class PostgreSQLFirstAutomatedProcessor:
                     try:
                         processed_path = self.processed_dir / ebook_info['path'].name
                         ebook_info['path'].rename(processed_path)
-                    except:
+                    except OSError:
                         pass
         else:
             # Process files individually
@@ -466,7 +466,7 @@ class PostgreSQLFirstAutomatedProcessor:
                     try:
                         failed_path = self.failed_dir / ebook_info['path'].name
                         ebook_info['path'].rename(failed_path)
-                    except:
+                    except OSError:
                         pass
                 
                 # Progress update every 10 files

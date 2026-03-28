@@ -2,7 +2,32 @@
 -- PostgreSQL Knowledge Base for AI Research Agents
 -- Optimized for full-text search and high-performance queries
 
--- Drop existing tables if they exist
+-- =============================================================================
+-- !! DANGER ZONE — READ BEFORE RUNNING !!
+-- =============================================================================
+-- This file is the INITIAL SETUP script for a fresh database only.
+-- Running it against an existing database WILL DESTROY ALL DATA:
+--   - chunks, authors, and books tables (and all dependents via CASCADE)
+--
+-- DO NOT run this file against production (knowledge_base).
+-- For schema changes use Flyway migrations in flyway/sql/.
+-- For emergency recovery use backups in backups/database/.
+--
+-- To intentionally wipe and rebuild a dev/test DB:
+--   psql -d knowledge_base_dev -f database/schema/schema.sql
+-- =============================================================================
+DO $$
+BEGIN
+  IF current_database() IN ('knowledge_base') THEN
+    RAISE EXCEPTION
+      'SAFETY BLOCK: Refusing to DROP tables on production database "%". '
+      'Run against a dev/test database only.',
+      current_database();
+  END IF;
+END
+$$;
+
+-- Drop existing tables if they exist (DEV/TEST ONLY — blocked on production above)
 DROP TABLE IF EXISTS chunks CASCADE;
 DROP TABLE IF EXISTS authors CASCADE;
 DROP TABLE IF EXISTS books CASCADE;

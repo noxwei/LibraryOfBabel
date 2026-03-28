@@ -10,7 +10,7 @@ on:
     - cron: '0 2 * * *'
 
 env:
-  PYTHON_VERSION: '3.11'
+  PYTHON_VERSION: '3.13'
 
 jobs:
   security-scan:
@@ -25,7 +25,7 @@ jobs:
         fetch-depth: 0
     
     - name: 🐍 Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
     
@@ -64,7 +64,7 @@ jobs:
         echo "✅ No hardcoded API keys detected"
     
     - name: 📊 Upload Security Results
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       if: always() && files('bandit-report.json')
       with:
         sarif_file: 'bandit-report.json'
@@ -83,15 +83,15 @@ jobs:
       uses: actions/checkout@v4
     
     - name: 🔍 Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
     
     - name: 🏗️ Autobuild
-      uses: github/codeql-action/autobuild@v2
+      uses: github/codeql-action/autobuild@v3
     
     - name: 🕵️ Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
 
   production-security-check:
     name: 🚀 Production Security Check

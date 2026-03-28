@@ -172,7 +172,7 @@ class NomicWaveEmbedder:
                 with conn.cursor() as cur:
                     cur.execute("SELECT COUNT(*) FROM chunks WHERE embedding_nomic IS NULL")
                     return cur.fetchone()[0]
-        except:
+        except Exception:
             return -1
 
     def run(self, max_waves: int = None, max_chunks: int = None, max_minutes: int = None):

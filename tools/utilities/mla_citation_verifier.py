@@ -94,7 +94,7 @@ class MLACitationVerifier:
                 return year
             else:
                 return str(date_str)[:4] if len(str(date_str)) >= 4 else None
-        except:
+        except (ValueError, AttributeError, TypeError):
             return None
     
     def normalize_author_name(self, name: str) -> str:

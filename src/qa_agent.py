@@ -542,7 +542,7 @@ class QAAgent:
             try:
                 cursor.execute("REFRESH MATERIALIZED VIEW mv_popular_searches;")
                 conn.commit()
-            except:
+            except Exception:
                 pass  # View might not exist yet
             
             self.performance_improvements.append({
