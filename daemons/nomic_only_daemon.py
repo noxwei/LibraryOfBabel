@@ -3,7 +3,7 @@
 🚀 NOMIC-ONLY EMBEDDING DAEMON - Maximum Throughput Focus
 =========================================================
 
-Single-model embedding daemon using only nomic-embed-text for maximum speed.
+Single-model embedding daemon using only nomic-embed-text-v2-moe for maximum speed.
 No model switching, no Arctic failures, pure throughput.
 """
 
@@ -61,7 +61,7 @@ class NomicOnlyDaemon:
         
         # Ollama configuration - NOMIC ONLY
         self.ollama_base_url = "http://localhost:11434"
-        self.model_name = "nomic-embed-text:latest"
+        self.model_name = "nomic-embed-text-v2-moe:latest"
         self.dimensions = 768
         
         # Processing parameters - OPTIMIZED FOR SPEED

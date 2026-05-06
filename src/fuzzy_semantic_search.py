@@ -51,7 +51,7 @@ class FuzzySemanticSearch:
             'port': 5432
         }
         self.ollama_url = ollama_url
-        self.embedding_model = "nomic-embed-text"
+        self.embedding_model = "nomic-embed-text-v2-moe"
         
         # Search configuration
         self.similarity_threshold = 0.4  # Minimum cosine similarity (lowered for better recall)

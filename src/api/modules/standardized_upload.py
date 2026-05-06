@@ -197,7 +197,7 @@ def _handle_status():
 
     with processing_jobs_lock:
         if job_id not in processing_jobs:
-            return create_error_response(f'Job {job_id} not found', 404)
+            return create_error_response(f'Job {job_id} not found', code="JOB_NOT_FOUND", status_code=404)
         job = processing_jobs[job_id]
     return create_success_response(job)
 
@@ -329,6 +329,64 @@ def _ingest_book_direct(db_config: Dict, book_data: Dict, chunks: list) -> Optio
         raise
 
 
+def _embed_book_chunks(db_config: Dict, book_id: int, total_chunks: int, job_id: str) -> int:
+    """Generate embeddings for all chunks of a book using Ollama"""
+    import requests as http_requests
+    import psycopg2
+
+    ollama_base = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434" if os.getenv("RUNNING_IN_CONTAINER") == "true" else "http://localhost:11434")
+    ollama_url = f"{ollama_base}/api/embed"
+    model = "nomic-embed-text-v2-moe"
+    embedded = 0
+
+    conn = psycopg2.connect(**db_config)
+    try:
+        cur = conn.cursor()
+        # Get all chunks for this book that don't have embeddings yet
+        cur.execute("""
+            SELECT c.chunk_id, c.content
+            FROM chunks c
+            LEFT JOIN chunk_embeddings ce ON c.chunk_id = ce.chunk_id AND ce.embedding_model = %s
+            WHERE c.book_id = %s AND ce.chunk_id IS NULL AND c.content IS NOT NULL
+        """, (model, book_id))
+        rows = cur.fetchall()
+
+        for chunk_id, content in rows:
+            if not content or len(content.strip()) < 10:
+                continue
+            try:
+                # Truncate to model max length
+                text = content[:8000]
+                resp = http_requests.post(ollama_url, json={"model": model, "input": text}, timeout=30)
+                resp.raise_for_status()
+                data = resp.json()
+                embedding = data.get("embeddings", [[]])[0]
+                if not embedding:
+                    continue
+
+                cur.execute("""
+                    INSERT INTO chunk_embeddings (chunk_id, book_id, embedding_model, embedding_dimension, embedding_vector)
+                    VALUES (%s, %s, %s, %s, %s::vector)
+                    ON CONFLICT (chunk_id, embedding_model) DO NOTHING
+                """, (chunk_id, book_id, model, len(embedding), str(embedding)))
+                embedded += 1
+
+                if embedded % 20 == 0:
+                    conn.commit()
+                    logger.info(f"[{job_id}] Embedded {embedded}/{len(rows)} chunks")
+
+            except Exception as e:
+                logger.warning(f"[{job_id}] Embedding failed for chunk {chunk_id}: {e}")
+                continue
+
+        conn.commit()
+    finally:
+        conn.close()
+
+    logger.info(f"[{job_id}] Embedding complete: {embedded} chunks embedded for book_id={book_id}")
+    return embedded
+
+
 def _process_job(job_id: str):
     """Process uploaded files in background"""
     with processing_jobs_lock:
@@ -414,11 +472,32 @@ def _process_job(job_id: str):
                     'chunks_ingested': len(chunks)
                 }
 
-                # Stage 4: Queue for embedding (nomic overnight embedder will pick these up)
+                # Stage 4: Generate embeddings inline
+                logger.info(f"[{job_id}] Embedding: {metadata.title}")
+                job['progress']['current_stage'] = 'embedding'
                 result['stages']['embedding'] = {
-                    'status': 'queued',
-                    'message': 'Chunks queued for nomic embedding (background process)'
+                    'status': 'in_progress',
+                    'model': 'nomic-embed-text-v2-moe',
+                    'chunks_embedded': 0,
+                    'chunks_total': len(chunks)
                 }
+
+                try:
+                    embedded_count = _embed_book_chunks(db_config, book_id, len(chunks), job_id)
+                    result['stages']['embedding'] = {
+                        'status': 'complete',
+                        'model': 'nomic-embed-text-v2-moe',
+                        'chunks_embedded': embedded_count,
+                        'chunks_total': len(chunks)
+                    }
+                except Exception as embed_err:
+                    logger.warning(f"[{job_id}] Embedding failed (book still ingested): {embed_err}")
+                    result['stages']['embedding'] = {
+                        'status': 'failed',
+                        'model': 'nomic-embed-text-v2-moe',
+                        'error': str(embed_err),
+                        'message': 'Book ingested but embedding failed — daemon will retry'
+                    }
 
                 result['status'] = 'complete'
                 result['book_id'] = book_id

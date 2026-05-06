@@ -27,6 +27,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the standardized API source code
 COPY src/api/ ./src/api/
+COPY src/*.py ./src/
 COPY database/ ./database/
 
 # Create logs directory

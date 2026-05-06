@@ -101,8 +101,8 @@ PARAM_SCHEMAS = {
     },
     'embedding_model': {
         'type': str,
-        'allowed_values': ['nomic-embed-text', 'mxbai-embed-large', 'bge-m3'],
-        'default': 'nomic-embed-text'
+        'allowed_values': ['nomic-embed-text-v2-moe', 'snowflake-arctic-embed2', 'bge-m3'],
+        'default': 'nomic-embed-text-v2-moe'
     },
     'ensemble': {
         'type': bool,

@@ -53,7 +53,7 @@ class OllamaVectorEmbedder:
     Optimized for LibraryOfBabel's knowledge base and semantic search.
     """
     
-    def __init__(self, db_config: Dict, ollama_base_url: str = "http://localhost:11434", embedding_model: str = "nomic-embed-text"):
+    def __init__(self, db_config: Dict, ollama_base_url: str = "http://localhost:11434", embedding_model: str = "nomic-embed-text-v2-moe"):
         """Initialize Ollama vector embedder"""
         self.db_config = db_config
         self.ollama_base_url = ollama_base_url.rstrip('/')
@@ -61,10 +61,10 @@ class OllamaVectorEmbedder:
         # Embedding configuration (Dr. Elena's performance optimization)
         # Multi-model support for enhanced embedding quality
         self.available_models = {
-            "nomic-embed-text": {"dimension": 768, "max_length": 8000, "description": "Optimized for text embeddings"},
+            "nomic-embed-text-v2-moe": {"dimension": 768, "max_length": 8000, "description": "Nomic v2 MoE text embedding model"},
             "bge-m3": {"dimension": 1024, "max_length": 8192, "description": "BGE M3 multilingual embedding model"},
-            "mxbai-embed-large": {"dimension": 1024, "max_length": 8000, "description": "MixedBread AI large embedding model"},
-            "granite-embedding:278m": {"dimension": 768, "max_length": 8192, "description": "IBM Granite embedding model (278M parameters)"}
+            "snowflake-arctic-embed2": {"dimension": 1024, "max_length": 8192, "description": "Snowflake Arctic Embed v2"},
+            "qwen3-embedding:0.6b": {"dimension": 768, "max_length": 8192, "description": "Qwen3 embedding model (0.6B)"}
         }
         
         # Setup logging first
@@ -75,8 +75,8 @@ class OllamaVectorEmbedder:
         if embedding_model in self.available_models:
             self.embedding_model = embedding_model
         else:
-            self.logger.warning(f"⚠️ Model '{embedding_model}' not recognized, defaulting to nomic-embed-text")
-            self.embedding_model = "nomic-embed-text"
+            self.logger.warning(f"⚠️ Model '{embedding_model}' not recognized, defaulting to nomic-embed-text-v2-moe")
+            self.embedding_model = "nomic-embed-text-v2-moe"
         
         self.batch_size = 10  # Process embeddings in batches
         self.max_chunk_length = self.available_models[self.embedding_model]["max_length"]

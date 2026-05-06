@@ -3,7 +3,7 @@ Nomic Intelligent Chapter Search Module
 ======================================
 
 Dr. Sarah Chen (陈雪芳) - Advanced Semantic Search with Intelligent Content Previews
-Uses nomic-embed-text for chapter-level semantic search with smart content extraction.
+Uses nomic-embed-text-v2-moe for chapter-level semantic search with smart content extraction.
 
 Features:
 - Chapter-level semantic search (8k token window coverage)
@@ -14,6 +14,7 @@ Features:
 """
 
 import logging
+import os
 import requests
 import re
 import psycopg2
@@ -25,8 +26,8 @@ logger = logging.getLogger(__name__)
 
 class NomicIntelligentSearch:
     def __init__(self):
-        self.ollama_url = "http://localhost:11434"
-        self.model_name = "nomic-embed-text"
+        self.ollama_url = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434" if os.getenv("RUNNING_IN_CONTAINER") == "true" else "http://localhost:11434")
+        self.model_name = "nomic-embed-text-v2-moe"
         self.max_chapter_words = 8000  # Ensure full token coverage
     
     def split_sentences(self, text: str) -> List[str]:
@@ -277,7 +278,7 @@ class NomicIntelligentSearch:
                             'preview_method': preview_data['method'],
                             'query_terms_found': preview_data['terms_found'],
                             'reading_link': reading_link,
-                            'search_model': 'nomic-embed-text',
+                            'search_model': 'nomic-embed-text-v2-moe',
                             'search_type': 'chapter_semantic'
                         }
                         
@@ -313,7 +314,7 @@ def nomic_chapter_semantic_search(query: str, limit: int = 10, genre_filter: Opt
             'total_results': len(results),
             'search_metadata': {
                 'query': query,
-                'model': 'nomic-embed-text',
+                'model': 'nomic-embed-text-v2-moe',
                 'search_type': 'chapter_semantic',
                 'max_chapter_words': nomic_search.max_chapter_words,
                 'genre_filter': genre_filter,

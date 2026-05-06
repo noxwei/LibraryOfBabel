@@ -6,8 +6,7 @@
 Intelligent content routing daemon that continuously processes chunks with optimal AI models:
 - Technical/Academic: snowflake-arctic-embed (1024d) - Precise factual embedding
 - Creative/Narrative: bge-m3 (1024d) - Rich semantic understanding (best RAG recall: 72%)
-- Cultural/Multilingual: mxbai-embed-large (1024d) - Cross-linguistic preservation
-- General: nomic-embed-text (768d) - Broad coverage fallback
+- General: nomic-embed-text-v2-moe (768d) - Broad coverage fallback
 
 LLM Backend (for classification queries):
 - Ollama: gemma3:4b — replaces llama3.2:3b (better reasoning, same ~3GB RAM)
@@ -105,7 +104,7 @@ class MultiModalEmbeddingDaemon:
         # Multi-modal AI model configuration (4 specialized models)
         self.embedding_models = {
             "nomic": {
-                "ollama_name": "nomic-embed-text:latest", 
+                "ollama_name": "nomic-embed-text-v2-moe:latest",
                 "dimensions": 768,
                 "specialization": "general",
                 "description": "General content - broad coverage fallback model",
@@ -120,16 +119,8 @@ class MultiModalEmbeddingDaemon:
                 "keywords": ["story", "novel", "fiction", "fantasy", "adventure", "romance", "character", 
                            "plot", "narrative", "tale", "saga", "epic", "literary", "drama", "thriller"]
             },
-            "mxbai": {
-                "ollama_name": "mxbai-embed-large:latest",
-                "dimensions": 1024,
-                "specialization": "multilingual",
-                "description": "Cultural/multilingual content with cross-linguistic preservation",
-                "keywords": ["culture", "cultural", "international", "global", "world", "foreign", 
-                           "translation", "history", "memoir", "biography", "travel", "ethnography"]
-            },
             "arctic": {
-                "ollama_name": "snowflake-arctic-embed:latest",
+                "ollama_name": "snowflake-arctic-embed2:latest",
                 "dimensions": 1024,
                 "specialization": "technical_academic",
                 "description": "Technical/academic content - Arctic embedding model",
@@ -253,8 +244,8 @@ class MultiModalEmbeddingDaemon:
         Analyzes content and metadata to determine optimal embedding model:
         - technical_academic: Philosophy, science, technology, business → snowflake-arctic-embed
         - semantic_narrative: Fiction, fantasy, romance, literature → bge-m3  
-        - multilingual: History, biography, travel, cultural studies → mxbai-embed-large
-        - general: Reference, self-help, mystery, psychology → nomic-embed-text
+        - multilingual: History, biography, travel, cultural studies → bge-m3
+        - general: Reference, self-help, mystery, psychology → nomic-embed-text-v2-moe
         """
         
         # Combine text for analysis

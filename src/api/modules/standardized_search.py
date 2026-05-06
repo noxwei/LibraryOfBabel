@@ -38,7 +38,7 @@ def before_request():
 
 @standardized_search_bp.route('/api/search')
 @public_read
-@validate_params(q=None, action='search', limit=20, page=1, format='json', sort='relevance', id=None, title=None, author=None, description=None, genre=None, embedding_model='nomic-embed-text', ensemble=False)
+@validate_params(q=None, action='search', limit=20, page=1, format='json', sort='relevance', id=None, title=None, author=None, description=None, genre=None, embedding_model='nomic-embed-text-v2-moe', ensemble=False)
 def search_endpoint():
     """
     LEVEL 1 CORE: Standardized Search API
@@ -50,7 +50,7 @@ def search_endpoint():
     - books: Comprehensive book metadata search (title, author, description, genre)
     - has_results: Check if results exist
     - semantic: Semantic vector search (book-level results)
-    - semantic_passages: Intelligent chapter-level semantic search with smart content previews (nomic-embed-text)
+    - semantic_passages: Intelligent chapter-level semantic search with smart content previews (nomic-embed-text-v2-moe)
     - concept: Concept-based search
     - passage: Passage similarity search
     - emotional: Emotional content search
@@ -67,7 +67,7 @@ def search_endpoint():
     - page: integer (page number, default: 1)
     - format: string (json|simple, default: json)
     - sort: string (relevance|title|author|word_count|publication_date, default: relevance)
-    - embedding_model: string (nomic-embed-text|mxbai-embed-large|bge-m3, default: nomic-embed-text)
+    - embedding_model: string (nomic-embed-text-v2-moe|snowflake-arctic-embed2|bge-m3, default: nomic-embed-text-v2-moe)
     - ensemble: boolean (use multiple models for better accuracy, default: false)
     """
     try:
@@ -96,12 +96,12 @@ def search_endpoint():
             return _handle_has_results(query, response_format)
             
         elif action == 'semantic':
-            embedding_model = params.get('embedding_model', 'nomic-embed-text')
+            embedding_model = params.get('embedding_model', 'nomic-embed-text-v2-moe')
             ensemble = params.get('ensemble', False)
             return _handle_semantic_search(query, limit, response_format, sort_field, embedding_model, ensemble)
             
         elif action == 'semantic_passages':
-            embedding_model = params.get('embedding_model', 'nomic-embed-text')
+            embedding_model = params.get('embedding_model', 'nomic-embed-text-v2-moe')
             genre_filter = request.args.get('genre')
             if genre_filter and (len(genre_filter) > 100 or not re.match(r'^[a-zA-Z0-9\s\-\']+$', genre_filter)):
                 return create_error_response(
@@ -132,15 +132,15 @@ def search_endpoint():
             return _handle_advanced_search(query, limit, response_format, sort_field)
             
         elif action == 'discovery':
-            embedding_model = params.get('embedding_model', 'nomic-embed-text')
+            embedding_model = params.get('embedding_model', 'nomic-embed-text-v2-moe')
             return _handle_discovery_search(query, limit, response_format, sort_field, embedding_model)
             
         elif action == 'style':
-            embedding_model = params.get('embedding_model', 'nomic-embed-text')
+            embedding_model = params.get('embedding_model', 'nomic-embed-text-v2-moe')
             return _handle_style_search(query, limit, response_format, sort_field, embedding_model)
             
         elif action == 'quality':
-            embedding_model = params.get('embedding_model', 'nomic-embed-text')
+            embedding_model = params.get('embedding_model', 'nomic-embed-text-v2-moe')
             quality_threshold = min(max(float(request.args.get('quality_threshold', 0.6)), 0.1), 1.0)
             return _handle_quality_search(query, limit, response_format, sort_field, embedding_model, quality_threshold)
         
@@ -253,11 +253,11 @@ def _handle_has_results(query: str, response_format: str):
             status_code=500
         )
 
-def _handle_semantic_search(query: str, limit: int, response_format: str, sort_field: str, embedding_model: str = 'nomic-embed-text', ensemble: bool = False):
+def _handle_semantic_search(query: str, limit: int, response_format: str, sort_field: str, embedding_model: str = 'nomic-embed-text-v2-moe', ensemble: bool = False):
     """Handle semantic search using PostgreSQL functions with model selection"""
     try:
         # Validate embedding model
-        valid_models = ['nomic-embed-text', 'mxbai-embed-large', 'bge-m3']
+        valid_models = ['nomic-embed-text-v2-moe', 'snowflake-arctic-embed2', 'bge-m3']
         if embedding_model not in valid_models:
             return create_error_response(
                 message=f"Invalid embedding model: {embedding_model}",
@@ -268,10 +268,10 @@ def _handle_semantic_search(query: str, limit: int, response_format: str, sort_f
                 },
                 status_code=400
             )
-        
+
         if ensemble:
             # Use ensemble search with multiple models
-            result = execute_pg_function('api_semantic_ensemble_search', query, ['nomic-embed-text', 'mxbai-embed-large', 'bge-m3'], [0.5, 0.3, 0.2], limit)
+            result = execute_pg_function('api_semantic_ensemble_search', query, ['nomic-embed-text-v2-moe', 'bge-m3'], [0.6, 0.4], limit)
         else:
             # Use single model search
             result = execute_pg_function('api_semantic_fullbook_search_multimodel', query, embedding_model, limit)
@@ -476,7 +476,7 @@ def _handle_nomic_intelligent_search(query: str, limit: int, response_format: st
                 enhanced_item = item.copy()
                 enhanced_item['search_metadata'] = {
                     'search_type': 'nomic_intelligent_chapter_search',
-                    'model': 'nomic-embed-text',
+                    'model': 'nomic-embed-text-v2-moe',
                     'intelligent_preview': True,
                     'max_chapter_words': metadata['max_chapter_words'],
                     'genre_filter': genre_filter
@@ -544,11 +544,11 @@ def _handle_books_metadata_search(query: str, limit: int, page: int, response_fo
             status_code=500
         )
 
-def _handle_discovery_search(query: str, limit: int, response_format: str, sort_field: str, embedding_model: str = 'nomic-embed-text'):
+def _handle_discovery_search(query: str, limit: int, response_format: str, sort_field: str, embedding_model: str = 'nomic-embed-text-v2-moe'):
     """Handle book discovery using opening chunk semantic analysis"""
     try:
         # Validate embedding model
-        valid_models = ['nomic-embed-text', 'mxbai-embed-large', 'bge-m3']
+        valid_models = ['nomic-embed-text-v2-moe', 'snowflake-arctic-embed2', 'bge-m3']
         if embedding_model not in valid_models:
             return create_error_response(
                 message=f"Invalid embedding model: {embedding_model}",
@@ -579,11 +579,11 @@ def _handle_discovery_search(query: str, limit: int, response_format: str, sort_
             status_code=500
         )
 
-def _handle_style_search(query: str, limit: int, response_format: str, sort_field: str, embedding_model: str = 'nomic-embed-text'):
+def _handle_style_search(query: str, limit: int, response_format: str, sort_field: str, embedding_model: str = 'nomic-embed-text-v2-moe'):
     """Handle writing style analysis using opening chunk analysis"""
     try:
         # Validate embedding model
-        valid_models = ['nomic-embed-text', 'mxbai-embed-large', 'bge-m3']
+        valid_models = ['nomic-embed-text-v2-moe', 'snowflake-arctic-embed2', 'bge-m3']
         if embedding_model not in valid_models:
             return create_error_response(
                 message=f"Invalid embedding model: {embedding_model}",
@@ -614,11 +614,11 @@ def _handle_style_search(query: str, limit: int, response_format: str, sort_fiel
             status_code=500
         )
 
-def _handle_quality_search(query: str, limit: int, response_format: str, sort_field: str, embedding_model: str = 'nomic-embed-text', quality_threshold: float = 0.6):
+def _handle_quality_search(query: str, limit: int, response_format: str, sort_field: str, embedding_model: str = 'nomic-embed-text-v2-moe', quality_threshold: float = 0.6):
     """Handle content quality assessment using opening analysis"""
     try:
         # Validate embedding model
-        valid_models = ['nomic-embed-text', 'mxbai-embed-large', 'bge-m3']
+        valid_models = ['nomic-embed-text-v2-moe', 'snowflake-arctic-embed2', 'bge-m3']
         if embedding_model not in valid_models:
             return create_error_response(
                 message=f"Invalid embedding model: {embedding_model}",

@@ -64,13 +64,13 @@ class APIConfig:
                 "chunking_levels": ["small", "medium", "large"]
             },
             "embedding_models": {
-                "default": "nomic-embed-text",
+                "default": "nomic-embed-text-v2-moe",
                 "available": {
-                    "nomic-embed-text": {
+                    "nomic-embed-text-v2-moe": {
                         "dimension": 768,
                         "max_length": 8000,
-                        "description": "Optimized for text embeddings",
-                        "model_id": "nomic-embed-text:latest"
+                        "description": "Nomic v2 MoE text embedding model",
+                        "model_id": "nomic-embed-text-v2-moe:latest"
                     },
                     "bge-m3": {
                         "dimension": 1024,
@@ -78,17 +78,17 @@ class APIConfig:
                         "description": "BGE M3 multilingual embedding model",
                         "model_id": "bge-m3:latest"
                     },
-                    "mxbai-embed-large": {
+                    "snowflake-arctic-embed2": {
                         "dimension": 1024,
-                        "max_length": 8000,
-                        "description": "MixedBread AI large embedding model",
-                        "model_id": "mxbai-embed-large:latest"
+                        "max_length": 8192,
+                        "description": "Snowflake Arctic Embed v2",
+                        "model_id": "snowflake-arctic-embed2:latest"
                     },
-                    "granite-embedding": {
+                    "qwen3-embedding:0.6b": {
                         "dimension": 768,
                         "max_length": 8192,
-                        "description": "IBM Granite embedding model (278M parameters)",
-                        "model_id": "granite-embedding:278m"
+                        "description": "Qwen3 embedding model (0.6B)",
+                        "model_id": "qwen3-embedding:0.6b"
                     }
                 }
             },

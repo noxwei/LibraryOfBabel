@@ -30,6 +30,8 @@ from modules.standardized_books import standardized_books_bp
 from modules.standardized_search import standardized_search_bp
 from modules.standardized_mobile import standardized_mobile_bp
 from modules.standardized_upload import standardized_upload_bp
+from modules.standardized_mcp import standardized_mcp_bp
+from modules.standardized_rag import standardized_rag_bp
 
 # Configure container-aware logging
 def get_log_path():
@@ -107,6 +109,8 @@ app.register_blueprint(standardized_books_bp)     # Level 1: Core Resources
 app.register_blueprint(standardized_search_bp)    # Level 1: Core Resources
 app.register_blueprint(standardized_mobile_bp)    # Level 3: Mobile Optimized
 app.register_blueprint(standardized_upload_bp)    # Level 2: Upload & Processing
+app.register_blueprint(standardized_mcp_bp)      # Level 3: MCP Integration
+app.register_blueprint(standardized_rag_bp)      # Level 2: RAG Endpoint
 
 def initialize_app():
     """Initialize application and test database connection"""
@@ -278,7 +282,7 @@ if __name__ == '__main__':
     # Container-aware server configuration
     is_container = os.getenv('RUNNING_IN_CONTAINER', '').lower() == 'true'
     port = int(os.getenv('API_PORT', os.getenv('PORT', 5565 if is_container else 5564)))
-    host = os.getenv('API_HOST', '0.0.0.0' if is_container else '127.0.0.1')
+    host = os.getenv('API_HOST', '0.0.0.0')
     debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     
     # Configure test mode based on environment
