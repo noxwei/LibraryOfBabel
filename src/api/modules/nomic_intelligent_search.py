@@ -217,7 +217,7 @@ class NomicIntelligentSearch:
                         FROM chunks c
                         JOIN books b ON c.book_id = b.book_id
                         JOIN chunk_embeddings ce ON c.chunk_id = ce.chunk_id
-                        WHERE ce.embedding_model = 'nomic-embed-text'
+                        WHERE ce.embedding_model = 'nomic-embed-text-v2-moe'
                             AND c.chunk_type = 'chapter'
                             AND c.word_count <= %s
                             AND c.content IS NOT NULL

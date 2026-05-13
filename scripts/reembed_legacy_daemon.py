@@ -59,6 +59,11 @@ DB_CONFIG = {
     'port': 5432
 }
 
+# Chunks that Ollama consistently rejects (encoding issues with CJK text)
+# Skip these to avoid wasting thousands of retries
+SKIP_CHUNKS = set()
+SKIP_FILE = LOGS_DIR / "reembed_skip.txt"
+
 shutdown_requested = False
 
 def handle_signal(sig, frame):
@@ -89,62 +94,94 @@ def get_legacy_chunks(conn, legacy_model: str, batch_size: int):
     return cur.fetchall()
 
 
-def embed_text(text: str) -> list:
-    """Generate embedding via Ollama."""
+EMBED_BATCH = int(os.getenv('REEMBED_BATCH', '10'))  # texts per Ollama call
+
+
+def embed_texts(texts: list) -> list:
+    """Generate embeddings for multiple texts in one Ollama call."""
+    inputs = [t[:8000] for t in texts]
     resp = requests.post(OLLAMA_URL, json={
         "model": NEW_MODEL,
-        "input": text[:8000]
-    }, timeout=30)
+        "input": inputs
+    }, timeout=60)
     resp.raise_for_status()
-    embeddings = resp.json().get("embeddings", [[]])
-    return embeddings[0] if embeddings else []
+    return resp.json().get("embeddings", [])
 
 
 def process_batch(conn, legacy_model: str, stats: dict):
-    """Process one batch of legacy chunks."""
+    """Process one batch of legacy chunks using batched Ollama calls."""
     rows = get_legacy_chunks(conn, legacy_model, BATCH_SIZE)
     if not rows:
+        return 0
+
+    # Filter out skipped chunks
+    valid_rows = [r for r in rows if r['chunk_id'] not in SKIP_CHUNKS and r['content'] and len(r['content'].strip()) > 10]
+    if not valid_rows:
         return 0
 
     cur = conn.cursor()
     embedded = 0
 
-    for row in rows:
+    # Process in sub-batches for Ollama
+    for i in range(0, len(valid_rows), EMBED_BATCH):
         if shutdown_requested:
             break
 
-        chunk_id = row['chunk_id']
-        book_id = row['book_id']
-        content = row['content']
+        sub_batch = valid_rows[i:i + EMBED_BATCH]
+        texts = [r['content'] for r in sub_batch]
 
         try:
-            embedding = embed_text(content)
-            if not embedding:
-                stats['skipped'] += 1
-                continue
+            embeddings = embed_texts(texts)
 
-            cur.execute("""
-                INSERT INTO chunk_embeddings (chunk_id, book_id, embedding_model, embedding_dimension, embedding_vector)
-                VALUES (%s, %s, %s, %s, %s::vector)
-                ON CONFLICT (chunk_id, embedding_model) DO NOTHING
-            """, (chunk_id, book_id, NEW_MODEL, len(embedding), str(embedding)))
+            for row, embedding in zip(sub_batch, embeddings):
+                if not embedding:
+                    stats['skipped'] += 1
+                    continue
 
-            embedded += 1
-            stats['embedded'] += 1
+                cur.execute("""
+                    INSERT INTO chunk_embeddings (chunk_id, book_id, embedding_model, embedding_dimension, embedding_vector)
+                    VALUES (%s, %s, %s, %s, %s::vector)
+                    ON CONFLICT (chunk_id, embedding_model) DO NOTHING
+                """, (row['chunk_id'], row['book_id'], NEW_MODEL, len(embedding), str(embedding)))
+
+                embedded += 1
+                stats['embedded'] += 1
+
+            conn.commit()
 
             if THROTTLE_SECONDS > 0:
                 time.sleep(THROTTLE_SECONDS)
 
-            if embedded % COMMIT_EVERY == 0:
-                conn.commit()
-
         except requests.exceptions.RequestException as e:
-            logger.warning(f"Ollama error for {chunk_id}: {e}")
-            stats['failed'] += 1
-            time.sleep(2)
+            # Fall back to one-by-one for this sub-batch to identify bad chunks
+            for row in sub_batch:
+                try:
+                    resp = requests.post(OLLAMA_URL, json={"model": NEW_MODEL, "input": row['content'][:8000]}, timeout=30)
+                    resp.raise_for_status()
+                    embs = resp.json().get("embeddings", [[]])
+                    emb = embs[0] if embs else []
+                    if emb:
+                        cur.execute("""
+                            INSERT INTO chunk_embeddings (chunk_id, book_id, embedding_model, embedding_dimension, embedding_vector)
+                            VALUES (%s, %s, %s, %s, %s::vector)
+                            ON CONFLICT (chunk_id, embedding_model) DO NOTHING
+                        """, (row['chunk_id'], row['book_id'], NEW_MODEL, len(emb), str(emb)))
+                        embedded += 1
+                        stats['embedded'] += 1
+                except Exception:
+                    stats['failed'] += 1
+                    fail_key = f"_fail_{row['chunk_id']}"
+                    stats[fail_key] = stats.get(fail_key, 0) + 1
+                    if stats[fail_key] >= 3:
+                        SKIP_CHUNKS.add(row['chunk_id'])
+                        logger.info(f"Auto-skipping {row['chunk_id']} after {stats[fail_key]} failures")
+                        with open(SKIP_FILE, 'a') as f:
+                            f.write(f"{row['chunk_id']}\n")
+            conn.commit()
+
         except Exception as e:
-            logger.warning(f"Error for {chunk_id}: {e}")
-            stats['failed'] += 1
+            logger.warning(f"Batch error: {e}")
+            stats['failed'] += len(sub_batch)
             conn.rollback()
 
     conn.commit()
@@ -187,13 +224,18 @@ def main():
     except OSError:
         pass
 
+    # Load skip list from previous runs
+    if SKIP_FILE.exists():
+        SKIP_CHUNKS.update(line.strip() for line in open(SKIP_FILE) if line.strip())
+        logger.info(f"Loaded {len(SKIP_CHUNKS)} chunks to skip")
+
     logger.info("Re-embedding daemon starting")
     logger.info(f"Model: {NEW_MODEL}")
     logger.info(f"Batch size: {BATCH_SIZE}")
 
     # Test Ollama
     try:
-        test = embed_text("test")
+        test = embed_texts(["test"])[0]
         logger.info(f"Ollama OK — {NEW_MODEL} returns {len(test)}-dim vectors")
     except Exception as e:
         logger.error(f"Ollama not reachable: {e}")
