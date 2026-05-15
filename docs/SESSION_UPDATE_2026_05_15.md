@@ -228,26 +228,41 @@ Key dependency: `GEMINIAPI_KEY` environment variable required. Set in:
 
 ---
 
-## 10. How to Resume
+## 10. End-of-Session Status (May 15, 2026 evening)
 
-1. Check re-embed progress:
+- **Gemini credits depleted** ($25 spent, including wasted retries from rate limit loop)
+- **Gemini embeddings**: 379,200 chunks (16.1%)
+- **Nomic-v2-moe embeddings**: 612K chunks (growing via Ollama daemon)
+- **Combined unique coverage**: 791,404 / 2,361,908 (33.5%)
+- **Ollama daemon running**: `screen -r ollama_reembed` — 4 workers, ~7-11 chunks/sec, ETA ~66h (Monday)
+- **Research page live**: http://100.71.141.45:4500/research (5 tabs working)
+- **Commits**: LoB main@846f754, life-dashboard master@fe301b2
+
+## 11. How to Resume
+
+1. Check Ollama re-embed progress:
    ```bash
-   cat /Users/weixiangzhang/Local_Dev/projects/LibraryOfBabel/logs/gemini_reembed_state.json
-   screen -r gemini_reembed
+   tail -1 logs/ollama_reembed.log
+   cat logs/ollama_reembed_state.json
+   screen -r ollama_reembed   # attach to see live output
+   psql -d knowledge_base -c "SELECT COUNT(DISTINCT chunk_id) FROM chunk_embeddings WHERE embedding_model IN ('gemini-embedding-001', 'nomic-embed-text-v2-moe');"
    ```
 
-2. If re-embed is done, rebuild production:
+2. If re-embed is done, rebuild production Docker:
    ```bash
    cd /Users/weixiangzhang/Local_Dev/projects/LibraryOfBabel
-   ./production_api_service.sh restart
+   docker compose build api && docker compose up -d api
+   # Also restart production with: ./production_api_service.sh restart
    ```
 
-3. Verify search works on both models:
+3. To resume Gemini re-embed (if credits added):
    ```bash
-   curl "http://localhost:5564/api/search?q=consciousness+and+free+will&action=semantic_passages&limit=5"
+   # Add credits at https://ai.studio/projects
+   screen -dmS gemini_reembed bash -c 'export GEMINIAPI_KEY=AIzaSyDEM8pPz_z59Xjr_WTNknKnunPgjqLpDW0; python3 -u scripts/gemini_reembed_all.py > logs/gemini_reembed.log 2>&1'
    ```
 
-4. Key config files to check:
-   - `/Users/weixiangzhang/Local_Dev/projects/LibraryOfBabel/.env` (GEMINIAPI_KEY)
-   - `/Users/weixiangzhang/Local_Dev/projects/LibraryOfBabel/config/api_settings.json` (model config)
-   - `/Users/weixiangzhang/Local_Dev/projects/LibraryOfBabel/docker-compose.yml` (env passthrough)
+4. Key config:
+   - `.env` — GEMINIAPI_KEY
+   - `config/api_settings.json` — model config
+   - `docker-compose.yml` — GEMINIAPI_KEY passthrough
+   - `scripts/ollama_reembed_remaining.py` — NUM_WORKERS=4, BATCH_SIZE=50
