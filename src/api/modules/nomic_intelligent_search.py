@@ -26,8 +26,12 @@ logger = logging.getLogger(__name__)
 
 class NomicIntelligentSearch:
     def __init__(self):
+        self.gemini_api_key = os.getenv("GEMINIAPI_KEY", "")
+        self.gemini_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent"
+        self.model_name = "gemini-embedding-001"
+        self.embedding_dim = 768
+        # Fallback to Ollama if no Gemini key
         self.ollama_url = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434" if os.getenv("RUNNING_IN_CONTAINER") == "true" else "http://localhost:11434")
-        self.model_name = "nomic-embed-text-v2-moe"
         self.max_chapter_words = 8000  # Ensure full token coverage
     
     def split_sentences(self, text: str) -> List[str]:
@@ -137,27 +141,21 @@ class NomicIntelligentSearch:
         try:
             with get_db() as conn:
                 with conn.cursor() as cur:
-                    # Get the cumulative word count up to this chunk to calculate page number
+                    # Sum word counts of all chunks that come before this one (by chunk_id sort order)
                     cur.execute("""
-                        SELECT SUM(c.word_count) as cumulative_words
-                        FROM chunks c 
-                        WHERE c.book_id = %s 
-                            AND c.start_position < (
-                                SELECT start_position 
-                                FROM chunks 
-                                WHERE chunk_id = %s
-                            )
+                        SELECT COALESCE(SUM(c.word_count), 0) as cumulative_words
+                        FROM chunks c
+                        WHERE c.book_id = %s
+                            AND c.chunk_id < %s
                     """, (book_id, chunk_id))
-                    
-                    result = cur.fetchone()
-                    cumulative_words = result[0] if result and result[0] else 0
-                    
+
+                    cumulative_words = cur.fetchone()[0]
+
                     # Calculate page number (1-indexed)
                     page_num = max(1, (cumulative_words // words_per_page) + 1)
-                    
-                    # Generate the reading link (relative path)
+
                     reading_link = f"/api/books?action=page&id={book_id}&page_num={page_num}&words_per_page={words_per_page}"
-                    
+
                     return reading_link
                     
         except Exception as e:
@@ -166,101 +164,132 @@ class NomicIntelligentSearch:
             return f"/api/books?action=page&id={book_id}&page_num=1&words_per_page={words_per_page}"
     
     def generate_query_embedding(self, query: str) -> Optional[List[float]]:
-        """Generate embedding for search query using nomic"""
+        """Generate embedding for search query using Gemini API (fallback: Ollama)"""
+        if self.gemini_api_key:
+            return self._embed_via_gemini(query)
+        return self._embed_via_ollama(query)
+
+    def _embed_via_gemini(self, query: str) -> Optional[List[float]]:
+        """Generate embedding via Google Gemini API"""
+        try:
+            response = requests.post(
+                f"{self.gemini_url}?key={self.gemini_api_key}",
+                json={
+                    "model": "models/gemini-embedding-001",
+                    "content": {"parts": [{"text": query}]},
+                    "outputDimensionality": self.embedding_dim
+                },
+                timeout=15
+            )
+            if response.status_code == 200:
+                return response.json().get("embedding", {}).get("values", [])
+            else:
+                logger.error(f"Gemini embedding error: {response.status_code}")
+                return None
+        except Exception as e:
+            logger.error(f"Gemini embedding error: {e}")
+            return None
+
+    def _embed_via_ollama(self, query: str) -> Optional[List[float]]:
+        """Fallback: generate embedding via local Ollama"""
         try:
             response = requests.post(
                 f"{self.ollama_url}/api/embeddings",
                 json={
-                    "model": self.model_name,
+                    "model": "nomic-embed-text-v2-moe",
                     "prompt": f"search_query: {query}"
                 },
                 timeout=30
             )
-            
             if response.status_code == 200:
-                result = response.json()
-                return result.get('embedding', [])
+                return response.json().get('embedding', [])
             else:
                 logger.error(f"Ollama embedding error: {response.status_code}")
                 return None
-                
         except Exception as e:
             logger.error(f"Embedding generation error: {e}")
             return None
     
+    def _run_vector_search(self, cur, vector_str: str, model_name: str, limit: int, genre_filter: Optional[str], sort_field: str) -> List[Dict]:
+        """Run a single vector search against a specific embedding model."""
+        base_query = """
+            SELECT
+                c.chunk_id,
+                c.book_id,
+                b.title,
+                b.author,
+                b.genre,
+                c.chunk_type,
+                c.word_count,
+                c.content,
+                (1.0 - (ce.embedding_vector <=> %s::vector)) as similarity_score
+            FROM chunks c
+            JOIN books b ON c.book_id = b.book_id
+            JOIN chunk_embeddings ce ON c.chunk_id = ce.chunk_id
+            WHERE ce.embedding_model = %s
+                AND c.chunk_type = 'chapter'
+                AND c.word_count <= %s
+                AND c.content IS NOT NULL
+        """
+        params = [vector_str, model_name, self.max_chapter_words]
+
+        if genre_filter:
+            base_query += " AND b.genre ILIKE %s"
+            params.append(f"%{genre_filter}%")
+
+        if sort_field == 'alpha_title':
+            base_query += " ORDER BY b.title ASC"
+        elif sort_field == 'alpha_author':
+            base_query += " ORDER BY b.author ASC, b.title ASC"
+        else:
+            base_query += " ORDER BY ce.embedding_vector <=> %s::vector"
+            params.append(vector_str)
+
+        base_query += " LIMIT %s"
+        params.append(limit)
+
+        cur.execute(base_query, params)
+        return [dict(row) for row in cur.fetchall()]
+
     def search_chapters_semantic(self, query: str, limit: int = 10, genre_filter: Optional[str] = None, sort_field: str = 'relevance') -> List[Dict]:
-        """Perform semantic search on chapter-level content using nomic embeddings"""
-        
-        # Generate query embedding
+        """Semantic search with multi-model fallback: Gemini first, then nomic-v2-moe to fill gaps."""
+
+        # Generate Gemini query embedding
         query_embedding = self.generate_query_embedding(query)
         if not query_embedding:
             raise Exception("Failed to generate query embedding")
-        
+
         try:
             with get_db() as conn:
                 with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                    
+
                     vector_str = f"[{','.join(map(str, query_embedding))}]"
-                    
-                    # Build query with optional genre filter
-                    base_query = """
-                        SELECT 
-                            c.chunk_id,
-                            c.book_id,
-                            b.title,
-                            b.author,
-                            b.genre,
-                            c.chunk_type,
-                            c.word_count,
-                            c.content,
-                            (1.0 - (ce.embedding_vector <=> %s::vector)) as similarity_score
-                        FROM chunks c
-                        JOIN books b ON c.book_id = b.book_id
-                        JOIN chunk_embeddings ce ON c.chunk_id = ce.chunk_id
-                        WHERE ce.embedding_model = 'nomic-embed-text-v2-moe'
-                            AND c.chunk_type = 'chapter'
-                            AND c.word_count <= %s
-                            AND c.content IS NOT NULL
-                    """
-                    
-                    params = [vector_str, self.max_chapter_words]
-                    
-                    if genre_filter:
-                        base_query += " AND b.genre ILIKE %s"
-                        params.append(f"%{genre_filter}%")
-                    
-                    # Add sorting based on sort_field
+
+                    # Primary: search Gemini embeddings
+                    rows = self._run_vector_search(cur, vector_str, 'gemini-embedding-001', limit, genre_filter, sort_field)
+
+                    # Fallback: if Gemini returned fewer than requested, backfill with nomic-v2-moe
+                    if len(rows) < limit:
+                        nomic_embedding = self._embed_via_ollama(query)
+                        if nomic_embedding:
+                            nomic_vec = f"[{','.join(map(str, nomic_embedding))}]"
+                            seen_chunks = {r['chunk_id'] for r in rows}
+                            nomic_rows = self._run_vector_search(cur, nomic_vec, 'nomic-embed-text-v2-moe', limit, genre_filter, sort_field)
+                            for nr in nomic_rows:
+                                if nr['chunk_id'] not in seen_chunks:
+                                    rows.append(nr)
+                                    seen_chunks.add(nr['chunk_id'])
+                                    if len(rows) >= limit:
+                                        break
+
+                    # Re-sort merged results by similarity
                     if sort_field == 'relevance':
-                        base_query += """
-                            ORDER BY ce.embedding_vector <=> %s::vector
-                        """
-                        params.append(vector_str)
-                    elif sort_field == 'alpha_title':
-                        base_query += """
-                            ORDER BY b.title ASC
-                        """
-                    elif sort_field == 'alpha_author':
-                        base_query += """
-                            ORDER BY b.author ASC, b.title ASC
-                        """
-                    else:
-                        # Default to relevance
-                        base_query += """
-                            ORDER BY ce.embedding_vector <=> %s::vector
-                        """
-                        params.append(vector_str)
-                    
-                    base_query += " LIMIT %s"
-                    params.append(limit)
-                    
-                    cur.execute(base_query, params)
-                    
+                        rows.sort(key=lambda r: r['similarity_score'], reverse=True)
+
                     results = []
-                    for row in cur.fetchall():
-                        row_dict = dict(row)
-                        
-                        # Generate intelligent preview (200 words, ending at period)
-                        preview_data = self.intelligent_preview(row_dict['content'], query, 200)
+                    for row_dict in rows:
+                        # Generate intelligent preview (300 words, ending at period)
+                        preview_data = self.intelligent_preview(row_dict['content'], query, 300)
                         
                         # Generate reading link to the exact page containing this chapter
                         reading_link = self.generate_reading_link(row_dict['book_id'], row_dict['chunk_id'])
@@ -278,7 +307,7 @@ class NomicIntelligentSearch:
                             'preview_method': preview_data['method'],
                             'query_terms_found': preview_data['terms_found'],
                             'reading_link': reading_link,
-                            'search_model': 'nomic-embed-text-v2-moe',
+                            'search_model': self.model_name,
                             'search_type': 'chapter_semantic'
                         }
                         

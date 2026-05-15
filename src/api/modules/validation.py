@@ -34,7 +34,7 @@ PARAM_SCHEMAS = {
     'q': {
         'type': str,
         'min_length': 1,
-        'max_length': 500,
+        'max_length': 4000,
         'strip': True
     },
     'action': {
@@ -101,8 +101,8 @@ PARAM_SCHEMAS = {
     },
     'embedding_model': {
         'type': str,
-        'allowed_values': ['nomic-embed-text-v2-moe', 'snowflake-arctic-embed2', 'bge-m3'],
-        'default': 'nomic-embed-text-v2-moe'
+        'allowed_values': ['gemini-embedding-001', 'nomic-embed-text-v2-moe', 'snowflake-arctic-embed2', 'bge-m3'],
+        'default': 'gemini-embedding-001'
     },
     'ensemble': {
         'type': bool,

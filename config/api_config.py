@@ -64,12 +64,18 @@ class APIConfig:
                 "chunking_levels": ["small", "medium", "large"]
             },
             "embedding_models": {
-                "default": "nomic-embed-text-v2-moe",
+                "default": "gemini-embedding-001",
                 "available": {
+                    "gemini-embedding-001": {
+                        "dimension": 768,
+                        "max_length": 8000,
+                        "description": "Google Gemini embedding model (primary)",
+                        "provider": "google"
+                    },
                     "nomic-embed-text-v2-moe": {
                         "dimension": 768,
                         "max_length": 8000,
-                        "description": "Nomic v2 MoE text embedding model",
+                        "description": "Nomic v2 MoE text embedding model (legacy)",
                         "model_id": "nomic-embed-text-v2-moe:latest"
                     },
                     "bge-m3": {

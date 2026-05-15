@@ -446,10 +446,8 @@ class SimpleMCPServer:
         """Get embedding models configuration"""
         config = {
             "embedding_models": {
-                "nomic":  {"name": "nomic-embed-text",      "dimensions": 768,  "use_case": "General fallback",         "context_tokens": 8192,  "backend": "ollama"},
-                "bge":    {"name": "bge-m3",                "dimensions": 1024, "use_case": "Creative/Narrative",       "context_tokens": 8192,  "backend": "ollama", "mteb_score": 63.0, "rag_recall_at_10": "72%"},
-                "mxbai":  {"name": "mxbai-embed-large",     "dimensions": 1024, "use_case": "Multilingual/Cultural",    "context_tokens": 512,   "backend": "ollama"},
-                "arctic": {"name": "snowflake-arctic-embed", "dimensions": 1024, "use_case": "Technical/Academic",       "context_tokens": 4096,  "backend": "ollama"},
+                "gemini": {"name": "gemini-embedding-001",  "dimensions": 768,  "use_case": "Primary semantic search",  "context_tokens": 8192,  "backend": "google-api", "status": "active"},
+                "bge":    {"name": "bge-m3",                "dimensions": 1024, "use_case": "Multilingual/fallback",    "context_tokens": 8192,  "backend": "ollama"},
             },
             "llm_models": {
                 "gemma3_4b":   {"name": "gemma3:4b",   "use_case": "Classification/Inference", "backend": "ollama", "tok_s_m2pro": "~110", "ram_gb": 3.0},

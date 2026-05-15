@@ -330,19 +330,17 @@ def _ingest_book_direct(db_config: Dict, book_data: Dict, chunks: list) -> Optio
 
 
 def _embed_book_chunks(db_config: Dict, book_id: int, total_chunks: int, job_id: str) -> int:
-    """Generate embeddings for all chunks of a book using Ollama"""
+    """Generate embeddings for all chunks of a book using Gemini API (fallback: Ollama)"""
     import requests as http_requests
     import psycopg2
 
-    ollama_base = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434" if os.getenv("RUNNING_IN_CONTAINER") == "true" else "http://localhost:11434")
-    ollama_url = f"{ollama_base}/api/embed"
-    model = "nomic-embed-text-v2-moe"
+    gemini_key = os.getenv("GEMINIAPI_KEY", "")
+    model = "gemini-embedding-001"
     embedded = 0
 
     conn = psycopg2.connect(**db_config)
     try:
         cur = conn.cursor()
-        # Get all chunks for this book that don't have embeddings yet
         cur.execute("""
             SELECT c.chunk_id, c.content
             FROM chunks c
@@ -355,12 +353,21 @@ def _embed_book_chunks(db_config: Dict, book_id: int, total_chunks: int, job_id:
             if not content or len(content.strip()) < 10:
                 continue
             try:
-                # Truncate to model max length
                 text = content[:8000]
-                resp = http_requests.post(ollama_url, json={"model": model, "input": text}, timeout=30)
-                resp.raise_for_status()
-                data = resp.json()
-                embedding = data.get("embeddings", [[]])[0]
+                if gemini_key:
+                    resp = http_requests.post(
+                        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key={gemini_key}",
+                        json={"model": "models/gemini-embedding-001", "content": {"parts": [{"text": text}]}, "outputDimensionality": 768},
+                        timeout=15
+                    )
+                    resp.raise_for_status()
+                    embedding = resp.json().get("embedding", {}).get("values", [])
+                else:
+                    ollama_base = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434" if os.getenv("RUNNING_IN_CONTAINER") == "true" else "http://localhost:11434")
+                    resp = http_requests.post(f"{ollama_base}/api/embed", json={"model": "nomic-embed-text-v2-moe", "input": text}, timeout=30)
+                    resp.raise_for_status()
+                    embedding = resp.json().get("embeddings", [[]])[0]
+
                 if not embedding:
                     continue
 
@@ -477,7 +484,7 @@ def _process_job(job_id: str):
                 job['progress']['current_stage'] = 'embedding'
                 result['stages']['embedding'] = {
                     'status': 'in_progress',
-                    'model': 'nomic-embed-text-v2-moe',
+                    'model': 'gemini-embedding-001',
                     'chunks_embedded': 0,
                     'chunks_total': len(chunks)
                 }
@@ -486,7 +493,7 @@ def _process_job(job_id: str):
                     embedded_count = _embed_book_chunks(db_config, book_id, len(chunks), job_id)
                     result['stages']['embedding'] = {
                         'status': 'complete',
-                        'model': 'nomic-embed-text-v2-moe',
+                        'model': 'gemini-embedding-001',
                         'chunks_embedded': embedded_count,
                         'chunks_total': len(chunks)
                     }
@@ -494,7 +501,7 @@ def _process_job(job_id: str):
                     logger.warning(f"[{job_id}] Embedding failed (book still ingested): {embed_err}")
                     result['stages']['embedding'] = {
                         'status': 'failed',
-                        'model': 'nomic-embed-text-v2-moe',
+                        'model': 'gemini-embedding-001',
                         'error': str(embed_err),
                         'message': 'Book ingested but embedding failed — daemon will retry'
                     }
