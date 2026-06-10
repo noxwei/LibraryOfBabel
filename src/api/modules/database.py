@@ -39,7 +39,7 @@ def get_db_config(connection_type: ConnectionType = ConnectionType.READONLY):
         'port': os.getenv('DB_PORT', '5432'),
         'database': os.getenv('DB_NAME', 'knowledge_base'),
         'connect_timeout': int(os.getenv('DB_CONNECT_TIMEOUT', '15')),  # Increased for container networking
-        'options': '-c statement_timeout=60s',  # Extended timeout for passage search
+        'options': '-c statement_timeout=120s',  # Extended timeout for vector search with JOINs
     }
     
     if connection_type == ConnectionType.READONLY:

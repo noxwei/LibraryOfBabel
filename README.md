@@ -1,342 +1,204 @@
-# LibraryOfBabel 🚀 Multi-Modal Semantic Search Library
+# Library of Babel
 
-**Next-Generation Personal Knowledge System with 5-Model AI Architecture**
+A personal library of 4,945 books, fully embedded and searchable by meaning.
 
-Transform your digital library into an AI-powered semantic search powerhouse. LibraryOfBabel delivers lightning-fast, contextually-aware search across massive ebook collections using advanced multi-modal embeddings and PostgreSQL-First architecture.
+## What it is
 
-## 🎯 **What Makes This Special**
+Every book is split into ~250-word passages, embedded with vector models, and indexed in PostgreSQL + pgvector. Search queries are embedded in real time via a local Ollama instance, then matched against 2.36 million passage vectors using HNSW indexing.
 
-LibraryOfBabel isn't just another ebook manager—it's a **semantic understanding system** that turns your book collection into an intelligent knowledge base accessible via secure APIs, with your entire library searchable in milliseconds using **5 specialized AI embedding models**.
+The entire system runs on a Mac Mini (M2 Pro).
 
-### **🧠 Revolutionary Multi-Modal AI Search**
-- **🎯 Precision Search**: `mxbai-embed-large` (1024d) - High-accuracy technical matching
-- **🌍 Multilingual Search**: `bge-m3` (1024d) - International content understanding  
-- **🔬 Technical Search**: `granite-embedding` (768d) - Academic/scientific content
-- **❄️ Domain-Specific**: `snowflake-arctic-embed` (1024d) - Specialized knowledge areas
-- **⚡ General Search**: `nomic-embed-text` (768d) - Broad semantic coverage
+## Numbers
 
-### **✨ Core Capabilities**
-- 🔍 **Intelligent Content Routing**: Auto-selects optimal AI model per book type
-- 🏛️ **PostgreSQL-First Architecture**: Database-native vector operations
-- 📚 **Massive Scale**: 8,673+ books, 247,911+ searchable chunks
-- ⚡ **Lightning Performance**: <200ms response times with intelligent caching
-- 🔐 **Production Security**: API key authentication, HTTPS, comprehensive auditing
-- 📱 **Universal Access**: REST API for any platform (iOS, web, CLI, agents)
-- 🎯 **Flexible Results**: 1-10,000 result limits for any use case
-- 🤖 **AI-Native**: Structured responses perfect for LLM agents
-- 📖 **E-Reader Experience**: Dynamic word-count pagination for customizable reading experience
+| | |
+|---|---|
+| Books | 4,945 |
+| Passages | 2,361,908 |
+| Words | 1.2 billion |
+| Embedding coverage | 100% |
+| Database size | 112 GB |
 
-## 🚀 **Quick Start - Lightning Demo**
+## Embedding models
+
+| Model | Dimensions | Coverage |
+|---|---|---|
+| nomic-embed-text-v2-moe | 768 | 96.4% (primary) |
+| bge-m3 | 1024 | 90.2% |
+| gemini-embedding-001 | 768 | 47.8% |
+
+Search uses nomic-v2-moe as the primary model. Query embedding runs locally via Ollama.
+
+## Seven modes of inquiry
+
+The API is organized around seven epistemological modes -- none privileged over another:
+
+**i. Meaning** (hermeneutic) -- Semantic search. Paste a passage or describe a theme, find where it resonates.
+- `semantic_passages`, `semantic`, `passage`, `concept`, `emotional`
+
+**ii. Reference** (referential) -- Keyword search. You know the word, find the exact match.
+- `search`, `count`, `titles`, `books`, `has_results`
+
+**iii. Analysis** (analytic) -- Cross-corpus pattern recognition.
+- `discovery`, `style`, `quality`, `author_influence`, `thematic_evolution`, `content_analysis`
+
+**iv. Reading** (exegetic) -- Navigate and read the texts page by page.
+- `books`: list, summary, toc, page, random_page, construct
+
+**v. Synthesis** (synthetic) -- Ask a question, get an answer from the corpus.
+- `rag`
+
+**vi. Discovery** (aleatory) -- Random pages, mobile shortcuts, serendipity.
+- `mobile/random`, `mobile/search`, `mobile/stats`, `mobile/dashboard`
+
+**vii. Instrument** (instrumental) -- The system itself.
+- `health`, `info`, `mcp`, `upload`
+
+## Architecture
+
+```
+EPUB --> text_chunker.py --> ~250-word passages --> PostgreSQL (chunks table)
+                                                        |
+                                                  Ollama / Gemini --> embeddings --> chunk_embeddings table
+                                                        |
+                                                  pgvector HNSW index
+                                                        |
+                                  Flask API (standardized_production_api.py) --> JSON responses
+```
+
+### Stack
+
+- **Database**: PostgreSQL 14 + pgvector (HNSW indexes)
+- **API**: Flask (Python 3.13), single-file standardized architecture
+- **Embedding**: Ollama (nomic-embed-text-v2-moe) for queries, batch embedding via scripts
+- **Frontend**: Static HTML (Newsreader + DM Sans, warm journal aesthetic)
+- **Hosting**: Mac Mini M2 Pro, Tailscale for remote access
+- **Production**: HTTPS via Let's Encrypt wildcard cert, port 5562
+
+### Key files
+
+```
+src/api/standardized_production_api.py    # Main API server
+src/api/modules/
+  standardized_search.py                  # Search endpoint (16 actions)
+  standardized_books.py                   # Books endpoint (6 actions)
+  standardized_mcp.py                     # MCP server for Claude Desktop
+  standardized_rag.py                     # RAG endpoint
+  standardized_mobile.py                  # iOS Shortcuts endpoints
+  standardized_upload.py                  # EPUB upload
+  standardized_health.py                  # Health + info
+  nomic_intelligent_search.py             # Vector search engine (CTE pattern)
+  database.py                             # Connection management (120s timeout)
+  auth.py                                 # API key auth
+  validation.py                           # Parameter validation
+
+src/text_chunker.py                       # Book --> passage chunking
+src/advanced_semantic_chunker.py          # Semantic-aware chunking
+
+scripts/
+  gemini_reembed_all.py                   # Gemini batch embedding (credits depleted)
+  ollama_reembed_parallel.py              # Ollama parallel embedding (DO NOT RUN -- all chunks covered)
+  rechunk_monsters.py                     # Re-chunk oversized passages (22,601 segments created)
+  chunk_processing_daemon.py              # Background chunking daemon
+
+frontend/out/                             # Static site (warm journal aesthetic)
+  index.html                              # Landing page with live search
+  api-docs/index.html                     # Interactive API reference (7 sections)
+  browse/index.html                       # Book catalog + e-reader (infinite scroll)
+  demo/index.html                         # Full search interface (16 modes)
+  upload/index.html                       # EPUB upload with drag-and-drop
+```
+
+### Database schema
+
+```sql
+-- Core tables
+books (book_id, title, author, genre, word_count, ...)
+chunks (chunk_id, book_id, chunk_type, content, word_count, parent_chunk_id, ...)
+chunk_embeddings (chunk_id, book_id, embedding_model, embedding_dimension, embedding_vector)
+
+-- Vector indexes
+idx_chunk_embeddings_hnsw       -- HNSW cosine index (all models, 12 GB)
+idx_embeddings_bge_hnsw_1024    -- HNSW for bge-m3 1024d (15 GB)
+
+-- The chunks table has 39 indexes (some legacy). Run ANALYZE chunks after bulk operations.
+-- pg_trgm extension is in semantic_archive schema, not public.
+```
+
+## Running
+
+### Production (port 5562)
 
 ```bash
-# 1. Health check
-curl https://api.ashortstayinhell.com:5562/health
-
-# 2. Multi-modal semantic search (auto-selects best AI model)
-curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_KEY&q=quantum%20consciousness&limit=5"
-
-# 3. Book-specific search with AI routing
-curl "https://api.ashortstayinhell.com:5562/books/1099/search?api_key=YOUR_KEY&q=neural%20networks"
-
-# 4. E-reader style reading with dynamic pagination
-curl "https://api.ashortstayinhell.com:5562/api/books?action=page&id=1482&page_num=1&words_per_page=500&api_key=YOUR_KEY"
-
-# 5. Advanced: Search by embedding model type
-curl "https://api.ashortstayinhell.com:5562/search?api_key=YOUR_KEY&q=machine%20learning&model=technical&limit=10"
+./production_api_service.sh restart
 ```
 
-**Response includes semantic similarity scores, content classification, and AI model routing metadata.**
+### Staging (port 5564)
 
-## 📊 **Current System Status**
-
-### **📚 Library Scale**
-- **Total Books**: 8,673 (tripled via Calibre integration)
-- **Searchable Chunks**: 247,911 with multi-modal embeddings
-- **Unique Authors**: 4,500+ (massive diversity)
-- **Languages**: English + multilingual content detection
-- **Content Types**: Fiction, technical, academic, reference, biography
-
-### **🧠 AI Architecture**
-- **Embedding Models**: 5 specialized Ollama models deployed
-- **Vector Dimensions**: 768d + 1024d hybrid architecture
-- **Content Classification**: Intelligent routing by genre/complexity
-- **Database**: PostgreSQL with pgvector extensions
-- **Search Types**: Semantic, fuzzy, exact, hybrid combinations
-
-### **⚡ Performance Metrics**
-- **API Response**: <200ms average (mobile-optimized)
-- **Search Accuracy**: 94%+ semantic relevance scores
-- **Uptime**: 99.9%+ with daemon auto-restart
-- **Throughput**: 1000+ concurrent searches/minute
-- **Cache Hit Rate**: 85%+ for common queries
-
-## 🏗️ **PostgreSQL-First Architecture**
-
-### **Why PostgreSQL-First?**
-Our revolutionary approach puts the database at the center, enabling:
-- **Transparent Upgrades**: Add AI models without changing production APIs
-- **Native Vector Operations**: pgvector for maximum performance
-- **Intelligent Indexing**: HNSW + IVFFlat optimized for each model
-- **Transaction Safety**: ACID compliance for all embedding updates
-- **Horizontal Scaling**: Ready for multi-node deployments
-
-### **Multi-Model Schema**
-```sql
--- Each chunk has 5 different embedding perspectives
-CREATE TABLE chunks (
-    chunk_id BIGINT PRIMARY KEY,
-    content TEXT,
-    embedding_nomic vector(768),     -- General semantic search
-    embedding_mxbai vector(1024),    -- High-precision matching  
-    embedding_bge vector(1024),      -- Multilingual understanding
-    embedding_granite vector(768),   -- Technical/academic content
-    embedding_arctic vector(1024),   -- Domain-specific knowledge
-    content_type TEXT,               -- Classification metadata
-    routing_reason TEXT              -- AI model selection rationale
-);
+```bash
+PYTHONPATH="src" python3.13 src/api/standardized_production_api.py
 ```
 
-## 🎯 **Intelligent Content Routing**
+Note: Use `python3.13` (has Flask), not `python3` (3.14, no Flask).
 
-LibraryOfBabel automatically selects the optimal AI model based on content analysis:
+### Authentication
 
-### **🔬 Technical/Academic Content** → `granite-embedding`
-- Philosophy, Science, Technology, Business, Economics
-- Precise factual embedding for analytical content
+API key via `X-API-Key` header. Health endpoints are public. `localhost` bypasses auth.
 
-### **📖 Creative/Narrative Content** → `bge-m3` 
-- Fiction, Fantasy, Romance, Literary works
-- Rich semantic understanding for storytelling
+## API quick reference
 
-### **🌍 Cultural/Multilingual Content** → `mxbai-embed-large`
-- History, Biography, Travel, Cultural studies  
-- Cross-linguistic semantic preservation
+```bash
+# Semantic passage search
+curl "localhost:5564/api/search?q=the+moral+weight+of+idleness&action=semantic_passages&limit=5"
 
-### **⚡ General Content** → `nomic-embed-text`
-- Reference, Self-help, Mystery, Psychology
-- Broad coverage for diverse topics
+# List books by genre
+curl "localhost:5564/api/books?action=list&limit=20&genre=Philosophy"
 
-### **❄️ Specialized Domains** → `snowflake-arctic-embed`
-- Domain-specific technical knowledge
-- Emerging specialized content types
+# Read a page
+curl "localhost:5564/api/books?action=page&id=100&page_num=1"
 
-## 🔐 **Enterprise-Grade Security**
+# RAG -- ask the library
+curl "localhost:5564/api/rag?q=What+do+the+books+say+about+power+and+knowledge"
 
-- **🔑 API Key Authentication**: Secure access control
-- **🔒 HTTPS Everywhere**: TLS 1.3 encryption
-- **🛡️ Input Validation**: SQL injection protection
-- **📝 Audit Logging**: Complete request/response tracking
-- **🚫 Rate Limiting**: Configurable per-key limits
-- **🔍 Security Monitoring**: Automated threat detection
-
-## 📱 **Integration Examples**
-
-### **iOS Shortcuts**
-```javascript
-// Quick semantic search from iPhone
-const response = await fetch('https://api.ashortstayinhell.com:5562/search', {
-    method: 'POST',
-    headers: { 'Authorization': 'Bearer YOUR_API_KEY' },
-    body: JSON.stringify({ q: 'artificial intelligence ethics', limit: 5 })
-});
+# Health
+curl "localhost:5564/api/health"
 ```
 
-### **Claude/ChatGPT Integration**
-```python
-# Perfect for AI agents
-import requests
+Full interactive API reference at `/api-docs/`
 
-def search_library(query, model_preference=None):
-    params = {
-        'api_key': os.environ['BABEL_API_KEY'],
-        'q': query,
-        'limit': 10,
-        'model': model_preference  # 'technical', 'creative', 'multilingual', 'general'
-    }
-    return requests.get('https://api.ashortstayinhell.com:5562/search', params=params)
-```
+## Website
 
-### **MCP (Model Context Protocol)**
-```json
-{
-  "name": "LibraryOfBabel",
-  "description": "Multi-modal semantic search across 8,673 books",
-  "baseUrl": "https://api.ashortstayinhell.com:5562",
-  "capabilities": ["semantic_search", "book_specific_search", "multi_modal_routing"]
-}
-```
+| Page | URL | Description |
+|---|---|---|
+| Landing | `/` | Search + seven modes overview |
+| Browse | `/browse/` | Book catalog, genre filters, infinite scroll, e-reader |
+| Search | `/demo/` | All 16 search modes |
+| API Docs | `/api-docs/` | Interactive reference with "Try it" |
+| Upload | `/upload/` | EPUB drag-and-drop upload |
 
-## 🛠️ **Development & Architecture**
+## Integrations
 
-### **Core Components**
-```
-LibraryOfBabel/
-├── src/                          # Core search & embedding systems
-│   ├── ollama_vector_embedder.py # 5-model embedding orchestration
-│   ├── phase2c_multi_model_embedder.py # Intelligent content routing
-│   └── postgresql_first_*.py    # Database-first processing
-├── scripts/                      # Automation & optimization
-├── daemons/                      # Background processing
-├── docs/                         # Comprehensive documentation
-└── config/                       # Security & performance tuning
-```
+### MCP (Claude Desktop)
 
-### **Technology Stack**
-- **Database**: PostgreSQL 15+ with pgvector
-- **AI Models**: 5 Ollama embedding models (13GB total)
-- **API**: Python Flask with production WSGI
-- **Security**: HTTPS, API keys, input validation
-- **Monitoring**: Comprehensive logging and metrics
-- **Integration**: MCP, REST API, WebSocket support
+MCP server at `/api/mcp` enables natural language queries against the library from Claude Desktop.
 
-## 🚀 **Recent Achievements**
+### Life Dashboard (:4500/research)
 
-### **🎉 Multi-Modal Enhancement (January 2025)**
-- ✅ Deployed 5 specialized AI embedding models
-- ✅ Built intelligent content classification system
-- ✅ Created PostgreSQL-First architecture for transparent upgrades
-- ✅ Tripled library size via automated Calibre integration (8,673 books)
-- ✅ Enhanced security with comprehensive .gitignore and secret management
+Highlights and audiomarks from reading are cross-referenced against the library:
+- **Find in Library** -- passage-level semantic search (prose mode, no NLP condensation)
+- **Mind Map** -- auto-clusters recent reading, finds library connections
+- **Themes** -- groups reading into book-based clusters with YAKE sublabels
+- **Reading Radar** -- recommends unread books based on recent patterns
+- **Search bar** -- two modes: Prose (raw passage) and Keywords (spaCy NLP extract)
 
-### **📈 Performance Optimization**
-- ✅ <200ms average API response times
-- ✅ Intelligent caching with 85%+ hit rates
-- ✅ Batch processing for 247,911 chunk re-embeddings
-- ✅ HNSW + IVFFlat indexing for each embedding model
-- ✅ Auto-scaling daemon management
+### iOS Shortcuts
 
-### **🔐 Security Hardening**
-- ✅ Removed all hardcoded secrets from codebase
-- ✅ Environment-based configuration management
-- ✅ Comprehensive hidden file protection
-- ✅ API key rotation and validation system
-- ✅ Security audit compliance
+Mobile-optimized endpoints at `/api/mobile/*` for random quotes, quick search, stats widgets.
 
-## 🔮 **Roadmap & Future Enhancements**
+## Operational notes
 
-### **Phase 2-5 Multi-Modal Completion (In Progress)**
-- 🔄 **Phase 2**: Add 4 new embedding columns to PostgreSQL schema
-- 🔄 **Phase 3**: Deploy intelligent content routing to production
-- 🔄 **Phase 4**: Re-embed all 247,911 chunks with optimal models
-- 🔄 **Phase 5**: Enhanced PostgreSQL semantic search functions
-
-### **Advanced Features (Q1 2025)**
-- 🎯 Real-time embedding updates for new books
-- 🌐 Multi-language detection and routing
-- 📊 Semantic similarity visualizations
-- 🤖 Advanced AI agent integration patterns
-- 📱 Mobile app with offline capabilities
-
-### **Enterprise Features**
-- 🏢 Multi-tenant architecture
-- 🔄 Real-time synchronization
-- 📈 Advanced analytics dashboard
-- 🌍 Global CDN deployment
-- 🛡️ Enterprise security compliance
-
-## 📞 **API Documentation**
-
-### **Search Endpoints**
-```
-GET  /search                    # Multi-modal semantic search
-GET  /books                     # Browse/filter book collection  
-GET  /books/{id}/search        # Search within specific book
-GET  /health                   # System status and metrics
-POST /search/batch             # Bulk search operations
-```
-
-### **E-Reader Endpoints**
-```
-GET  /api/books?action=page     # Dynamic word-count pagination
-     &id={book_id}              # Book identifier
-     &page_num={page}           # Page number (1-based)
-     &words_per_page={count}    # 100-2000 words (default: 1000)
-
-GET  /api/books?action=toc      # Table of contents navigation
-GET  /api/books?action=summary  # Book metadata and details
-```
-
-### **Dynamic Pagination Features**
-- **📖 Customizable Reading Experience**: Choose 100-2000 words per page
-- **🧭 Smart Navigation**: Environment-aware URLs for staging/production
-- **🎧 TTS Integration**: Ready-to-use URLs for automation workflows
-- **📱 iOS Shortcuts Compatible**: Perfect for mobile automation
-- **⚡ Sub-second Performance**: PostgreSQL-optimized pagination
-- **🔄 Backward Compatible**: Existing chunk-based pagination preserved
-
-### **Search Response Format**
-```json
-{
-  "status": "success",
-  "query": "quantum consciousness",
-  "model_used": "granite-embedding",
-  "routing_reason": "technical_academic_content",
-  "total_results": 147,
-  "response_time_ms": 89,
-  "results": [
-    {
-      "book_id": 1099,
-      "book_title": "Consciousness Explained",
-      "chunk_id": 15847,
-      "content": "The quantum theory of consciousness...",
-      "similarity_score": 0.94,
-      "content_classification": "technical_academic",
-      "embedding_model": "granite-embedding"
-    }
-  ]
-}
-```
-
-### **E-Reader Response Format**
-```json
-{
-  "success": true,
-  "data": {
-    "book_id": 1482,
-    "title": "Cloud Cuckoo Land",
-    "page_number": 1,
-    "content": "Konstance A fourteen-year-old girl sits cross-legged...",
-    "word_count": 500,
-    "words_per_page": 500,
-    "pagination_info": {
-      "total_pages": 281,
-      "total_words": 140048,
-      "word_range": { "start": 1, "end": 500 }
-    },
-    "navigation": {
-      "next_page": "/api/books?action=page&id=1482&page_num=2&words_per_page=500",
-      "next_page_url": "https://api.ashortstayinhell.com:5562/api/books?action=page&id=1482&page_num=2&words_per_page=500",
-      "previous_page_url": null,
-      "first_page": "/api/books?action=page&id=1482&page_num=1&words_per_page=500",
-      "last_page": "/api/books?action=page&id=1482&page_num=281&words_per_page=500"
-    }
-  },
-  "meta": {
-    "response_time_ms": 0.8,
-    "timestamp": "2025-01-17T02:36:21Z"
-  }
-}
-```
-
-## 🏆 **Why LibraryOfBabel?**
-
-1. **🧠 Multi-Modal Intelligence**: 5 AI models vs. competitors' single embedding
-2. **⚡ PostgreSQL-First**: Database-native performance vs. external vector stores  
-3. **🎯 Content-Aware Routing**: Intelligent model selection vs. one-size-fits-all
-4. **📈 Massive Scale**: 8,673+ books vs. typical hundreds
-5. **🔐 Production Security**: Enterprise-grade vs. hobby projects
-6. **📱 Universal Access**: Any platform vs. limited integrations
-7. **🚀 Continuous Innovation**: Active development vs. abandoned projects
-
----
-
-**LibraryOfBabel**: Where human knowledge meets artificial intelligence. 
-
-*Transform your library. Amplify your intelligence. Discover the impossible.*
-
-🔥 **[Start your semantic search journey today](https://api.ashortstayinhell.com:5562/health)** 🔥
-
----
-
-*Built with ❤️ for researchers, developers, and knowledge seekers everywhere.*
-*PostgreSQL-First Architecture • Multi-Modal AI • Production-Ready*
+- **Never leave ollama_reembed_parallel.py running** when all chunks are covered. It creates zombie DB connections that thrash disk I/O and block all queries.
+- **Statement timeout** is 120s (set in database.py). Vector search uses CTE pattern (HNSW first, then JOIN) to stay under this limit.
+- **Gemini credits are depleted**. The search pipeline skips Gemini and goes straight to Ollama for query embedding.
+- **Cost lesson**: Use average word count (510) for cost estimates, not median (210). The long tail of monster chunks makes avg >> median.
+- Run `ANALYZE chunks;` after killing zombie queries or bulk operations.
+- Check for zombie connections: `SELECT count(*) FROM pg_stat_activity WHERE state='active';`

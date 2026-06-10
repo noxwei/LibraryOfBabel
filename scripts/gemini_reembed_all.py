@@ -76,31 +76,77 @@ def get_unembedded_chunks(conn, batch_size=DB_BATCH):
         WHERE ce.chunk_id IS NULL
             AND c.content IS NOT NULL
             AND length(c.content) > 10
+            AND length(c.content) < 100000
+            AND NOT EXISTS (
+                SELECT 1 FROM chunk_embeddings ce2
+                WHERE ce2.chunk_id = c.chunk_id
+                AND ce2.embedding_model = 'nomic-embed-text-v2-moe'
+            )
         ORDER BY c.book_id
         LIMIT %s
     """, (EMBED_MODEL_NAME, batch_size))
     return cur.fetchall()
 
 
+def clean_text(text):
+    """Pre-clean text to minimize bad embeddings and API errors."""
+    import unicodedata
+    # Remove null bytes and control chars
+    text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
+    # Normalize unicode (CJK, accents, ligatures)
+    text = unicodedata.normalize('NFKC', text)
+    # Collapse whitespace
+    text = re.sub(r'\s+', ' ', text).strip()
+    # Remove excessive punctuation runs (e.g. "...........")
+    text = re.sub(r'([.\-_=*#~])\1{4,}', r'\1\1\1', text)
+    return text
+
+
+def is_junk(text):
+    """Skip chunks with no semantic value."""
+    words = text.split()
+    if len(words) < 5:
+        return True
+    # Numbers/punctuation only
+    if re.match(r'^[\d\s\.\,\-\(\)\[\]\/\:\;]+$', text):
+        return True
+    # Mostly digits (page number dumps, indices)
+    digit_ratio = sum(c.isdigit() for c in text) / max(len(text), 1)
+    if digit_ratio > 0.4:
+        return True
+    return False
+
+
+import re
+
 def batch_embed(texts: list) -> list:
     """Call Gemini batch embed API. Returns list of embedding vectors."""
     requests_body = []
     for text in texts:
-        truncated = text[:MAX_TEXT_LEN] if len(text) > MAX_TEXT_LEN else text
+        cleaned = clean_text(text)[:MAX_TEXT_LEN]
         requests_body.append({
             "model": f"models/{MODEL}",
-            "content": {"parts": [{"text": truncated}]},
+            "content": {"parts": [{"text": cleaned}]},
             "outputDimensionality": OUTPUT_DIM
         })
 
     resp = requests.post(BATCH_URL, json={"requests": requests_body}, timeout=60)
 
     if resp.status_code == 429:
-        # Rate limited — back off and retry
+        # Check if credits depleted vs rate limit
+        try:
+            err_msg = resp.json().get("error", {}).get("message", "")
+        except Exception:
+            err_msg = ""
+
+        if "credits are depleted" in err_msg or "prepayment" in err_msg.lower():
+            logger.error("CREDITS DEPLETED — stopping immediately to avoid wasting money")
+            raise SystemExit("Credits depleted")
+
+        # Genuine rate limit — back off once, don't retry more than once
         retry_delay = 30
         try:
-            err = resp.json()
-            for detail in err.get("error", {}).get("details", []):
+            for detail in resp.json().get("error", {}).get("details", []):
                 if "retryDelay" in str(detail):
                     delay_str = detail.get("retryDelay", "30s")
                     retry_delay = int(delay_str.replace("s", "")) + 5
@@ -109,6 +155,12 @@ def batch_embed(texts: list) -> list:
         logger.warning(f"Rate limited, waiting {retry_delay}s...")
         time.sleep(retry_delay)
         resp = requests.post(BATCH_URL, json={"requests": requests_body}, timeout=60)
+
+        # If still 429 after one retry, don't keep burning credits
+        if resp.status_code == 429:
+            logger.error("Still rate limited after retry — pausing 5 min")
+            time.sleep(300)
+            return []  # skip this batch, don't raise
 
     resp.raise_for_status()
     data = resp.json()
@@ -176,9 +228,15 @@ def main():
     }
     t0 = time.time()
 
+    consecutive_failures = 0
+    MAX_CONSECUTIVE_FAILURES = 5  # circuit breaker: stop after 5 failed batches in a row
+
     while not shutdown_requested:
         if MAX_CHUNKS and stats['embedded_this_run'] >= MAX_CHUNKS:
             logger.info(f"Budget cap reached: {stats['embedded_this_run']:,} chunks")
+            break
+        if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+            logger.error(f"Circuit breaker: {consecutive_failures} consecutive failures — stopping to avoid wasting credits")
             break
         rows = get_unembedded_chunks(conn, DB_BATCH)
         if not rows:
@@ -190,7 +248,9 @@ def main():
             if shutdown_requested:
                 break
 
-            sub_batch = rows[i:i + BATCH_SIZE]
+            sub_batch = [r for r in rows[i:i + BATCH_SIZE] if not is_junk(r['content'])]
+            if not sub_batch:
+                continue
             texts = [r['content'] for r in sub_batch]
 
             try:
@@ -198,6 +258,7 @@ def main():
                 stats['api_calls'] += 1
                 inserted = insert_embeddings(conn, sub_batch, embeddings)
                 stats['embedded_this_run'] += inserted
+                consecutive_failures = 0
                 time.sleep(THROTTLE_SECONDS)
 
             except requests.exceptions.HTTPError as e:
@@ -210,17 +271,21 @@ def main():
                         stats['api_calls'] += 1
                         inserted = insert_embeddings(conn, sub_batch, embeddings)
                         stats['embedded_this_run'] += inserted
+                        consecutive_failures = 0
                         time.sleep(THROTTLE_SECONDS)
                     except Exception as e2:
                         logger.error(f"Retry failed: {e2}")
                         stats['failed'] += len(sub_batch)
+                        consecutive_failures += 1
                 else:
                     logger.error(f"API error: {e}")
                     stats['failed'] += len(sub_batch)
+                    consecutive_failures += 1
 
             except Exception as e:
                 logger.error(f"Batch error: {e}")
                 stats['failed'] += len(sub_batch)
+                consecutive_failures += 1
 
         # Progress report every DB_BATCH
         elapsed = time.time() - t0

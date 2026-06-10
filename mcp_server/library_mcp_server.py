@@ -408,9 +408,11 @@ class LibraryMCPServer:
             # Get model analytics if requested
             if include_models:
                 model_stats = {}
-                for model in ["nomic", "bge", "mxbai", "arctic"]:
-                    cur.execute(f"SELECT COUNT(*) FROM chunks WHERE embedding_{model} IS NOT NULL")
-                    count = cur.fetchone()[0]
+                cur.execute("""
+                    SELECT embedding_model, COUNT(DISTINCT chunk_id)
+                    FROM chunk_embeddings GROUP BY embedding_model
+                """)
+                for model, count in cur.fetchall():
                     model_stats[model] = {
                         "embedded_chunks": count,
                         "coverage": f"{(count/total_chunks*100):.1f}%" if total_chunks > 0 else "0%"

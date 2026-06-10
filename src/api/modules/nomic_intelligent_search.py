@@ -28,7 +28,7 @@ class NomicIntelligentSearch:
     def __init__(self):
         self.gemini_api_key = os.getenv("GEMINIAPI_KEY", "")
         self.gemini_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent"
-        self.model_name = "gemini-embedding-001"
+        self.model_name = "nomic-embed-text-v2-moe"
         self.embedding_dim = 768
         # Fallback to Ollama if no Gemini key
         self.ollama_url = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434" if os.getenv("RUNNING_IN_CONTAINER") == "true" else "http://localhost:11434")
@@ -164,9 +164,8 @@ class NomicIntelligentSearch:
             return f"/api/books?action=page&id={book_id}&page_num=1&words_per_page={words_per_page}"
     
     def generate_query_embedding(self, query: str) -> Optional[List[float]]:
-        """Generate embedding for search query using Gemini API (fallback: Ollama)"""
-        if self.gemini_api_key:
-            return self._embed_via_gemini(query)
+        """Generate embedding for search query using Ollama (Gemini credits depleted)."""
+        # Gemini credits depleted — go straight to Ollama to avoid wasted API calls
         return self._embed_via_ollama(query)
 
     def _embed_via_gemini(self, query: str) -> Optional[List[float]]:
@@ -211,27 +210,42 @@ class NomicIntelligentSearch:
             return None
     
     def _run_vector_search(self, cur, vector_str: str, model_name: str, limit: int, genre_filter: Optional[str], sort_field: str) -> List[Dict]:
-        """Run a single vector search against a specific embedding model."""
+        """Run a single vector search against a specific embedding model.
+
+        Uses a CTE to do fast HNSW vector search first, then joins/filters
+        to avoid the planner pulling all chunks through expensive JOINs.
+        """
+        # Fetch more candidates than needed since some will be filtered out
+        candidate_multiplier = 5
+        candidate_limit = limit * candidate_multiplier
+
         base_query = """
+            WITH candidates AS (
+                SELECT ce.chunk_id, ce.book_id,
+                       (1.0 - (ce.embedding_vector <=> %s::vector)) as similarity_score
+                FROM chunk_embeddings ce
+                WHERE ce.embedding_model = %s
+                ORDER BY ce.embedding_vector <=> %s::vector
+                LIMIT %s
+            )
             SELECT
-                c.chunk_id,
-                c.book_id,
+                ca.chunk_id,
+                ca.book_id,
                 b.title,
                 b.author,
                 b.genre,
                 c.chunk_type,
                 c.word_count,
                 c.content,
-                (1.0 - (ce.embedding_vector <=> %s::vector)) as similarity_score
-            FROM chunks c
-            JOIN books b ON c.book_id = b.book_id
-            JOIN chunk_embeddings ce ON c.chunk_id = ce.chunk_id
-            WHERE ce.embedding_model = %s
-                AND c.chunk_type = 'chapter'
+                ca.similarity_score
+            FROM candidates ca
+            JOIN chunks c ON ca.chunk_id = c.chunk_id
+            JOIN books b ON ca.book_id = b.book_id
+            WHERE c.chunk_type = 'chapter'
                 AND c.word_count <= %s
                 AND c.content IS NOT NULL
         """
-        params = [vector_str, model_name, self.max_chapter_words]
+        params = [vector_str, model_name, vector_str, candidate_limit, self.max_chapter_words]
 
         if genre_filter:
             base_query += " AND b.genre ILIKE %s"
@@ -242,8 +256,7 @@ class NomicIntelligentSearch:
         elif sort_field == 'alpha_author':
             base_query += " ORDER BY b.author ASC, b.title ASC"
         else:
-            base_query += " ORDER BY ce.embedding_vector <=> %s::vector"
-            params.append(vector_str)
+            base_query += " ORDER BY ca.similarity_score DESC"
 
         base_query += " LIMIT %s"
         params.append(limit)
@@ -254,7 +267,7 @@ class NomicIntelligentSearch:
     def search_chapters_semantic(self, query: str, limit: int = 10, genre_filter: Optional[str] = None, sort_field: str = 'relevance') -> List[Dict]:
         """Semantic search with multi-model fallback: Gemini first, then nomic-v2-moe to fill gaps."""
 
-        # Generate Gemini query embedding
+        # Generate query embedding via Ollama (nomic-v2-moe)
         query_embedding = self.generate_query_embedding(query)
         if not query_embedding:
             raise Exception("Failed to generate query embedding")
@@ -265,26 +278,8 @@ class NomicIntelligentSearch:
 
                     vector_str = f"[{','.join(map(str, query_embedding))}]"
 
-                    # Primary: search Gemini embeddings
-                    rows = self._run_vector_search(cur, vector_str, 'gemini-embedding-001', limit, genre_filter, sort_field)
-
-                    # Fallback: if Gemini returned fewer than requested, backfill with nomic-v2-moe
-                    if len(rows) < limit:
-                        nomic_embedding = self._embed_via_ollama(query)
-                        if nomic_embedding:
-                            nomic_vec = f"[{','.join(map(str, nomic_embedding))}]"
-                            seen_chunks = {r['chunk_id'] for r in rows}
-                            nomic_rows = self._run_vector_search(cur, nomic_vec, 'nomic-embed-text-v2-moe', limit, genre_filter, sort_field)
-                            for nr in nomic_rows:
-                                if nr['chunk_id'] not in seen_chunks:
-                                    rows.append(nr)
-                                    seen_chunks.add(nr['chunk_id'])
-                                    if len(rows) >= limit:
-                                        break
-
-                    # Re-sort merged results by similarity
-                    if sort_field == 'relevance':
-                        rows.sort(key=lambda r: r['similarity_score'], reverse=True)
+                    # Search nomic-v2-moe embeddings (96.4% coverage, Gemini credits depleted)
+                    rows = self._run_vector_search(cur, vector_str, 'nomic-embed-text-v2-moe', limit, genre_filter, sort_field)
 
                     results = []
                     for row_dict in rows:

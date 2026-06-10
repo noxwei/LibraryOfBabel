@@ -35,7 +35,7 @@ def before_request():
 
 @standardized_books_bp.route('/api/books')
 @public_read
-@validate_params(action='list', id=5560, limit=20, page=1, format='json', sort='title', words_per_page=1000)
+@validate_params(action='list', id=5560, limit=20, page=1, format='json', sort='title', words_per_page=1000, genre='')
 def books_endpoint():
     """
     LEVEL 1 CORE: Standardized Books API
@@ -68,7 +68,8 @@ def books_endpoint():
         
         # ACTION ROUTING
         if action == 'list':
-            return _handle_books_list(limit, page, response_format, sort_field)
+            genre_filter = request.args.get('genre', '').strip()
+            return _handle_books_list(limit, page, response_format, sort_field, genre_filter)
             
         elif action == 'summary':
             return _handle_book_summary(book_id, response_format)
@@ -113,38 +114,78 @@ def books_endpoint():
             status_code=500
         )
 
-def _handle_books_list(limit: int, page: int, response_format: str, sort_field: str):
+def _handle_books_list(limit: int, page: int, response_format: str, sort_field: str, genre_filter: str = ''):
     """Handle books list action with standardized response - PostgreSQL-First ONLY"""
     try:
         # Validate and sanitize sort field
         valid_sort_fields = ['book_id', 'author', 'title', 'publication_date', 'word_count']
         if sort_field not in valid_sort_fields:
-            sort_field = 'title'  # Default to title if invalid
-        
-        # Secure ORDER BY clause mapping to prevent SQL injection
+            sort_field = 'title'
+
         ORDER_BY_CLAUSES = {
             'book_id': 'ORDER BY book_id',
             'author': 'ORDER BY author, title',
-            'title': 'ORDER BY title', 
+            'title': 'ORDER BY title',
             'publication_date': 'ORDER BY publication_date DESC NULLS LAST, title',
             'word_count': 'ORDER BY word_count DESC NULLS LAST, title'
         }
         order_by_clause = ORDER_BY_CLAUSES.get(sort_field, ORDER_BY_CLAUSES['title'])
-        
-        # Use direct SQL query approach with dynamic sorting
+
+        # Build WHERE clause for genre filter
+        where_clause = ''
+        query_params = [limit, (page - 1) * limit]
+        if genre_filter:
+            where_clause = 'WHERE genre ILIKE %s'
+            query_params = [genre_filter, limit, (page - 1) * limit]
+
         from .database import get_db
         with get_db() as conn:
             with conn.cursor() as cur:
-                cur.execute(f"""
-                    WITH book_data AS (
-                        SELECT book_id, title, author, publication_date, genre, word_count, processed_date
-                        FROM books 
-                        {order_by_clause}
-                        LIMIT %s OFFSET %s
-                    ),
-                    total_count AS (
-                        SELECT COUNT(*) as total_books FROM books
-                    )
+                if genre_filter:
+                    cur.execute(f"""
+                        WITH book_data AS (
+                            SELECT book_id, title, author, publication_date, genre, word_count, processed_date
+                            FROM books
+                            WHERE genre ILIKE %s
+                            {order_by_clause}
+                            LIMIT %s OFFSET %s
+                        ),
+                        total_count AS (
+                            SELECT COUNT(*) as total_books FROM books WHERE genre ILIKE %s
+                        )""" + """
+                        SELECT json_build_object(
+                            'success', true,
+                            'data', json_build_object(
+                                'books', json_agg(
+                                    json_build_object(
+                                        'book_id', book_id,
+                                        'title', title,
+                                        'author', author,
+                                        'publication_date', publication_date,
+                                        'genre', COALESCE(genre, 'Unknown'),
+                                        'word_count', word_count,
+                                        'processed_date', processed_date
+                                    ) ORDER BY title
+                                ),
+                                'total_count', (SELECT total_books FROM total_count),
+                                'limit', %s,
+                                'page', %s,
+                                'sort_by', %s
+                            )
+                        )
+                        FROM book_data
+                    """, (genre_filter, limit, (page - 1) * limit, genre_filter, limit, page, sort_field))
+                else:
+                    cur.execute(f"""
+                        WITH book_data AS (
+                            SELECT book_id, title, author, publication_date, genre, word_count, processed_date
+                            FROM books
+                            {order_by_clause}
+                            LIMIT %s OFFSET %s
+                        ),
+                        total_count AS (
+                            SELECT COUNT(*) as total_books FROM books
+                        )
                     SELECT json_build_object(
                         'success', true,
                         'data', json_build_object(
@@ -362,42 +403,40 @@ def books_chapter_navigation():
         params = request.validated_params
         book_id = params['id']
         chapter = params['chapter']
-        
-        # PostgreSQL-First ONLY - use existing book chunk functions
-        try:
-            # Use existing api_get_book_chunks to find chapter content
-            # Get chunks for this book filtered by chapter
-            result = execute_pg_function('api_get_book_chunks', book_id, 1, 1)
-            
-            if result and len(result) > 0:
-                # Find the first chunk of the requested chapter
-                for chunk_data in result:
-                    if isinstance(chunk_data, dict) and chunk_data.get('chapter_number') == chapter:
-                        # Found the chapter, get the page content
-                        page_result = execute_pg_function('api_shortcuts_book_page', book_id, 1)
-                        return create_single_item_response(page_result)
-                
-                # Chapter not found
-                return create_error_response(
-                    message=f"Chapter {chapter} not found in book {book_id}",
-                    code="CHAPTER_NOT_FOUND",
-                    status_code=404
-                )
-            else:
-                return create_error_response(
-                    message=f"No content found for book {book_id}",
-                    code="BOOK_NOT_FOUND",
-                    status_code=404
-                )
-                
-        except Exception as e:
-            logger.error(f"Chapter navigation PostgreSQL error: {e}")
+
+        # Get TOC to find chapter's starting page
+        toc_result = execute_pg_function('api_shortcuts_book_toc', book_id)
+        if isinstance(toc_result, dict) and not toc_result.get('success', True):
             return create_error_response(
-                message=f"Failed to navigate to chapter {chapter} in book {book_id}",
-                code="CHAPTER_NAVIGATION_ERROR",
-                status_code=500
+                message=f"Book {book_id} not found",
+                code="BOOK_NOT_FOUND",
+                status_code=404
             )
-                    
+
+        # Parse TOC to find the chapter
+        chapters = []
+        if isinstance(toc_result, dict):
+            chapters = toc_result.get('chapters', toc_result.get('data', {}).get('chapters', []))
+        elif isinstance(toc_result, list):
+            chapters = toc_result
+
+        target_page = None
+        for ch in chapters:
+            if isinstance(ch, dict) and ch.get('chapter_number') == chapter:
+                target_page = ch.get('start_page', ch.get('page', 1))
+                break
+
+        if target_page is None:
+            return create_error_response(
+                message=f"Chapter {chapter} not found in book {book_id}",
+                code="CHAPTER_NOT_FOUND",
+                status_code=404
+            )
+
+        # Get the page content at chapter start
+        page_result = execute_pg_function('api_shortcuts_book_page', book_id, target_page)
+        return create_single_item_response(page_result)
+
     except Exception as e:
         logger.error(f"Chapter navigation error: {e}")
         return create_error_response(

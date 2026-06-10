@@ -19,6 +19,11 @@ import os
 import sys
 import logging
 from flask import Flask, jsonify, send_from_directory
+from dotenv import load_dotenv
+
+# Load project .env (API_KEY etc.) before any module reads the environment
+PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+load_dotenv(os.path.join(PROJECT_ROOT, '.env'))
 
 # Add the parent directory to the path so we can import modules
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -71,12 +76,16 @@ def get_cors_origins():
     if env_origins:
         return env_origins.split(',')
     
-    # Default origins for different environments
+    # Default origins: localhost dev + Tailscale-only access (no public domain)
     default_origins = [
         "http://localhost:3000",
         "http://localhost:3001",
-        "https://api.ashortstayinhell.com",
-        "https://api.ashortstayinhell.com:5562",
+        "http://100.71.141.45:5562",
+        "http://100.71.141.45:5564",
+        "http://weixiangs-mac-mini:5562",
+        "http://weixiangs-mac-mini:5564",
+        "http://100.71.141.45:4500",
+        "http://weixiangs-mac-mini:4500",
     ]
     
     # Add container-specific origins if running in container

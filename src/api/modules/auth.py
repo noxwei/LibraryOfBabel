@@ -11,8 +11,10 @@ SECURITY FIXES:
 
 import os
 import re
+import time
 import logging
 import secrets
+from collections import defaultdict, deque
 from functools import wraps
 from flask import request, jsonify
 
@@ -21,8 +23,8 @@ security_logger = logging.getLogger('security')
 
 
 def get_api_key():
-    """Get API key from environment"""
-    return os.getenv('API_KEY', 'your-secret-api-key')
+    """Get API key from environment (no default — fail closed)"""
+    return os.getenv('API_KEY')
 
 
 def validate_input(value, param_name, max_length=1000, allow_special=False):
@@ -61,6 +63,10 @@ def verify_api_key():
     """Verify API key from request headers (SECURE - NO QUERY PARAMS)"""
     api_key = get_api_key()
     client_ip = request.remote_addr
+
+    if not api_key:
+        security_logger.error("API_KEY not configured - rejecting all authenticated requests")
+        return False
     
     # Check for API-Key header (primary)
     request_key = request.headers.get('API-Key')
@@ -144,6 +150,33 @@ def require_auth_unless_localhost(f):
     return decorated_function
 
 
+RATE_LIMIT_PER_MINUTE = int(os.getenv('RATE_LIMIT_PER_MINUTE', '60'))
+_rate_buckets = defaultdict(deque)
+
+
+def check_rate_limit():
+    """Sliding-window per-IP rate limit. Localhost exempt."""
+    if is_localhost():
+        return True
+    now = time.time()
+    bucket = _rate_buckets[request.remote_addr]
+    while bucket and now - bucket[0] > 60:
+        bucket.popleft()
+    if len(bucket) >= RATE_LIMIT_PER_MINUTE:
+        security_logger.warning(f"Rate limit exceeded for {request.remote_addr}")
+        return False
+    bucket.append(now)
+    return True
+
+
+def _rate_limited_response():
+    return jsonify({
+        'success': False,
+        'error': 'Rate limit exceeded',
+        'message': f'Maximum {RATE_LIMIT_PER_MINUTE} requests per minute'
+    }), 429
+
+
 def public_read(f):
     """Decorator for public read-only endpoints.
 
@@ -153,6 +186,8 @@ def public_read(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        if not check_rate_limit():
+            return _rate_limited_response()
         if request.method == 'GET':
             # Public read access — no auth required
             return f(*args, **kwargs)

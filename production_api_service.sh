@@ -2,9 +2,9 @@
 # LibraryOfBabel API Service Manager
 # Provides start/stop/restart/status commands for the API
 
-API_PID_FILE="/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/api.pid"
-API_LOG_FILE="/Users/weixiangzhang/Local_Dev/LibraryOfBabel/logs/api_persistent.log"
-API_SCRIPT="/Users/weixiangzhang/Local_Dev/LibraryOfBabel/start_api_daemon.sh"
+API_PID_FILE="/Users/weixiangzhang/Local_Dev/projects/LibraryOfBabel/logs/api.pid"
+API_LOG_FILE="/Users/weixiangzhang/Local_Dev/projects/LibraryOfBabel/logs/api_persistent.log"
+API_SCRIPT="/Users/weixiangzhang/Local_Dev/projects/LibraryOfBabel/start_api_daemon.sh"
 
 start_api() {
     if [ -f "$API_PID_FILE" ] && kill -0 "$(cat "$API_PID_FILE")" 2>/dev/null; then
@@ -13,14 +13,14 @@ start_api() {
     fi
     
     echo "Starting LibraryOfBabel API..."
-    cd /Users/weixiangzhang/Local_Dev/LibraryOfBabel
+    cd /Users/weixiangzhang/Local_Dev/projects/LibraryOfBabel
     nohup "$API_SCRIPT" > "$API_LOG_FILE" 2>&1 &
     echo $! > "$API_PID_FILE"
     sleep 2
     
     if kill -0 "$(cat "$API_PID_FILE")" 2>/dev/null; then
         echo "✅ API started successfully (PID: $(cat "$API_PID_FILE"))"
-        echo "📊 Test: curl -s https://api.ashortstayinhell.com:5562/health"
+        echo "📊 Test: curl -s http://localhost:5562/health"
     else
         echo "❌ Failed to start API"
         return 1
@@ -57,8 +57,8 @@ status_api() {
     if [ -f "$API_PID_FILE" ] && kill -0 "$(cat "$API_PID_FILE")" 2>/dev/null; then
         PID=$(cat "$API_PID_FILE")
         echo "✅ API is running (PID: $PID)"
-        echo "📊 Health check: $(curl -s https://api.ashortstayinhell.com:5562/health | jq -r '.status' 2>/dev/null || echo 'Failed')"
-        echo "🔗 MCP endpoint: $(curl -s https://api.ashortstayinhell.com:5562/api/mcp | jq -r '.data.name' 2>/dev/null || echo 'Failed')"
+        echo "📊 Health check: $(curl -s http://localhost:5562/health | jq -r '.status' 2>/dev/null || echo 'Failed')"
+        echo "🔗 MCP endpoint: $(curl -s http://localhost:5562/api/mcp | jq -r '.data.name' 2>/dev/null || echo 'Failed')"
     else
         echo "❌ API is not running"
         return 1

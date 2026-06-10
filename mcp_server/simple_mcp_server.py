@@ -304,11 +304,13 @@ class SimpleMCPServer:
             # Model analytics
             if include_models:
                 result_text += f"**🧠 AI Models**\\n"
-                for model in ["nomic", "bge", "mxbai", "arctic"]:
-                    cur.execute(f"SELECT COUNT(*) FROM chunks WHERE embedding_{model} IS NOT NULL")
-                    count = cur.fetchone()[0]
+                cur.execute("""
+                    SELECT embedding_model, COUNT(DISTINCT chunk_id)
+                    FROM chunk_embeddings GROUP BY embedding_model
+                """)
+                for model, count in cur.fetchall():
                     coverage = (count/total_chunks*100) if total_chunks > 0 else 0
-                    result_text += f"• {model.upper()}: {count:,} ({coverage:.1f}%)\\n"
+                    result_text += f"• {model}: {count:,} ({coverage:.1f}%)\\n"
             
             result_text += f"\\n**Updated**: {datetime.now().strftime('%H:%M:%S')}"
             

@@ -38,7 +38,7 @@ def before_request():
 
 @standardized_search_bp.route('/api/search')
 @public_read
-@validate_params(q=None, action='search', limit=20, page=1, format='json', sort='relevance', id=None, title=None, author=None, description=None, genre=None, embedding_model='gemini-embedding-001', ensemble=False)
+@validate_params(q=None, action='search', limit=20, page=1, format='json', sort='relevance', id=None, title=None, author=None, description=None, genre=None, embedding_model='nomic-embed-text-v2-moe', ensemble=False)
 def search_endpoint():
     """
     LEVEL 1 CORE: Standardized Search API
@@ -50,7 +50,7 @@ def search_endpoint():
     - books: Comprehensive book metadata search (title, author, description, genre)
     - has_results: Check if results exist
     - semantic: Semantic vector search (book-level results)
-    - semantic_passages: Intelligent chapter-level semantic search with smart content previews (gemini-embedding-001)
+    - semantic_passages: Intelligent chapter-level semantic search with smart content previews (nomic-embed-text-v2-moe)
     - concept: Concept-based search
     - passage: Passage similarity search
     - emotional: Emotional content search
@@ -67,7 +67,7 @@ def search_endpoint():
     - page: integer (page number, default: 1)
     - format: string (json|simple, default: json)
     - sort: string (relevance|title|author|word_count|publication_date, default: relevance)
-    - embedding_model: string (gemini-embedding-001|snowflake-arctic-embed2|bge-m3, default: gemini-embedding-001)
+    - embedding_model: string (nomic-embed-text-v2-moe, default — all semantic actions use the nomic CTE path)
     - ensemble: boolean (use multiple models for better accuracy, default: false)
     """
     try:
@@ -78,7 +78,14 @@ def search_endpoint():
         page = params['page']
         response_format = params['format']
         sort_field = params.get('sort', 'relevance')
-        
+
+        if not query or not str(query).strip():
+            return create_error_response(
+                message="Missing required parameter: q",
+                code="MISSING_QUERY_PARAMETER",
+                status_code=400
+            )
+
         # ACTION ROUTING - All PostgreSQL functions
         if action == 'search':
             return _handle_basic_search(query, limit, response_format, sort_field)
@@ -96,12 +103,11 @@ def search_endpoint():
             return _handle_has_results(query, response_format)
             
         elif action == 'semantic':
-            embedding_model = params.get('embedding_model', 'gemini-embedding-001')
-            ensemble = params.get('ensemble', False)
-            return _handle_semantic_search(query, limit, response_format, sort_field, embedding_model, ensemble)
-            
+            # Redirect to nomic intelligent search — pg function path uses a
+            # zero-vector placeholder embedding (returns NaN similarities)
+            return _handle_nomic_intelligent_search(query, limit, response_format, sort_field=sort_field)
+
         elif action == 'semantic_passages':
-            embedding_model = params.get('embedding_model', 'gemini-embedding-001')
             genre_filter = request.args.get('genre')
             if genre_filter and (len(genre_filter) > 100 or not re.match(r'^[a-zA-Z0-9\s\-\']+$', genre_filter)):
                 return create_error_response(
@@ -113,11 +119,12 @@ def search_endpoint():
             return _handle_nomic_intelligent_search(query, limit, response_format, genre_filter, sort_field)
             
         elif action == 'concept':
-            threshold = min(max(float(request.args.get('threshold', 0.4)), 0.1), 1.0)
-            return _handle_concept_search(query, threshold, limit, response_format, sort_field)
-            
+            # Redirect to nomic intelligent search — pg function hardcodes
+            # nomic v1 (6.7% coverage) with a zero-vector placeholder
+            return _handle_nomic_intelligent_search(query, limit, response_format, sort_field=sort_field)
+
         elif action == 'passage':
-            return _handle_passage_search(query, limit, response_format, sort_field)
+            return _handle_nomic_intelligent_search(query, limit, response_format, sort_field=sort_field)
             
         elif action == 'emotional':
             book_filter = request.args.get('book_id', type=int)
@@ -129,20 +136,13 @@ def search_endpoint():
             return _handle_highlighted_search(query, limit, snippet_length, response_format, sort_field, book_id)
             
         elif action == 'advanced':
-            return _handle_advanced_search(query, limit, response_format, sort_field)
-            
-        elif action == 'discovery':
-            embedding_model = params.get('embedding_model', 'gemini-embedding-001')
-            return _handle_discovery_search(query, limit, response_format, sort_field, embedding_model)
-            
-        elif action == 'style':
-            embedding_model = params.get('embedding_model', 'gemini-embedding-001')
-            return _handle_style_search(query, limit, response_format, sort_field, embedding_model)
-            
-        elif action == 'quality':
-            embedding_model = params.get('embedding_model', 'gemini-embedding-001')
-            quality_threshold = min(max(float(request.args.get('quality_threshold', 0.6)), 0.1), 1.0)
-            return _handle_quality_search(query, limit, response_format, sort_field, embedding_model, quality_threshold)
+            # Redirect to nomic intelligent search — trigram scan too slow on 112GB DB
+            return _handle_nomic_intelligent_search(query, limit, response_format, sort_field=sort_field)
+
+        elif action in ('discovery', 'style', 'quality'):
+            # Redirect to nomic intelligent search — pg function path rejects
+            # all current models and embeds queries as zero vectors
+            return _handle_nomic_intelligent_search(query, limit, response_format, sort_field=sort_field)
         
         elif action == 'author_influence':
             # Author influence network analysis
@@ -476,7 +476,7 @@ def _handle_nomic_intelligent_search(query: str, limit: int, response_format: st
                 enhanced_item = item.copy()
                 enhanced_item['search_metadata'] = {
                     'search_type': 'nomic_intelligent_chapter_search',
-                    'model': 'gemini-embedding-001',
+                    'model': 'nomic-embed-text-v2-moe',
                     'intelligent_preview': True,
                     'max_chapter_words': metadata['max_chapter_words'],
                     'genre_filter': genre_filter

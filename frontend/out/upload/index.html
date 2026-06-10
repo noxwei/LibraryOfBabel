@@ -1,4 +1,243 @@
-<!DOCTYPE html><html lang="en" class="__variable_f367f3 __variable_3c557b"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" href="/_next/static/media/bb3ef058b751a6ad-s.p.woff2" as="font" crossorigin="" type="font/woff2"/><link rel="preload" href="/_next/static/media/e4af272ccee01ff0-s.p.woff2" as="font" crossorigin="" type="font/woff2"/><link rel="stylesheet" href="/_next/static/css/68d553d975e708be.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack-b7043c012fe82d52.js"/><script src="/_next/static/chunks/fd9d1056-f2c2e16e27628020.js" async=""></script><script src="/_next/static/chunks/23-f3c01f2be3c31d68.js" async=""></script><script src="/_next/static/chunks/main-app-d03196f28b7e10c9.js" async=""></script><script src="/_next/static/chunks/app/upload/page-1a6bea099048c429.js" async=""></script><script src="/_next/static/chunks/336-01094d69a3cd0021.js" async=""></script><script src="/_next/static/chunks/app/layout-283b0a5cbcc03ae3.js" async=""></script><title>LibraryOfBabel - Multi-Modal AI Search</title><meta name="description" content="Search 247,911 passages across 8,673 books with 5 specialized AI models"/><meta name="next-size-adjust"/><script src="/_next/static/chunks/polyfills-78c92fac7aa8fdd8.js" noModule=""></script></head><body class="min-h-screen bg-bg-primary text-text-primary"><div class="min-h-screen bg-bg-primary"><div class="container mx-auto px-4 py-8 max-w-4xl"><div class="mb-8"><h1 class="text-3xl font-bold mb-2">Upload Books</h1><p class="text-text-secondary">Upload EPUB files to add them to the Library of Babel. Files will be processed, chunked, and queued for embedding.</p></div><div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"><div class="bg-bg-card rounded-xl border border-gray-800 p-4 text-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-8 h-8 mx-auto mb-2 text-blue-400"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg><p class="font-medium text-sm">1. Extract</p><p class="text-text-secondary text-xs">Parse EPUB metadata &amp; content</p></div><div class="bg-bg-card rounded-xl border border-gray-800 p-4 text-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap w-8 h-8 mx-auto mb-2 text-yellow-400"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><p class="font-medium text-sm">2. Chunk</p><p class="text-text-secondary text-xs">Split into semantic passages</p></div><div class="bg-bg-card rounded-xl border border-gray-800 p-4 text-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database w-8 h-8 mx-auto mb-2 text-green-400"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg><p class="font-medium text-sm">3. Ingest</p><p class="text-text-secondary text-xs">Store in PostgreSQL</p></div><div class="bg-bg-card rounded-xl border border-gray-800 p-4 text-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu w-8 h-8 mx-auto mb-2 text-purple-400"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M2 9h2"></path><path d="M20 15h2"></path><path d="M20 9h2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path></svg><p class="font-medium text-sm">4. Embed</p><p class="text-text-secondary text-xs">Generate nomic vectors</p></div></div><div class="space-y-6"><div class="
-          relative border-2 border-dashed rounded-xl p-8 text-center transition-all
-          border-gray-700 hover:border-gray-600 bg-bg-card
-        "><input type="file" accept=".epub" multiple="" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"/><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload w-12 h-12 mx-auto mb-4 text-text-secondary"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg><p class="text-lg font-medium mb-1">Drag &amp; drop EPUB files</p><p class="text-text-secondary text-sm">or click to browse (max 100MB per file)</p></div></div><div class="mt-8 bg-bg-card rounded-xl border border-gray-800 p-4"><h3 class="font-medium mb-2">Processing Notes</h3><ul class="text-text-secondary text-sm space-y-1"><li>Extraction, chunking, and ingestion happen immediately after upload.</li><li>Embedding is queued for background processing (nomic overnight embedder).</li><li>Books will be searchable once embedding completes.</li><li>Maximum file size: 100MB per EPUB.</li><li>Supported format: EPUB only (no PDF, MOBI, etc.)</li></ul></div></div></div><script src="/_next/static/chunks/webpack-b7043c012fe82d52.js" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0]);self.__next_f.push([2,null])</script><script>self.__next_f.push([1,"1:HL[\"/_next/static/media/bb3ef058b751a6ad-s.p.woff2\",\"font\",{\"crossOrigin\":\"\",\"type\":\"font/woff2\"}]\n2:HL[\"/_next/static/media/e4af272ccee01ff0-s.p.woff2\",\"font\",{\"crossOrigin\":\"\",\"type\":\"font/woff2\"}]\n3:HL[\"/_next/static/css/68d553d975e708be.css\",\"style\"]\n"])</script><script>self.__next_f.push([1,"4:I[5751,[],\"\"]\n6:I[6513,[],\"ClientPageRoot\"]\n7:I[2437,[\"676\",\"static/chunks/app/upload/page-1a6bea099048c429.js\"],\"default\"]\n8:I[9275,[],\"\"]\n9:I[1343,[],\"\"]\na:I[3566,[\"336\",\"static/chunks/336-01094d69a3cd0021.js\",\"185\",\"static/chunks/app/layout-283b0a5cbcc03ae3.js\"],\"Providers\"]\nc:I[6130,[],\"\"]\nd:[]\n"])</script><script>self.__next_f.push([1,"0:[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/css/68d553d975e708be.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\"}]],[\"$\",\"$L4\",null,{\"buildId\":\"CHOe9EY1cQ4oyA6FWya3l\",\"assetPrefix\":\"\",\"initialCanonicalUrl\":\"/upload/\",\"initialTree\":[\"\",{\"children\":[\"upload\",{\"children\":[\"__PAGE__\",{}]}]},\"$undefined\",\"$undefined\",true],\"initialSeedData\":[\"\",{\"children\":[\"upload\",{\"children\":[\"__PAGE__\",{},[[\"$L5\",[\"$\",\"$L6\",null,{\"props\":{\"params\":{},\"searchParams\":{}},\"Component\":\"$7\"}]],null],null]},[\"$\",\"$L8\",null,{\"parallelRouterKey\":\"children\",\"segmentPath\":[\"children\",\"upload\",\"children\"],\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L9\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"notFoundStyles\":\"$undefined\",\"styles\":null}],null]},[[\"$\",\"html\",null,{\"lang\":\"en\",\"className\":\"__variable_f367f3 __variable_3c557b\",\"children\":[\"$\",\"body\",null,{\"className\":\"min-h-screen bg-bg-primary text-text-primary\",\"children\":[\"$\",\"$La\",null,{\"children\":[\"$\",\"$L8\",null,{\"parallelRouterKey\":\"children\",\"segmentPath\":[\"children\"],\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L9\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"}],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}}],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":\"404\"}],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"}]}]]}]}]],\"notFoundStyles\":[],\"styles\":null}]}]}]}],null],null],\"couldBeIntercepted\":false,\"initialHead\":[false,\"$Lb\"],\"globalErrorComponent\":\"$c\",\"missingSlots\":\"$Wd\"}]]\n"])</script><script>self.__next_f.push([1,"b:[[\"$\",\"meta\",\"0\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}],[\"$\",\"meta\",\"1\",{\"charSet\":\"utf-8\"}],[\"$\",\"title\",\"2\",{\"children\":\"LibraryOfBabel - Multi-Modal AI Search\"}],[\"$\",\"meta\",\"3\",{\"name\":\"description\",\"content\":\"Search 247,911 passages across 8,673 books with 5 specialized AI models\"}],[\"$\",\"meta\",\"4\",{\"name\":\"next-size-adjust\"}]]\n5:null\n"])</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload - Library of Babel</title>
+<meta name="description" content="Upload EPUB files to the Library of Babel.">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf7f2;--raised:#fff;--surface:#f3efe8;--border:#e2dbd2;--border-s:#ece6dd;--text:#2c2420;--sec:#756a62;--ter:#998b80;--accent:#6b8f71;--acc-l:#e8f0e9;--warm:#c4956a;--warm-l:#f5ece3;--serif:'Newsreader',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--mono:'DM Mono',Menlo,monospace;--r:12px;--rs:8px;--sh:0 2px 8px rgba(44,36,32,.06);color-scheme:light}
+[data-theme=dark]{--bg:#1a1714;--raised:#221f1a;--surface:#2a2620;--border:#3a342c;--border-s:#322c25;--text:#e8e2d9;--sec:#9b8e82;--ter:#7a6f65;--accent:#8fb896;--acc-l:rgba(143,184,150,.12);--warm:#d4a574;--warm-l:rgba(212,165,116,.12);--sh:0 2px 8px rgba(0,0,0,.2);color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{font-family:var(--sans);font-size:15px;line-height:1.6;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.pg{max-width:760px;margin:0 auto;padding:0 28px 100px}
+.tm{position:fixed;top:20px;right:20px;z-index:100;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--raised);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--sec);transition:all .2s;box-shadow:var(--sh)}.tm:hover{border-color:var(--accent);color:var(--text)}
+nav.bar{display:flex;gap:12px;justify-content:center;padding:24px 0 0;flex-wrap:wrap}
+nav.bar a{font-family:var(--sans);font-size:.8rem;font-weight:500;color:var(--sec);padding:6px 14px;border-radius:var(--rs);transition:color .2s}nav.bar a:hover{color:var(--accent);text-decoration:none}nav.bar a.active{color:var(--accent);background:var(--acc-l)}
+.hdr{padding:48px 0 0;text-align:center}
+.hdr h1{font-family:var(--serif);font-weight:300;font-size:2.2rem;letter-spacing:-.03em;line-height:1.1}
+.hdr p{font-family:var(--serif);font-style:italic;font-weight:300;font-size:.95rem;color:var(--ter);margin:8px auto 0;max-width:440px}
+.rule{width:50px;height:1px;background:var(--warm);margin:28px auto;opacity:.5}
+.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:40px}
+.pipe-step{background:var(--raised);border:1px solid var(--border);border-radius:var(--r);padding:16px 12px;text-align:center;position:relative}
+.pipe-step .ps-num{font-family:var(--mono);font-size:.7rem;color:var(--warm);margin-bottom:4px}
+.pipe-step .ps-name{font-family:var(--serif);font-weight:500;font-size:.95rem;margin-bottom:4px}
+.pipe-step .ps-desc{font-size:.75rem;color:var(--ter);line-height:1.4}
+.pipe-step.done{border-color:var(--accent)}.pipe-step.done .ps-num{color:var(--accent)}
+.pipe-step.active{border-color:var(--warm);background:var(--warm-l)}.pipe-step.active .ps-num{color:var(--warm)}
+.pipe-step.error{border-color:#c46a6a}.pipe-step.error .ps-num{color:#c46a6a}
+.drop-zone{border:2px dashed var(--border);border-radius:var(--r);padding:48px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--raised);margin-bottom:24px;position:relative}
+.drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:var(--acc-l)}
+.drop-zone input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.drop-zone .dz-icon{font-size:2rem;color:var(--ter);margin-bottom:8px}
+.drop-zone .dz-main{font-family:var(--serif);font-size:1.05rem;color:var(--text);margin-bottom:4px}
+.drop-zone .dz-sub{font-size:.8rem;color:var(--ter)}
+.upload-btn{display:block;width:100%;font-family:var(--sans);font-size:.85rem;font-weight:500;padding:12px 24px;border:none;border-radius:var(--rs);background:var(--accent);color:#fff;cursor:pointer;transition:opacity .2s;margin-bottom:24px}
+[data-theme=dark] .upload-btn{color:#1a1714}.upload-btn:hover{opacity:.85}.upload-btn:disabled{opacity:.4;cursor:default}
+.file-list{margin-bottom:20px}
+.file-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--raised);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:6px;font-size:.85rem}
+.file-item .fi-name{font-family:var(--serif);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item .fi-size{font-family:var(--mono);font-size:.7rem;color:var(--ter);white-space:nowrap}
+.file-item .fi-remove{background:none;border:none;color:var(--ter);cursor:pointer;font-size:1rem;padding:0 4px;transition:color .2s}.file-item .fi-remove:hover{color:#c46a6a}
+.status-area{margin-top:24px}
+.status-card{background:var(--raised);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:12px}
+.status-card .sc-title{font-family:var(--serif);font-size:1rem;font-weight:500;margin-bottom:4px}
+.status-card .sc-status{font-family:var(--mono);font-size:.78rem;margin-bottom:8px}
+.status-card .sc-status.pending{color:var(--ter)}
+.status-card .sc-status.processing{color:var(--warm)}
+.status-card .sc-status.done{color:var(--accent)}
+.status-card .sc-status.error{color:#c46a6a}
+.progress-bar{width:100%;height:4px;background:var(--surface);border-radius:2px;overflow:hidden;margin-top:8px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+.notes{background:var(--surface);border-radius:var(--r);padding:18px 20px;margin-top:32px}
+.notes h3{font-family:var(--serif);font-weight:400;font-size:.95rem;margin-bottom:8px;color:var(--sec)}
+.notes ul{list-style:none;padding:0}
+.notes li{font-size:.82rem;color:var(--ter);line-height:1.7;padding-left:14px;position:relative}
+.notes li::before{content:'\2013';position:absolute;left:0;color:var(--border)}
+.empty{text-align:center;color:var(--ter);font-style:italic;padding:24px 0;font-family:var(--serif)}
+.ft{text-align:center;padding:48px 0 24px;border-top:1px solid var(--border-s);font-family:var(--serif);font-style:italic;font-size:.85rem;color:var(--ter)}
+@media(max-width:640px){.hdr h1{font-size:1.8rem}.pipeline{grid-template-columns:repeat(2,1fr)}}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.hdr,.pipeline,.drop-zone{animation:fu .5s ease both}.pipeline{animation-delay:.1s}.drop-zone{animation-delay:.15s}
+</style>
+</head>
+<body>
+<button class="tm" onclick="toggleTheme()" title="Toggle theme">&#9789;</button>
+<div class="pg">
+<nav class="bar">
+  <a href="/">Home</a>
+  <a href="/browse/">Browse</a>
+  <a href="/demo/">Search</a>
+  <a href="/api-docs/">API</a>
+  <a href="/upload/" class="active">Upload</a>
+</nav>
+<header class="hdr">
+  <h1>Upload a Book</h1>
+  <p>Add EPUB files to the library for processing and embedding</p>
+  <div class="rule"></div>
+</header>
+<div class="pipeline" id="pipeline">
+  <div class="pipe-step" id="step-extract"><div class="ps-num">i.</div><div class="ps-name">Extract</div><div class="ps-desc">Parse EPUB metadata and content</div></div>
+  <div class="pipe-step" id="step-chunk"><div class="ps-num">ii.</div><div class="ps-name">Chunk</div><div class="ps-desc">Split into semantic passages</div></div>
+  <div class="pipe-step" id="step-ingest"><div class="ps-num">iii.</div><div class="ps-name">Ingest</div><div class="ps-desc">Store in PostgreSQL</div></div>
+  <div class="pipe-step" id="step-embed"><div class="ps-num">iv.</div><div class="ps-name">Embed</div><div class="ps-desc">Generate vector embeddings</div></div>
+</div>
+<div class="drop-zone" id="dropzone">
+  <input type="file" id="file-input" accept=".epub" multiple>
+  <div class="dz-icon">&#8593;</div>
+  <div class="dz-main">Drag and drop EPUB files</div>
+  <div class="dz-sub">or click to browse &middot; EPUB only &middot; 100 MB max</div>
+</div>
+<div class="file-list" id="file-list"></div>
+<button class="upload-btn" id="upload-btn" onclick="uploadFiles()" disabled>Upload</button>
+<div class="status-area" id="status-area"></div>
+<div class="notes">
+  <h3>Processing notes</h3>
+  <ul>
+    <li>Extraction, chunking, and ingestion happen immediately after upload.</li>
+    <li>Embedding is queued for background processing via the overnight daemon.</li>
+    <li>Books become searchable once embedding completes.</li>
+    <li>Supported format: EPUB only (no PDF, MOBI, etc.)</li>
+    <li>Maximum file size: 100 MB per EPUB.</li>
+  </ul>
+</div>
+<footer class="ft">A Short Stay in Hell &middot; <a href="/" style="color:var(--ter)">Home</a> &middot; <a href="/browse/" style="color:var(--ter)">Browse</a> &middot; <a href="/api-docs/" style="color:var(--ter)">API</a></footer>
+</div>
+<script>
+function toggleTheme(){const d=document.documentElement,n=d.getAttribute('data-theme')==='dark'?'light':'dark';d.setAttribute('data-theme',n);localStorage.setItem('theme',n);document.querySelector('.tm').textContent=n==='dark'?'\u263C':'\u263D'}
+(()=>{const s=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',s);document.querySelector('.tm').textContent=s==='dark'?'\u263C':'\u263D'})();
+
+let selectedFiles=[];
+const dropzone=document.getElementById('dropzone');
+const fileInput=document.getElementById('file-input');
+const fileList=document.getElementById('file-list');
+const uploadBtn=document.getElementById('upload-btn');
+
+dropzone.addEventListener('dragover',e=>{e.preventDefault();dropzone.classList.add('over')});
+dropzone.addEventListener('dragleave',()=>dropzone.classList.remove('over'));
+dropzone.addEventListener('drop',e=>{e.preventDefault();dropzone.classList.remove('over');addFiles(e.dataTransfer.files)});
+fileInput.addEventListener('change',e=>addFiles(e.target.files));
+
+function addFiles(files){
+  for(const f of files){
+    if(!f.name.toLowerCase().endsWith('.epub'))continue;
+    if(selectedFiles.some(x=>x.name===f.name))continue;
+    selectedFiles.push(f);
+  }
+  renderFiles();
+}
+
+function removeFile(idx){selectedFiles.splice(idx,1);renderFiles()}
+
+function renderFiles(){
+  uploadBtn.disabled=selectedFiles.length===0;
+  if(!selectedFiles.length){fileList.innerHTML='';return}
+  fileList.innerHTML=selectedFiles.map((f,i)=>{
+    const size=(f.size/(1024*1024)).toFixed(1)+' MB';
+    return'<div class="file-item"><span class="fi-name">'+esc(f.name)+'</span><span class="fi-size">'+size+'</span><button class="fi-remove" onclick="removeFile('+i+')" title="Remove">&times;</button></div>'
+  }).join('');
+}
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+function setPipelineState(step){
+  const steps=['extract','chunk','ingest','embed'];
+  const idx=steps.indexOf(step);
+  steps.forEach((s,i)=>{
+    const el=document.getElementById('step-'+s);
+    el.className='pipe-step';
+    if(i<idx)el.classList.add('done');
+    else if(i===idx)el.classList.add('active');
+  });
+}
+
+function resetPipeline(){
+  ['extract','chunk','ingest','embed'].forEach(s=>{
+    document.getElementById('step-'+s).className='pipe-step';
+  });
+}
+
+async function uploadFiles(){
+  if(!selectedFiles.length)return;
+  uploadBtn.disabled=true;uploadBtn.textContent='Uploading...';
+  const statusArea=document.getElementById('status-area');
+  for(const file of selectedFiles){
+    const fd=new FormData();
+    fd.append('files',file);
+    setPipelineState('extract');
+    const card=document.createElement('div');
+    card.className='status-card';
+    card.innerHTML='<div class="sc-title">'+esc(file.name)+'</div><div class="sc-status processing">Uploading...</div><div class="progress-bar"><div class="fill" style="width:10%"></div></div>';
+    statusArea.prepend(card);
+    try{
+      const res=await fetch('/api/upload',{method:'POST',body:fd});
+      const d=await res.json();
+      if(d.error){
+        card.querySelector('.sc-status').textContent='Error: '+d.error;
+        card.querySelector('.sc-status').className='sc-status error';
+        card.querySelector('.fill').style.width='100%';
+        card.querySelector('.fill').style.background='#c46a6a';
+        document.getElementById('step-extract').className='pipe-step error';
+        continue;
+      }
+      const jobId=d.job_id||d.data?.job_id;
+      if(jobId){
+        card.querySelector('.sc-status').textContent='Processing... (job: '+jobId+')';
+        card.querySelector('.fill').style.width='40%';
+        setPipelineState('chunk');
+        pollStatus(jobId,card);
+      }else{
+        card.querySelector('.sc-status').textContent='Uploaded successfully';
+        card.querySelector('.sc-status').className='sc-status done';
+        card.querySelector('.fill').style.width='100%';
+        setPipelineState('embed');
+        setTimeout(resetPipeline,2000);
+      }
+    }catch(e){
+      card.querySelector('.sc-status').textContent='Upload failed';
+      card.querySelector('.sc-status').className='sc-status error';
+      card.querySelector('.fill').style.width='100%';
+      card.querySelector('.fill').style.background='#c46a6a';
+    }
+  }
+  selectedFiles=[];renderFiles();
+  uploadBtn.textContent='Upload';uploadBtn.disabled=true;
+}
+
+async function pollStatus(jobId,card){
+  let attempts=0;
+  const poll=async()=>{
+    if(attempts++>60)return;
+    try{
+      const res=await fetch('/api/upload?job_id='+encodeURIComponent(jobId));
+      const d=await res.json();
+      const status=d.status||d.data?.status||'unknown';
+      const step=d.step||d.data?.step||'';
+      if(step)setPipelineState(step);
+      if(status==='completed'||status==='done'){
+        card.querySelector('.sc-status').textContent='Completed';
+        card.querySelector('.sc-status').className='sc-status done';
+        card.querySelector('.fill').style.width='100%';
+        ['extract','chunk','ingest','embed'].forEach(s=>document.getElementById('step-'+s).className='pipe-step done');
+        setTimeout(resetPipeline,3000);
+        return;
+      }
+      if(status==='error'||status==='failed'){
+        card.querySelector('.sc-status').textContent='Error: '+(d.message||d.error||'processing failed');
+        card.querySelector('.sc-status').className='sc-status error';
+        card.querySelector('.fill').style.background='#c46a6a';
+        return;
+      }
+      const progress=d.progress||d.data?.progress;
+      if(progress)card.querySelector('.fill').style.width=Math.min(progress,95)+'%';
+      card.querySelector('.sc-status').textContent='Processing: '+status+(step?' ('+step+')':'');
+      setTimeout(poll,3000);
+    }catch(e){setTimeout(poll,5000)}
+  };
+  poll();
+}
+</script>
+</body>
+</html>
