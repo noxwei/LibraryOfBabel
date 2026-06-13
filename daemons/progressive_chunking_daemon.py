@@ -48,6 +48,9 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'src'))
+from chunk_ordering import ContentLocator, chapter_spine_order_sql
+
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
@@ -524,7 +527,7 @@ class MultiGranularChunkingDaemon:
                         WHERE c.book_id = %s
                         AND c.content IS NOT NULL
                         AND c.word_count BETWEEN 200 AND 2000
-                        ORDER BY c.chunk_id ASC
+                        ORDER BY c.start_position ASC, c.chunk_id ASC
                     """, (book_id,))
                     
                     results = cur.fetchall()
@@ -597,13 +600,21 @@ class MultiGranularChunkingDaemon:
         return None
 
     def process_chapter_into_granularities(
-        self, 
+        self,
         chapter_id: int,
         chapter_content: str,
-        book_id: int
+        book_id: int,
+        chapter_base: int = 0,
+        chapter_number: Optional[int] = None
     ) -> Dict[str, int]:
-        """Process a chapter into multiple granularity levels"""
-        
+        """Process a chapter into multiple granularity levels.
+
+        chapter_base is the cumulative character offset of this chapter
+        within the book (in spine order), so every granular chunk gets a
+        book-global start_position and (book_id, start_position) is the
+        true reading order.
+        """
+
         results = {"sentence": 0, "paragraph": 0, "section": 0}
         
         try:
@@ -641,39 +652,35 @@ class MultiGranularChunkingDaemon:
                 chunk.parent_chunk_id = chapter_id
                 chunk.chunk_type = "section"
                 
-            # Insert into database
+            # Insert into database. Each granularity gets its own locator
+            # (moving cursor) so overlapping/repeated content stays monotonic.
             with self.get_db_connection() as conn:
                 with conn.cursor() as cur:
-                    # Insert sentence chunks
-                    for i, chunk in enumerate(sentence_chunks):
-                        chunk_id = f"{book_id}_sentence_{chapter_id}_{i}"
-                        cur.execute("""
-                            INSERT INTO chunks (chunk_id, book_id, content, chunk_type, parent_chunk_id, word_count, created_at)
-                            VALUES (%s, %s, %s, %s, %s, %s, NOW())
-                        """, (chunk_id, book_id, chunk.content, chunk.chunk_type, str(chunk.parent_chunk_id), 
-                              len(chunk.content.split())))
-                    results["sentence"] = len(sentence_chunks)
-                    
-                    # Insert paragraph chunks
-                    for i, chunk in enumerate(paragraph_chunks):
-                        chunk_id = f"{book_id}_paragraph_{chapter_id}_{i}"
-                        cur.execute("""
-                            INSERT INTO chunks (chunk_id, book_id, content, chunk_type, parent_chunk_id, word_count, created_at)
-                            VALUES (%s, %s, %s, %s, %s, %s, NOW())
-                        """, (chunk_id, book_id, chunk.content, chunk.chunk_type, str(chunk.parent_chunk_id),
-                              len(chunk.content.split())))
-                    results["paragraph"] = len(paragraph_chunks)
-                    
-                    # Insert section chunks
-                    for i, chunk in enumerate(section_chunks):
-                        chunk_id = f"{book_id}_section_{chapter_id}_{i}"
-                        cur.execute("""
-                            INSERT INTO chunks (chunk_id, book_id, content, chunk_type, parent_chunk_id, word_count, created_at)
-                            VALUES (%s, %s, %s, %s, %s, %s, NOW())
-                        """, (chunk_id, book_id, chunk.content, chunk.chunk_type, str(chunk.parent_chunk_id),
-                              len(chunk.content.split())))
-                    results["section"] = len(section_chunks)
-                    
+                    for granularity, chunk_list in (
+                        ("sentence", sentence_chunks),
+                        ("paragraph", paragraph_chunks),
+                        ("section", section_chunks),
+                    ):
+                        locator = ContentLocator(chapter_content)
+                        for i, chunk in enumerate(chunk_list):
+                            chunk_id = f"{book_id}_{granularity}_{chapter_id}_{i}"
+                            span = locator.locate(chunk.content)
+                            if span is not None:
+                                start_pos = chapter_base + span[0]
+                                end_pos = chapter_base + span[1]
+                            else:
+                                # Unlocatable content still lands inside the
+                                # right chapter for ordering purposes.
+                                start_pos = chapter_base
+                                end_pos = chapter_base + len(chunk.content)
+                            cur.execute("""
+                                INSERT INTO chunks (chunk_id, book_id, content, chunk_type, parent_chunk_id,
+                                                    word_count, chapter_number, start_position, end_position, created_at)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                            """, (chunk_id, book_id, chunk.content, chunk.chunk_type, str(chunk.parent_chunk_id),
+                                  len(chunk.content.split()), chapter_number, start_pos, end_pos))
+                        results[granularity] = len(chunk_list)
+
                     conn.commit()
                     
         except Exception as e:
@@ -683,26 +690,46 @@ class MultiGranularChunkingDaemon:
         return results
 
     def get_chapters_for_processing(self) -> List[Dict[str, Any]]:
-        """Get chapter chunks that need multi-granular processing"""
+        """Get chapter chunks that need multi-granular processing.
+
+        IMPORTANT: chapters MUST be ordered by the numeric trailing part of
+        their chunk_id (the spine ordinal assigned at ingest), NOT by the raw
+        varchar chunk_id. The old `ORDER BY c.chunk_id` sorted
+        '<book>_chapter_10' before '<book>_chapter_2' and scrambled the
+        reading order of every multi-granular chunk created on 2025-08-01/02.
+        chapter_base is the cumulative character offset of the chapter within
+        its book, so granular chunks get book-global start_position values.
+        """
+        spine_order = chapter_spine_order_sql('chunk_id')
         try:
             with self.get_db_connection() as conn:
                 with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                    cur.execute("""
-                        SELECT c.chunk_id, c.book_id, c.content, b.title
-                        FROM chunks c
+                    cur.execute(f"""
+                        WITH chapters AS (
+                            SELECT chunk_id, book_id, content, chapter_number,
+                                   COALESCE(SUM(LENGTH(content) + 2) OVER (
+                                       PARTITION BY book_id
+                                       ORDER BY {spine_order}
+                                       ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                                   ), 0) AS chapter_base
+                            FROM chunks
+                            WHERE chunk_type = 'chapter'
+                            AND content IS NOT NULL
+                        )
+                        SELECT c.chunk_id, c.book_id, c.content, c.chapter_number,
+                               c.chapter_base, b.title
+                        FROM chapters c
                         JOIN books b ON c.book_id = b.book_id
-                        WHERE c.chunk_type = 'chapter' 
-                        AND c.content IS NOT NULL
-                        AND LENGTH(c.content) > 500
+                        WHERE LENGTH(c.content) > 500
                         AND NOT EXISTS (
-                            SELECT 1 FROM chunks gc 
-                            WHERE gc.parent_chunk_id = c.chunk_id 
+                            SELECT 1 FROM chunks gc
+                            WHERE gc.parent_chunk_id = c.chunk_id
                             AND gc.chunk_type IN ('sentence', 'paragraph', 'section')
                         )
-                        ORDER BY c.book_id, c.chunk_id
+                        ORDER BY c.book_id, {chapter_spine_order_sql('c.chunk_id')}
                         LIMIT %s
                     """, (self.batch_size,))
-                    
+
                     return [dict(row) for row in cur.fetchall()]
         except Exception as e:
             logger.error(f"Error getting chapters: {e}")
@@ -749,7 +776,11 @@ class MultiGranularChunkingDaemon:
                     logger.info(f"🔄 Processing chapter {chapter_id} from '{title}'")
                     
                     start_time = time.time()
-                    results = self.process_chapter_into_granularities(chapter_id, content, book_id)
+                    results = self.process_chapter_into_granularities(
+                        chapter_id, content, book_id,
+                        chapter_base=chapter.get('chapter_base', 0) or 0,
+                        chapter_number=chapter.get('chapter_number')
+                    )
                     processing_time = time.time() - start_time
                     
                     # Update stats

@@ -81,14 +81,19 @@ class TextChunker:
             List of TextChunk objects
         """
         logger.info(f"Creating chunks for: {book_metadata.title}")
-        
+
         all_chunks = []
         book_id = self._generate_book_id(book_metadata)
-        
+
+        # Accumulate a book-global character offset (in spine order) so that
+        # start_position/end_position give a true reading order across the
+        # whole book, not just within a chapter.
+        book_offset = 0
         for chapter in chapters:
-            chapter_chunks = self._chunk_chapter(chapter, book_id)
+            chapter_chunks = self._chunk_chapter(chapter, book_id, book_offset)
             all_chunks.extend(chapter_chunks)
-        
+            book_offset += len(chapter.content) + 2  # +2 = chapter separator
+
         logger.info(f"Created {len(all_chunks)} chunks total")
         return all_chunks
     
@@ -106,26 +111,30 @@ class TextChunker:
         
         return f"{title_part}_{author_part}".lower()
     
-    def _chunk_chapter(self, chapter, book_id: str) -> List[TextChunk]:
-        """Create chunks from a single chapter."""
+    def _chunk_chapter(self, chapter, book_id: str, book_offset: int = 0) -> List[TextChunk]:
+        """Create chunks from a single chapter.
+
+        book_offset is the chapter's base character offset within the book,
+        added to every chunk position so positions are book-global.
+        """
         chunks = []
-        
+
         # Start with chapter-level chunk
-        chapter_chunk = self._create_chapter_chunk(chapter, book_id)
+        chapter_chunk = self._create_chapter_chunk(chapter, book_id, book_offset)
         chunks.append(chapter_chunk)
-        
+
         # Create section-level chunks if chapter is large enough
         if chapter.word_count > self.config['chapter_max_words']:
-            section_chunks = self._create_section_chunks(chapter, book_id, chapter_chunk.chunk_id)
+            section_chunks = self._create_section_chunks(chapter, book_id, chapter_chunk.chunk_id, book_offset)
             chunks.extend(section_chunks)
-        
+
         # Create paragraph-level chunks
-        paragraph_chunks = self._create_paragraph_chunks(chapter, book_id, chapter_chunk.chunk_id)
+        paragraph_chunks = self._create_paragraph_chunks(chapter, book_id, chapter_chunk.chunk_id, book_offset)
         chunks.extend(paragraph_chunks)
-        
+
         return chunks
-    
-    def _create_chapter_chunk(self, chapter, book_id: str) -> TextChunk:
+
+    def _create_chapter_chunk(self, chapter, book_id: str, book_offset: int = 0) -> TextChunk:
         """Create a chapter-level chunk."""
         chunk_id = f"{book_id}_ch{chapter.chapter_number or chapter.spine_order}"
 
@@ -157,15 +166,16 @@ class TextChunker:
             chapter_number=chapter.chapter_number,
             section_number=None,
             paragraph_number=None,
-            start_position=0,
-            end_position=len(content)
+            start_position=book_offset,
+            end_position=book_offset + len(content)
         )
     
-    def _create_section_chunks(self, chapter, book_id: str, parent_chunk_id: str) -> List[TextChunk]:
+    def _create_section_chunks(self, chapter, book_id: str, parent_chunk_id: str,
+                               book_offset: int = 0) -> List[TextChunk]:
         """Create section-level chunks from a chapter."""
         sections = self._split_into_sections(chapter.content)
         chunks = []
-        
+
         for i, (section_title, section_content, start_pos, end_pos) in enumerate(sections):
             word_count = len(section_content.split())
             
@@ -186,8 +196,8 @@ class TextChunker:
                 chapter_number=chapter.chapter_number,
                 section_number=i+1,
                 paragraph_number=None,
-                start_position=start_pos,
-                end_position=end_pos,
+                start_position=book_offset + start_pos,
+                end_position=book_offset + end_pos,
                 parent_chunk_id=parent_chunk_id
             )
             
@@ -195,7 +205,8 @@ class TextChunker:
         
         return chunks
     
-    def _create_paragraph_chunks(self, chapter, book_id: str, parent_chunk_id: str) -> List[TextChunk]:
+    def _create_paragraph_chunks(self, chapter, book_id: str, parent_chunk_id: str,
+                                 book_offset: int = 0) -> List[TextChunk]:
         """Create paragraph-level chunks from a chapter."""
         paragraphs = self._split_into_paragraphs(chapter.content)
         chunks = []
@@ -218,8 +229,8 @@ class TextChunker:
                 
                 # Create chunk from current content
                 chunk = self._create_paragraph_chunk(
-                    current_chunk_content, book_id, parent_chunk_id, 
-                    chapter.chapter_number, chunk_counter, chunk_start_pos
+                    current_chunk_content, book_id, parent_chunk_id,
+                    chapter.chapter_number, chunk_counter, book_offset + chunk_start_pos
                 )
                 chunks.append(chunk)
                 
@@ -242,7 +253,7 @@ class TextChunker:
         if current_chunk_content:
             chunk = self._create_paragraph_chunk(
                 current_chunk_content, book_id, parent_chunk_id,
-                chapter.chapter_number, chunk_counter, chunk_start_pos
+                chapter.chapter_number, chunk_counter, book_offset + chunk_start_pos
             )
             chunks.append(chunk)
         

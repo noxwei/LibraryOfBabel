@@ -560,6 +560,9 @@ class LibraryMCPServer:
             else:
                 chunk_filter = f"AND c.chunk_type = '{granularity}'"
             
+            # Reading order: start_position (backfilled spine order) first;
+            # raw varchar chunk_id sort alone scrambles chapter_10 before
+            # chapter_2 (see scripts/backfill_chunk_positions.py).
             content_sql = f"""
             SELECT c.chunk_id, c.content, c.chunk_type, c.char_length, c.quality_score
             FROM chunks c
@@ -567,7 +570,7 @@ class LibraryMCPServer:
             AND c.content IS NOT NULL
             AND c.content != ''
             {chunk_filter}
-            ORDER BY c.chunk_id
+            ORDER BY c.start_position, c.chunk_id
             LIMIT %s
             """
             
